@@ -53,8 +53,8 @@ namespace mnemea {
         return {};
     }
 
-    void Dataset::createHierarchy(UID uid, std::string type) {
+    Node* Dataset::createHierarchy(UID uid, std::string type) {
         _hierarchy.emplace(uid, type);
+        return &_hierarchy.value();
     }
-
 }

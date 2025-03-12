@@ -44,7 +44,7 @@ namespace mnemea {
 
         [[nodiscard]] std::optional<const Node*> getHierarchy() const;
 
-        void createHierarchy(UID uid, std::string type);
+        Node* createHierarchy(UID uid, std::string type);
 
         [[nodiscard]] auto getNeurons() {
             return _neurons | std::views::transform([](auto& pair) -> Neuron& {

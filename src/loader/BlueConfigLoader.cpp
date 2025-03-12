@@ -84,12 +84,25 @@ namespace mnemea {
                                          const brion::Circuit& circuit) {
         auto data = circuit.get(ids, brion::NEURON_COLUMN_GID | brion::NEURON_MINICOLUMN_GID);
 
+        auto root = dataset.createHierarchy(0, "mnemea:root");
+
         size_t index = 0;
         for (UID id: ids) {
             if (auto neuron = dataset.getNeuron(id); neuron.has_value()) {
                 auto sub = data[index];
-                neuron.value()->setPropertyAsAny(properties.neuronColumn, boost::lexical_cast<UID>(sub[0]));
-                neuron.value()->setPropertyAsAny(properties.neuronMiniColumn, boost::lexical_cast<UID>(sub[1]));
+
+                UID column = boost::lexical_cast<UID>(sub[0]);
+                UID miniColumn = boost::lexical_cast<UID>(sub[1]);
+
+                if (auto columnResult = root->getOrCreateNode(column, "mnemea:column"); columnResult.isOk()) {
+                    if (auto miniColumnResult = columnResult.getResult()->getOrCreateNode(miniColumn,
+                        "mnemea:mini_column"); miniColumnResult.isOk()) {
+                        miniColumnResult.getResult()->addNeuron(neuron.value());
+                    }
+                }
+
+                neuron.value()->setPropertyAsAny(properties.neuronColumn, column);
+                neuron.value()->setPropertyAsAny(properties.neuronMiniColumn, miniColumn);
             }
             ++index;
         }
