@@ -5,7 +5,7 @@
 #ifdef MNEMEA_BRION
 
 #include <mnemea/util/NeuronTransform.h>
-#include <mnemea/loader/BrionLoader.h>
+#include <mnemea/loader/BlueConfigLoader.h>
 #include <mnemea/DefaultProperties.h>
 
 #include <brain/circuit.h>
@@ -13,8 +13,8 @@
 
 
 namespace mnemea {
-    BrionLoaderProperties BrionLoader::initProperties(Properties& properties) {
-        BrionLoaderProperties result{};
+    BlueConfigLoaderProperties BlueConfigLoader::initProperties(Properties& properties) const {
+        BlueConfigLoaderProperties result{};
         if (_loadHierarchy) {
             result.neuritePosition = properties.defineProperty(PROPERTY_POSITION);
             result.neuriteRadius = properties.defineProperty(PROPERTY_RADIUS);
@@ -32,10 +32,10 @@ namespace mnemea {
         return result;
     }
 
-    void BrionLoader::loadNeurons(Dataset& dataset,
-                                  const BrionLoaderProperties& properties,
-                                  const brion::GIDSet& ids,
-                                  const brain::Circuit& circuit) {
+    void BlueConfigLoader::loadNeurons(Dataset& dataset,
+                                       const BlueConfigLoaderProperties& properties,
+                                       const brion::GIDSet& ids,
+                                       const brain::Circuit& circuit) {
         auto transforms = circuit.getTransforms(ids);
         auto layers = circuit.getLayers(ids);
         size_t index = 0;
@@ -48,10 +48,10 @@ namespace mnemea {
         }
     }
 
-    void BrionLoader::loadMorphologies(Dataset& dataset,
-                                       const BrionLoaderProperties& properties,
-                                       const brion::GIDSet& ids,
-                                       const brain::Circuit& circuit) {
+    void BlueConfigLoader::loadMorphologies(Dataset& dataset,
+                                            const BlueConfigLoaderProperties& properties,
+                                            const brion::GIDSet& ids,
+                                            const brain::Circuit& circuit) {
         auto uris = circuit.getMorphologyURIs(ids);
         auto transforms = circuit.getTransforms(ids);
         auto layers = circuit.getLayers(ids);
@@ -78,10 +78,10 @@ namespace mnemea {
         }
     }
 
-    void BrionLoader::loadHierarchy(Dataset& dataset,
-                                    const BrionLoaderProperties& properties,
-                                    const brion::GIDSet& ids,
-                                    const brion::Circuit& circuit) {
+    void BlueConfigLoader::loadHierarchy(Dataset& dataset,
+                                         const BlueConfigLoaderProperties& properties,
+                                         const brion::GIDSet& ids,
+                                         const brion::Circuit& circuit) {
         auto data = circuit.get(ids, brion::NEURON_COLUMN_GID | brion::NEURON_MINICOLUMN_GID);
 
         size_t index = 0;
@@ -95,8 +95,8 @@ namespace mnemea {
         }
     }
 
-    std::shared_ptr<Morphology> BrionLoader::loadMorphology(const BrionLoaderProperties& properties,
-                                                            const brion::Morphology& morphology) {
+    std::shared_ptr<Morphology> BlueConfigLoader::loadMorphology(const BlueConfigLoaderProperties& properties,
+                                                                 const brion::Morphology& morphology) {
         auto result = std::make_shared<Morphology>();
 
         auto& points = morphology.getPoints();
@@ -108,7 +108,7 @@ namespace mnemea {
             neurite.setPropertyAsAny(properties.neuritePosition, rush::Vec3f(points[i]));
             neurite.setPropertyAsAny(properties.neuriteRadius, points[i].w / 2.0f); // Brion returns the diameter!
             neurite.setPropertyAsAny(properties.neuriteType, type);
-            result->addNeurite(neurite);
+            result->addNeurite(std::move(neurite));
         }
 
         auto& sections = morphology.getSections();
@@ -123,39 +123,40 @@ namespace mnemea {
         return result;
     }
 
-    BrionLoader::BrionLoader(std::filesystem::path path): _blueConfig(std::move(path)),
-                                                          _loadMorphology(true),
-                                                          _loadHierarchy(true) {}
+    BlueConfigLoader::BlueConfigLoader(std::filesystem::path path):
+        _blueConfig(std::move(path)),
+        _loadMorphology(true),
+        _loadHierarchy(true) {}
 
-    bool BrionLoader::addTarget(std::string target) {
+    bool BlueConfigLoader::addTarget(std::string target) {
         return _targets.insert(std::move(target)).second;
     }
 
-    std::set<std::string>& BrionLoader::getTargets() {
+    std::set<std::string>& BlueConfigLoader::getTargets() {
         return _targets;
     }
 
-    const std::set<std::string>& BrionLoader::getTargets() const {
+    const std::set<std::string>& BlueConfigLoader::getTargets() const {
         return _targets;
     }
 
-    bool BrionLoader::shouldLoadMorphology() const {
+    bool BlueConfigLoader::shouldLoadMorphology() const {
         return _loadMorphology;
     }
 
-    void BrionLoader::setLoadMorphology(bool loadMorphology) {
+    void BlueConfigLoader::setLoadMorphology(bool loadMorphology) {
         _loadMorphology = loadMorphology;
     }
 
-    bool BrionLoader::shouldLoadHierarchy() const {
+    bool BlueConfigLoader::shouldLoadHierarchy() const {
         return _loadHierarchy;
     }
 
-    void BrionLoader::setLoadHierarchy(bool loadHierarchy) {
+    void BlueConfigLoader::setLoadHierarchy(bool loadHierarchy) {
         _loadHierarchy = loadHierarchy;
     }
 
-    void BrionLoader::load(Dataset& dataset) const {
+    void BlueConfigLoader::load(Dataset& dataset) const {
         if (_targets.empty()) return;
 
 
@@ -165,7 +166,7 @@ namespace mnemea {
             ids.insert(targetSet.begin(), targetSet.end());
         }
         if (ids.empty()) return;
-        BrionLoaderProperties properties = initProperties(dataset.getProperties());
+        BlueConfigLoaderProperties properties = initProperties(dataset.getProperties());
 
         /**/ {
             auto circuit = brain::Circuit(_blueConfig);

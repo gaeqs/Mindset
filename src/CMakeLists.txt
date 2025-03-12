@@ -17,7 +17,9 @@ target_sources(Mnemea PRIVATE
         Morphology.cpp
 
         util/NeuronTransform.cpp
-        loader/BrionLoader.cpp
+
+        loader/BlueConfigLoader.cpp
+        loader/MorphoIOLoader.cpp
 )
 
 target_include_directories(Mnemea

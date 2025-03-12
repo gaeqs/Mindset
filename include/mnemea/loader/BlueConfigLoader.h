@@ -2,8 +2,8 @@
 // Created by gaeqs on 12/03/2025.
 //
 
-#ifndef BRIONLOADER_H
-#define BRIONLOADER_H
+#ifndef BLUECONFIGLOADER_H
+#define BLUECONFIGLOADER_H
 
 #include <filesystem>
 #include <brain/python/types.h>
@@ -11,7 +11,7 @@
 #include <mnemea/Dataset.h>
 
 namespace mnemea {
-    struct BrionLoaderProperties {
+    struct BlueConfigLoaderProperties {
         UID neuritePosition;
         UID neuriteRadius;
         UID neuriteParent;
@@ -23,34 +23,34 @@ namespace mnemea {
         UID neuronLayer;
     };
 
-    class BrionLoader {
+    class BlueConfigLoader {
         brion::BlueConfig _blueConfig;
         std::set<std::string> _targets;
         bool _loadMorphology;
         bool _loadHierarchy;
 
-        BrionLoaderProperties initProperties(Properties& properties);
+        BlueConfigLoaderProperties initProperties(Properties& properties) const;
 
         static void loadNeurons(Dataset& dataset,
-                                const BrionLoaderProperties& properties,
+                                const BlueConfigLoaderProperties& properties,
                                 const brion::GIDSet& ids,
                                 const brain::Circuit& circuit);
 
         static void loadMorphologies(Dataset& dataset,
-                                     const BrionLoaderProperties& properties,
+                                     const BlueConfigLoaderProperties& properties,
                                      const brion::GIDSet& ids,
                                      const brain::Circuit& circuit);
 
         static void loadHierarchy(Dataset& dataset,
-                                  const BrionLoaderProperties& properties,
+                                  const BlueConfigLoaderProperties& properties,
                                   const brion::GIDSet& ids,
                                   const brion::Circuit& circuit);
 
-        static std::shared_ptr<Morphology> loadMorphology(const BrionLoaderProperties& properties,
+        static std::shared_ptr<Morphology> loadMorphology(const BlueConfigLoaderProperties& properties,
                                                           const brion::Morphology& morphology);
 
     public:
-        BrionLoader(std::filesystem::path path);
+        BlueConfigLoader(std::filesystem::path path);
 
         bool addTarget(std::string target);
 
@@ -70,4 +70,4 @@ namespace mnemea {
     };
 }
 
-#endif //BRIONLOADER_H
+#endif //BLUECONFIGLOADER_H
