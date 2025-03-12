@@ -5,6 +5,8 @@
 #include <mnemea/Circuit.h>
 
 namespace mnemea {
+    Circuit::Circuit() = default;
+
     void Circuit::addSynapse(Synapse synapse) {
         UID pre = synapse.getPreSynapticNeuron();
         UID post = synapse.getPostSynapticNeuron();

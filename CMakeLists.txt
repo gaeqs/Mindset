@@ -6,13 +6,25 @@ include(FetchContent)
 # Configuration options
 option(MNEMEA_BUILD_SHARED "Build Mnemea as a shared library" OFF)
 option(MNEMEA_USE_BRION "Import Brion" ON)
+option(MNEMEA_TESTS "Include Mnemea tests" ON)
 
 # Global parameters
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Import Rush
+FetchContent_Declare(
+        rush
+        GIT_REPOSITORY https://github.com/gaeqs/Rush.git
+        GIT_TAG master
+        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/rush
+)
+
+FetchContent_MakeAvailable(rush)
+list(APPEND LIBRARIES rush)
+
 # Import Brion
-if(MNEMEA_USE_BRION)
+if (MNEMEA_USE_BRION)
     FetchContent_Declare(
             brion
             GIT_REPOSITORY https://github.com/BlueBrain/Brion.git
@@ -21,11 +33,16 @@ if(MNEMEA_USE_BRION)
     )
 
     FetchContent_MakeAvailable(brion)
-    list(APPEND LIBRARIES Brion)
+    list(APPEND LIBRARIES Brion Brain)
+    target_compile_definitions(rush INTERFACE MNEMEA_BRION)
 endif ()
 
 # Create the library
 add_subdirectory(src)
+
+if (MNEMEA_TESTS)
+    add_subdirectory(test)
+endif ()
 
 # Installation and export
 include(CMakePackageConfigHelpers)

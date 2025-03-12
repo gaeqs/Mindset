@@ -14,6 +14,10 @@ target_sources(Mnemea PRIVATE
         Neurite.cpp
         Synapse.cpp
         Circuit.cpp
+        Morphology.cpp
+
+        util/NeuronTransform.cpp
+        loader/BrionLoader.cpp
 )
 
 target_include_directories(Mnemea

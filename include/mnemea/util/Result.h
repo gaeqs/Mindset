@@ -2,8 +2,8 @@
 // Created by grial on 19/10/22.
 //
 
-#ifndef RVTRACKING_RESULT_H
-#define RVTRACKING_RESULT_H
+#ifndef MNEMEA_RESULT_H
+#define MNEMEA_RESULT_H
 
 #include <cstdint>
 #include <functional>
@@ -108,4 +108,4 @@ namespace mnemea {
     };
 }
 
-#endif //RVTRACKING_RESULT_H
+#endif //MNEMEA_RESULT_H
