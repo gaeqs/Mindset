@@ -3,10 +3,9 @@
 //
 
 #include <fstream>
-#include <mnemea/DefaultProperties.h>
-#include <mnemea/loader/SWCLoader.h>
-#include <mnemea/loader/XMLLoader.h>
 
+#include <mnemea/loader/XMLLoader.h>
+#include <mnemea/loader/SWCLoader.h>
 
 namespace {
     std::optional<mnemea::UID> asUID(pugi::xml_attribute attr) {

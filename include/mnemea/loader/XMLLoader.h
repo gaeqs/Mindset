@@ -16,6 +16,7 @@
 #include <mnemea/UID.h>
 #include <mnemea/util/NeuronTransform.h>
 #include <mnemea/loader/LoaderStatus.h>
+#include <mnemea/DefaultProperties.h>
 
 namespace mnemea {
     class XMLLoader : public hey::Observable<LoaderStatus> {
