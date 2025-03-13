@@ -16,7 +16,7 @@ namespace mnemea {
     const std::string PROPERTY_MINI_COLUMN = "mnemea:mini_column";
     const std::string PROPERTY_LAYER = "mnemea:layer";
 
-    enum class NeuriteType : uint8_t {
+    enum NeuriteType : uint8_t {
         UNDEFINED = 0,
         SOMA = 1,
         AXON = 2,

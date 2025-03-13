@@ -9,12 +9,17 @@
 #include <mnemea/Dataset.h>
 
 namespace mnemea {
+
+    /**
+    * This Loader is a wrapper for the MorphoIO file loader.
+    * This loader loads .h5, .swc and .asc files.
+    */
     class MorphoIOLoader {
         std::filesystem::path _path;
         UID _uid;
 
     public:
-        MorphoIOLoader(std::filesystem::path path);
+        explicit MorphoIOLoader(std::filesystem::path path);
 
         [[nodiscard]] UID getUID() const;
 

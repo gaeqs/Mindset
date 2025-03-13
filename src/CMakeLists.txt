@@ -20,6 +20,7 @@ target_sources(Mnemea PRIVATE
 
         loader/BlueConfigLoader.cpp
         loader/MorphoIOLoader.cpp
+        loader/SWCLoader.cpp
 )
 
 target_include_directories(Mnemea

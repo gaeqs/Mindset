@@ -23,6 +23,9 @@ namespace mnemea {
         UID neuronLayer;
     };
 
+    /**
+    * This Loader loads BlueConfig files.
+    */
     class BlueConfigLoader {
         brion::BlueConfig _blueConfig;
         std::set<std::string> _targets;

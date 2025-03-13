@@ -5,13 +5,13 @@
 #include <catch2/catch_all.hpp>
 #include <mnemea/DefaultProperties.h>
 
-#include <mnemea/loader/BrionLoader.h>
+#include <mnemea/loader/BlueConfigLoader.h>
 #include <mnemea/util/NeuronTransform.h>
 #include <rush/vector/vec.h>
 
 TEST_CASE("Brion load") {
     std::filesystem::path path = "/run/media/gaeqs/HDD/SynCoPaData/build/vizCa2p0_1x7/BlueConfig";
-    mnemea::BrionLoader loader(path);
+    mnemea::BlueConfigLoader loader(path);
     loader.setLoadMorphology(false);
     loader.setLoadHierarchy(true);
 
