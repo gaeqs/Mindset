@@ -10,13 +10,15 @@
 #include <optional>
 
 #include <pugixml.hpp>
-#include <mnemea/Dataset.h>
+#include <hey/Observable.h>
 
+#include <mnemea/Dataset.h>
 #include <mnemea/UID.h>
 #include <mnemea/util/NeuronTransform.h>
+#include <mnemea/loader/LoaderStatus.h>
 
 namespace mnemea {
-    class XMLLoader {
+    class XMLLoader : public hey::Observable<LoaderStatus> {
         struct XMLNeuron {
             UID id;
             std::optional<UID> column;
@@ -24,6 +26,7 @@ namespace mnemea {
             std::optional<UID> layer;
             std::optional<std::string> neuronType;
             std::optional<NeuronTransform> transform;
+            Node* node;
         };
 
     public:

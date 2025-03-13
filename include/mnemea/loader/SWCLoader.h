@@ -7,18 +7,20 @@
 #include <filesystem>
 #include <string>
 #include <vector>
+#include <hey/Observable.h>
 
 #include <rush/rush.h>
 
 #include <mnemea/Dataset.h>
 #include <mnemea/UID.h>
 #include <mnemea/util/Result.h>
+#include <mnemea/loader/LoaderStatus.h>
 
 namespace mnemea {
     /**
     * This is an auxiliary SWC Loader that doesn't require Brion to work.
     */
-    class SWCLoader {
+    class SWCLoader : public hey::Observable<LoaderStatus> {
         struct SWCSegment {
             UID id;
             uint32_t type;

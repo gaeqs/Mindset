@@ -11,8 +11,9 @@ namespace mnemea {
         _neurons.reserve(amount);
     }
 
-    bool Dataset::addNeuron(Neuron neuron) {
-        return _neurons.insert({neuron.getUID(), std::move(neuron)}).second;
+    std::pair<Neuron*, bool> Dataset::addNeuron(Neuron neuron) {
+        auto [it, result] = _neurons.insert({neuron.getUID(), std::move(neuron)});
+        return {&it->second, result};
     }
 
     std::optional<Neuron*> Dataset::getNeuron(UID uid) {

@@ -82,34 +82,63 @@ namespace mnemea {
     }
 
     void XMLLoader::load(Dataset& dataset) const {
+        constexpr size_t STAGES = 3;
+        invoke({LoaderStatusType::LOADING, "Validating XML file", STAGES, 0});
+
         if (!_valid) {
             std::cerr << "Parser is not valid" << std::endl;
+            invoke({LoaderStatusType::ERROR, "Parser is not valid", STAGES, 0});
             return;
         }
         if (!_fileProvider) {
-            std::cerr << "Filesystem not set" << std::endl;
+            std::cerr << "Filesystem is not set" << std::endl;
+            invoke({LoaderStatusType::ERROR, "Filesystem is not set", STAGES, 0});
             return;
         }
         auto scene = _doc.child("scene").child("morphology");
         if (!scene) {
             std::cerr << "Scene not found" << std::endl;
+            invoke({LoaderStatusType::ERROR, "Scene not found", STAGES, 0});
             return;
         };
 
         UID transformProp = dataset.getProperties().defineProperty(PROPERTY_TRANSFORM);
-
         std::unordered_map<UID, XMLNeuron> xmlNeurons;
+
+        invoke({LoaderStatusType::LOADING, "Loading hierarchy", STAGES, 1});
+
+        Node* root = dataset.getHierarchy().value_or(nullptr);
+        if (root == nullptr) {
+            root = dataset.createHierarchy(0, "mnemea:root");
+        }
 
         for (auto column: scene.child("columns").children("column")) {
             auto columnId = asUID(column.attribute("id"));
 
+            Node* columnNode = nullptr;
+            if (columnId.has_value()) {
+                if (auto result = root->getOrCreateNode(columnId.value(), "mnemea:column"); result.isOk()) {
+                    columnNode = result.getResult();
+                }
+            }
+
             for (auto miniColumn: column.children("minicolumn")) {
                 auto miniColumnId = asUID(miniColumn.attribute("id"));
+
+                Node* miniColumnNode = nullptr;
+                if (columnNode != nullptr && columnId.has_value()) {
+                    auto result = columnNode->getOrCreateNode(columnId.value(), "mnemea:mini_column");
+                    if (result.isOk()) {
+                        miniColumnNode = result.getResult();
+                    }
+                }
+
 
                 for (auto neuron: miniColumn.children("neuron")) {
                     auto gid = asUID(neuron.attribute("gid"));
                     if (!gid.has_value()) {
                         std::cerr << "Neuron GID not found!" << std::endl;
+                        invoke({LoaderStatusType::ERROR, "Neuron GID not found", STAGES, 1});
                         return;
                     };
 
@@ -119,7 +148,8 @@ namespace mnemea {
                         .miniColumn = miniColumnId,
                         .layer = asUID(neuron.append_attribute("layer")),
                         .neuronType = asString(neuron.attribute("type")),
-                        .transform = {}
+                        .transform = {},
+                        .node = miniColumnNode
                     };
 
                     if (auto transform = neuron.child("transform").first_child()) {
@@ -127,11 +157,13 @@ namespace mnemea {
                         auto result = split(string, ',');
                         if (!result.isOk()) {
                             std::cerr << result.getError() << std::endl;
+                            invoke({LoaderStatusType::ERROR, result.getError(), STAGES, 1});
                             return;
                         };
                         auto floats = std::move(result.getResult());
                         if (floats.size() != 16) {
                             std::cerr << "Invalid matrix size." << std::endl;
+                            invoke({LoaderStatusType::ERROR, "Invalid matrix size", STAGES, 1});
                             return;
                         };
 
@@ -146,6 +178,8 @@ namespace mnemea {
                 }
             }
         }
+
+        invoke({LoaderStatusType::LOADING, "Load morphology", STAGES, 2});
 
         for (auto morpho: scene.child("neuronmorphologies").children("neuronmorphology")) {
             auto att = morpho.attribute("neurons");
@@ -172,7 +206,9 @@ namespace mnemea {
             auto loader = SWCLoader(lines.value());
             auto swcResult = loader.loadMorphology(dataset);
             if (!swcResult.isOk()) {
-                std::cerr << "Error loading SWC file '" + fileName + "': " + swcResult.getError() << std::endl;
+                auto error = "Error loading SWC file '" + fileName + "': " + swcResult.getError();
+                std::cerr << error << std::endl;
+                invoke({LoaderStatusType::ERROR, error, STAGES, 2});
                 return;
             };
 
@@ -188,8 +224,13 @@ namespace mnemea {
                     neuron.setPropertyAsAny(transformProp, xml.transform.value());
                 }
 
-                dataset.addNeuron(std::move(neuron));
+                auto [neuronInDataset, result] = dataset.addNeuron(std::move(neuron));
+                if (result && xml.node != nullptr) {
+                    xml.node->addNeuron(neuronInDataset);
+                }
             }
         }
+
+        invoke({LoaderStatusType::DONE, "Done", STAGES, 3});
     }
 }

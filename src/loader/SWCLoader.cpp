@@ -56,7 +56,11 @@ namespace mnemea {
     }
 
     Result<std::shared_ptr<Morphology>, std::string> SWCLoader::loadMorphology(Dataset& dataset) const {
+        constexpr size_t STAGES = 3;
+
         std::unordered_map<UID, SWCSegment> prototypes;
+
+        invoke({LoaderStatusType::LOADING, "Defining properties", STAGES, 0});
 
         // Define properties
         auto& properties = dataset.getProperties();
@@ -65,14 +69,17 @@ namespace mnemea {
         auto propParent = properties.defineProperty(PROPERTY_PARENT);
         auto propType = properties.defineProperty(PROPERTY_NEURITE_TYPE);
 
-        prototypes.reserve(_lines.size());
+        invoke({LoaderStatusType::LOADING, "Parsing SWC file", STAGES, 1});
 
+        prototypes.reserve(_lines.size());
         for (size_t i = 0; i < _lines.size(); ++i) {
             auto line = _lines[i];
             if (line.starts_with("#") || line.empty()) continue;
             auto result = toSegment(i);
             if (!result.isOk()) {
-                return {"Error while converting segment " + std::to_string(i) + ". " + result.getError()};
+                std::string error = "Error while converting segment " + std::to_string(i) + ". " + result.getError();
+                invoke({LoaderStatusType::ERROR, error, STAGES, 1});
+                return error;
             }
             prototypes.emplace(result.getResult().id, result.getResult());
         }
@@ -80,6 +87,7 @@ namespace mnemea {
         auto morphology = std::make_shared<Morphology>();
         morphology->reserveSpaceForNeurites(_lines.size());
 
+        invoke({LoaderStatusType::LOADING, "Parsing neurites", STAGES, 2});
 
         for (auto& [id, prototype]: prototypes) {
             Neurite neurite(id);
@@ -90,6 +98,8 @@ namespace mnemea {
             neurite.setPropertyAsAny(propRadius, prototype.parent);
             morphology->addNeurite(std::move(neurite));
         }
+
+        invoke({LoaderStatusType::DONE, "Done", STAGES, 3});
 
         return morphology;
     }

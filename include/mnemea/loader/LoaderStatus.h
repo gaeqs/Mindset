@@ -6,8 +6,7 @@
 #define LOADERSTATUS_H
 
 namespace mnemea {
-
-    enum class LoaderStatusResult {
+    enum class LoaderStatusType {
         READY,
         LOADING,
         DONE,
@@ -15,11 +14,11 @@ namespace mnemea {
     };
 
     struct LoaderStatus {
-        LoaderStatusResult status;
+        LoaderStatusType status;
+        std::string currentTask;
         size_t stages;
         size_t stagesCompleted;
     };
-
 }
 
 #endif //LOADERSTATUS_H

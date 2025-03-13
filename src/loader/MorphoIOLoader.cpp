@@ -25,7 +25,14 @@ namespace mnemea {
 
 
     void MorphoIOLoader::load(Dataset& dataset) const {
+        constexpr size_t STAGES = 5;
+        invoke({LoaderStatusType::LOADING, "Loading morphology", STAGES, 0});
         brain::neuron::Morphology morphology(brion::URI(absolute(_path).string()));
+        auto& points = morphology.getPoints();
+        auto& sections = morphology.getSections();
+        auto& types = morphology.getSectionTypes();
+
+        invoke({LoaderStatusType::LOADING, "Defining properties", STAGES, 1});
 
         auto& properties = dataset.getProperties();
         auto propPosition = properties.defineProperty(PROPERTY_POSITION);
@@ -33,9 +40,9 @@ namespace mnemea {
         auto propParent = properties.defineProperty(PROPERTY_PARENT);
         auto propType = properties.defineProperty(PROPERTY_NEURITE_TYPE);
 
+        invoke({LoaderStatusType::LOADING, "Parsing neurites", STAGES, 2});
+
         auto result = std::make_shared<Morphology>();
-        auto& points = morphology.getPoints();
-        auto& types = morphology.getSectionTypes();
         for (size_t i = 0; i < points.size(); ++i) {
             Neurite neurite(i);
             auto type = static_cast<NeuriteType>(types[i]);
@@ -46,7 +53,8 @@ namespace mnemea {
             result->addNeurite(std::move(neurite));
         }
 
-        auto& sections = morphology.getSections();
+        invoke({LoaderStatusType::LOADING, "Parsing hierarchy", STAGES, 3});
+
         for (auto& section: sections) {
             UID from = section.x;
             UID to = section.y;
@@ -55,7 +63,9 @@ namespace mnemea {
             }
         }
 
+        invoke({LoaderStatusType::LOADING, "Creating neuron", STAGES, 4});
         dataset.addNeuron(Neuron(_uid, std::move(result)));
+        invoke({LoaderStatusType::DONE, "Done", STAGES, 5});
     }
 }
 

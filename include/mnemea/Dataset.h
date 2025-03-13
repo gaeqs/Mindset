@@ -26,7 +26,7 @@ namespace mnemea {
 
         void reserveSpaceForNeurons(size_t amount);
 
-        bool addNeuron(Neuron neuron);
+        std::pair<Neuron*, bool> addNeuron(Neuron neuron);
 
         [[nodiscard]] std::optional<Neuron*> getNeuron(UID uid);
 

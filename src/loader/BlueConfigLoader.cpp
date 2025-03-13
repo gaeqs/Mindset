@@ -84,7 +84,10 @@ namespace mnemea {
                                          const brion::Circuit& circuit) {
         auto data = circuit.get(ids, brion::NEURON_COLUMN_GID | brion::NEURON_MINICOLUMN_GID);
 
-        auto root = dataset.createHierarchy(0, "mnemea:root");
+        Node* root = dataset.getHierarchy().value_or(nullptr);
+        if (root == nullptr) {
+            root = dataset.createHierarchy(0, "mnemea:root");
+        }
 
         size_t index = 0;
         for (UID id: ids) {
@@ -170,30 +173,46 @@ namespace mnemea {
     }
 
     void BlueConfigLoader::load(Dataset& dataset) const {
-        if (_targets.empty()) return;
+        constexpr size_t STAGES = 5;
+        if (_targets.empty()) {
+            invoke({LoaderStatusType::ERROR, "No targets found", STAGES, 0});
+        }
 
+        invoke({LoaderStatusType::LOADING, "Loading targets", STAGES, 0});
 
         brion::GIDSet ids;
         for (auto& target: _targets) {
             brion::GIDSet targetSet = _blueConfig.parseTarget(target);
             ids.insert(targetSet.begin(), targetSet.end());
         }
-        if (ids.empty()) return;
+        if (ids.empty()) {
+            invoke({LoaderStatusType::ERROR, "No neurons found", STAGES, 0});
+            return;
+        }
+
+        invoke({LoaderStatusType::LOADING, "Defining properties", STAGES, 1});
+
         BlueConfigLoaderProperties properties = initProperties(dataset.getProperties());
+
+        invoke({LoaderStatusType::LOADING, "Loading global neuron data", STAGES, 2});
 
         /**/ {
             auto circuit = brain::Circuit(_blueConfig);
             loadNeurons(dataset, properties, ids, circuit);
 
             if (_loadMorphology) {
+                invoke({LoaderStatusType::LOADING, "Loading morphologies", STAGES, 3});
                 loadMorphologies(dataset, properties, ids, circuit);
             }
         }
 
         if (_loadHierarchy) {
+            invoke({LoaderStatusType::LOADING, "Loading hierarchy", STAGES, 4});
             auto circuit = brion::Circuit(_blueConfig.getCircuitSource());
             loadHierarchy(dataset, properties, ids, circuit);
         }
+
+        invoke({LoaderStatusType::DONE, "Done", STAGES, 5});
     }
 }
 
