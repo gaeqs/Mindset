@@ -55,7 +55,7 @@ namespace mnemea {
         _uid = uid;
     }
 
-    void SWCLoader::load(Dataset& dataset) const {
+    Result<std::shared_ptr<Morphology>, std::string> SWCLoader::loadMorphology(Dataset& dataset) const {
         std::unordered_map<UID, SWCSegment> prototypes;
 
         // Define properties
@@ -72,8 +72,7 @@ namespace mnemea {
             if (line.starts_with("#") || line.empty()) continue;
             auto result = toSegment(i);
             if (!result.isOk()) {
-                std::cerr << "Error while converting segment " << i << ". " << result.getError() << std::endl;
-                return;
+                return {"Error while converting segment " + std::to_string(i) + ". " + result.getError()};
             }
             prototypes.emplace(result.getResult().id, result.getResult());
         }
@@ -92,6 +91,15 @@ namespace mnemea {
             morphology->addNeurite(std::move(neurite));
         }
 
-        dataset.addNeuron(Neuron(_uid, std::move(morphology)));
+        return morphology;
+    }
+
+    void SWCLoader::load(Dataset& dataset) const {
+        auto result = loadMorphology(dataset);
+        if (!result.isOk()) {
+            std::cerr << result.getError() << std::endl;
+            return;
+        }
+        dataset.addNeuron(Neuron(_uid, result.getResult()));
     }
 }

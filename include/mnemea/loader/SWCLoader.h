@@ -45,6 +45,8 @@ namespace mnemea {
 
         void setUID(UID uid);
 
+        Result<std::shared_ptr<Morphology>, std::string> loadMorphology(Dataset& dataset) const;
+
         void load(Dataset& dataset) const;
     };
 }
