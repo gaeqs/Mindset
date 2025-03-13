@@ -8,6 +8,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(mnemea-tests brion.cpp)
 
-target_link_libraries(mnemea-tests PUBLIC ${LIBRARIES} Mnemea Catch2::Catch2WithMain)
+target_link_libraries(mnemea-tests PUBLIC ${LIBRARIES} mnemea Catch2::Catch2WithMain)
 
 catch_discover_tests(mnemea-tests)

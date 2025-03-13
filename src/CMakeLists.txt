@@ -1,10 +1,10 @@
 if (MNEMEA_BUILD_SHARED)
-    add_library(Mnemea STATIC)
+    add_library(mnemea STATIC)
 else ()
-    add_library(Mnemea SHARED)
+    add_library(mnemea SHARED)
 endif ()
 
-target_sources(Mnemea PRIVATE
+target_sources(mnemea PRIVATE
         Identifiable.cpp
         Neuron.cpp
         Dataset.cpp
@@ -23,20 +23,20 @@ target_sources(Mnemea PRIVATE
         loader/SWCLoader.cpp
 )
 
-target_include_directories(Mnemea
+target_include_directories(mnemea
         PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(Mnemea PUBLIC ${LIBRARIES})
+target_link_libraries(mnemea PUBLIC ${LIBRARIES})
 
-set_target_properties(Mnemea PROPERTIES
+set_target_properties(mnemea PROPERTIES
         VERSION ${PROJECT_VERSION}
         SUBVERSION ${PROJECT_VERSION_MAJOR}
 )
 
-install(TARGETS Mnemea
+install(TARGETS mnemea
         EXPORT MnemeaTargets
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
