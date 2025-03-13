@@ -23,6 +23,17 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(rush)
 list(APPEND LIBRARIES rush)
 
+# Import Hey
+FetchContent_Declare(
+        hey
+        GIT_REPOSITORY https://github.com/gaeqs/Hey.git
+        GIT_TAG master
+        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/hey
+)
+
+FetchContent_MakeAvailable(hey)
+list(APPEND LIBRARIES hey)
+
 # Import Brion
 if (MNEMEA_USE_BRION)
     FetchContent_Declare(
@@ -36,6 +47,10 @@ if (MNEMEA_USE_BRION)
     list(APPEND LIBRARIES Brion Brain)
     target_compile_definitions(rush INTERFACE MNEMEA_BRION)
 endif ()
+
+# Import pugiXML
+find_package(pugixml REQUIRED)
+list(APPEND LIBRARIES pugixml)
 
 # Create the library
 add_subdirectory(src)

@@ -8,7 +8,10 @@
 #include <filesystem>
 #include <brain/python/types.h>
 #include <brion/brion.h>
+#include <hey/Observable.h>
+
 #include <mnemea/Dataset.h>
+#include <mnemea/loader/LoaderStatus.h>
 
 namespace mnemea {
     struct BlueConfigLoaderProperties {
@@ -26,7 +29,7 @@ namespace mnemea {
     /**
     * This Loader loads BlueConfig files.
     */
-    class BlueConfigLoader {
+    class BlueConfigLoader : public hey::Observable<LoaderStatus> {
         brion::BlueConfig _blueConfig;
         std::set<std::string> _targets;
         bool _loadMorphology;
