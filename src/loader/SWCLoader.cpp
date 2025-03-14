@@ -28,18 +28,18 @@ namespace mnemea {
         return segment;
     }
 
-    SWCLoader::SWCLoader(const std::vector<std::string>& lines) : _uid(0), _lines(lines) {}
+    SWCLoader::SWCLoader(const std::vector<std::string>& lines): _lines(lines) {}
 
-    SWCLoader::SWCLoader(std::vector<std::string>&& lines) : _uid(0), _lines(std::move(lines)) {}
+    SWCLoader::SWCLoader(std::vector<std::string>&& lines) : _lines(std::move(lines)) {}
 
-    SWCLoader::SWCLoader(std::istream& stream) : _uid(0) {
+    SWCLoader::SWCLoader(std::istream& stream) {
         std::string line;
         while (std::getline(stream, line)) {
             _lines.push_back(std::move(line));
         }
     }
 
-    SWCLoader::SWCLoader(const std::filesystem::path& path) : _uid(0) {
+    SWCLoader::SWCLoader(const std::filesystem::path& path) {
         std::ifstream stream(path);
         std::string line;
         while (std::getline(stream, line)) {

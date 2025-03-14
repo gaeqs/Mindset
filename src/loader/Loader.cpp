@@ -7,6 +7,7 @@
 namespace mnemea {
     LoaderFactory::LoaderFactory(std::string id,
                                  std::string displayName,
+                                 bool providesUIDs,
                                  SupportFilter supportFilter,
                                  FromPath fromPath,
                                  FromLines fromLines,
@@ -14,6 +15,7 @@ namespace mnemea {
         : _id(id),
           _displayName(displayName),
           _supportFilter(supportFilter),
+          _providesUIDs(providesUIDs),
           _fromPath(fromPath),
           _fromLines(fromLines),
           _fromIstream(fromIstream) {}

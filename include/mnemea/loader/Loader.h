@@ -19,6 +19,7 @@ namespace mnemea {
         virtual void load(Dataset& dataset) const = 0;
 
         virtual void addUIDProvider(std::function<UID()> provider);
+
     };
 
     class LoaderFactory {
