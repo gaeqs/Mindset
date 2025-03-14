@@ -116,24 +116,42 @@ namespace mnemea {
         auto result = std::make_shared<Morphology>();
 
         auto& points = morphology.getPoints();
-        auto& types = morphology.getSectionTypes();
-        for (size_t i = 0; i < points.size(); ++i) {
-            Neurite neurite(i);
-            auto type = static_cast<NeuriteType>(types[i]);
-
-            neurite.setPropertyAsAny(properties.neuritePosition, rush::Vec3f(points[i]));
-            neurite.setPropertyAsAny(properties.neuriteRadius, points[i].w / 2.0f); // Brion returns the diameter!
-            neurite.setPropertyAsAny(properties.neuriteType, type);
-            result->addNeurite(std::move(neurite));
-        }
-
         auto& sections = morphology.getSections();
-        for (auto& section: sections) {
-            UID from = section.x;
-            UID to = section.y;
-            if (auto neurite = result->getNeurite(to); neurite.has_value()) {
-                neurite.value()->setPropertyAsAny(properties.neuriteParent, from);
+        auto& types = morphology.getSectionTypes();
+
+        std::vector<Neurite*> lastNeurites;
+        lastNeurites.resize(sections.size(), nullptr);
+
+        size_t idGenerator = 0;
+        for (size_t i = 0; i < sections.size(); ++i) {
+            int fatherSectionId = sections[i].y;
+            auto sectionType = static_cast<NeuriteType>(types[i]);
+
+            size_t startNode = sections[i].x;
+            size_t endNode = i + 1 >= sections.size() ? points.size() : sections[i + 1].x;
+
+            if (sectionType == NeuriteType::SOMA) {
+                std::cout << "SOMAAA" << std::endl;
+                endNode = startNode + 1;
             }
+
+            Neurite* previous = fatherSectionId >= 0 ? lastNeurites[fatherSectionId] : nullptr;
+            for (size_t p = startNode; p < endNode; ++p) {
+                auto point = points[p];
+                Neurite neurite(idGenerator++);
+                neurite.setPropertyAsAny(properties.neuritePosition, rush::Vec3f(point.x, point.y, point.z));
+                neurite.setPropertyAsAny(properties.neuriteRadius, point.w / 2.0f); // Brion returns the diameter!
+                if (previous != nullptr) {
+                    neurite.setPropertyAsAny(properties.neuriteParent, previous->getUID());
+                }
+                neurite.setPropertyAsAny(properties.neuriteType, sectionType);
+                auto [ptr, _] = result->addNeurite(std::move(neurite));
+                previous = ptr;
+                if (p == startNode) {
+                    lastNeurites[i] = previous;
+                }
+            }
+
         }
 
         return result;

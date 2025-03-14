@@ -19,7 +19,7 @@ namespace mnemea {
 
         void reserveSpaceForNeurites(size_t amount);
 
-        bool addNeurite(Neurite neurite);
+        std::pair<Neurite*, bool> addNeurite(Neurite neurite);
 
         [[nodiscard]] size_t getNeuritesAmount() const;
 

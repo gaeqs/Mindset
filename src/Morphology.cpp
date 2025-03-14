@@ -21,8 +21,9 @@ namespace mnemea {
         _neurites.reserve(amount);
     }
 
-    bool Morphology::addNeurite(Neurite neurite) {
-        return _neurites.insert({neurite.getUID(), std::move(neurite)}).second;
+    std::pair<Neurite*, bool> Morphology::addNeurite(Neurite neurite) {
+        auto [it, result] = _neurites.insert({neurite.getUID(), std::move(neurite)});
+        return {&it->second, result};
     }
 
     size_t Morphology::getNeuritesAmount() const {
