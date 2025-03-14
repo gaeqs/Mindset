@@ -11,6 +11,7 @@
 
 #include <pugixml.hpp>
 
+#include <mnemea/DefaultProperties.h>
 #include <mnemea/Dataset.h>
 #include <mnemea/UID.h>
 #include <mnemea/util/NeuronTransform.h>
