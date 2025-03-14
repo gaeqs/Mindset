@@ -23,6 +23,7 @@ target_sources(mnemea PRIVATE
         loader/MorphoIOLoader.cpp
         loader/SWCLoader.cpp
         loader/XMLLoader.cpp
+        loader/SnuddaLoader.cpp
         loader/LoaderRegistry.cpp
 )
 

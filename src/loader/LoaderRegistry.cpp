@@ -5,6 +5,7 @@
 #include <mnemea/loader/BlueConfigLoader.h>
 #include <mnemea/loader/LoaderRegistry.h>
 #include <mnemea/loader/MorphoIOLoader.h>
+#include <mnemea/loader/SnuddaLoader.h>
 #include <mnemea/loader/SWCLoader.h>
 #include <mnemea/loader/XMLLoader.h>
 
@@ -15,6 +16,7 @@ namespace mnemea {
             add(MorphoIOLoader::createFactory());
             add(SWCLoader::createFactory());
             add(XMLLoader::createFactory());
+            add(SnuddaLoader::createFactory());
         }
     }
 
