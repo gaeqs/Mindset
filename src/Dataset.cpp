@@ -16,6 +16,10 @@ namespace mnemea {
         return {&it->second, result};
     }
 
+    bool Dataset::removeNeuron(UID uid) {
+        return _neurons.erase(uid) > 0;
+    }
+
     std::optional<Neuron*> Dataset::getNeuron(UID uid) {
         auto it = _neurons.find(uid);
         if (it != _neurons.end()) return &it->second;

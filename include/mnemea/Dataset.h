@@ -28,6 +28,8 @@ namespace mnemea {
 
         std::pair<Neuron*, bool> addNeuron(Neuron neuron);
 
+        bool removeNeuron(UID uid);
+
         [[nodiscard]] std::optional<Neuron*> getNeuron(UID uid);
 
         [[nodiscard]] std::optional<const Neuron*> getNeuron(UID uid) const;
