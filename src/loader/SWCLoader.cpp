@@ -90,8 +90,10 @@ namespace mnemea {
             auto type = static_cast<NeuriteType>(prototype.type);
             neurite.setPropertyAsAny(propType, type);
             neurite.setPropertyAsAny(propPosition, prototype.end);
-            neurite.setPropertyAsAny(propParent, prototype.radius);
-            neurite.setPropertyAsAny(propRadius, prototype.parent);
+            neurite.setPropertyAsAny(propRadius, prototype.radius);
+            if (prototype.parent >= 0) {
+                neurite.setPropertyAsAny(propParent, static_cast<UID>(prototype.parent));
+            }
             morphology->addNeurite(std::move(neurite));
         }
 
