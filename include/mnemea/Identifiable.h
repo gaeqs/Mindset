@@ -18,6 +18,8 @@ namespace mnemea {
 
         [[nodiscard]] UID getUID() const;
 
+        void setUID(UID uid);
+
         bool operator==(const Identifiable& other) const;
 
         bool operator!=(const Identifiable& other) const;
