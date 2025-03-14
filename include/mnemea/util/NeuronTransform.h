@@ -2,8 +2,6 @@
 // Created by gaeqs on 18/12/2024.
 //
 
-#ifdef MNEMEA_BRION
-
 #ifndef NEURONTRANSFORM_H
 #define NEURONTRANSFORM_H
 
@@ -47,4 +45,3 @@ namespace mnemea {
 
 
 #endif //NEURONTRANSFORM_H
-#endif

@@ -2,8 +2,8 @@
 // Created by gaeqs on 12/03/25.
 //
 
-#ifndef DEFAULTPARAMETERS_H
-#define DEFAULTPARAMETERS_H
+#ifndef MNEMEA_DEFAULTPARAMETERS_H
+#define MNEMEA_DEFAULTPARAMETERS_H
 
 namespace mnemea {
 
@@ -29,4 +29,4 @@ namespace mnemea {
     };
 }
 
-#endif //DEFAULTPARAMETERS_H
+#endif //MNEMEA_DEFAULTPARAMETERS_H
