@@ -100,7 +100,7 @@ namespace mnemea {
                 if (auto columnResult = root->getOrCreateNode(column, "mnemea:column"); columnResult.isOk()) {
                     if (auto miniColumnResult = columnResult.getResult()->getOrCreateNode(miniColumn,
                         "mnemea:mini_column"); miniColumnResult.isOk()) {
-                        miniColumnResult.getResult()->addNeuron(neuron.value());
+                        miniColumnResult.getResult()->addNeuron(id);
                     }
                 }
 

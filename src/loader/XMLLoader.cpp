@@ -225,7 +225,7 @@ namespace mnemea {
 
                 auto [neuronInDataset, result] = dataset.addNeuron(std::move(neuron));
                 if (result && xml.node != nullptr) {
-                    xml.node->addNeuron(neuronInDataset);
+                    xml.node->addNeuron(neuronInDataset->getUID());
                 }
             }
         }

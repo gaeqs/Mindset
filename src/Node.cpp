@@ -46,24 +46,8 @@ namespace mnemea {
         return it->second.get();
     }
 
-    bool Node::addNeuron(Neuron* neuron, bool override) {
-        if (override) {
-            _neurons.insert_or_assign(neuron->getUID(), neuron);
-            return true;
-        }
-        return _neurons.insert({neuron->getUID(), neuron}).second;
-    }
-
-    std::optional<Neuron*> Node::getNeuron(UID uid) {
-        auto it = _neurons.find(uid);
-        if (it != _neurons.end()) return {};
-        return it->second;
-    }
-
-    std::optional<const Neuron*> Node::getNeuron(UID uid) const {
-        auto it = _neurons.find(uid);
-        if (it != _neurons.end()) return {};
-        return it->second;
+    bool Node::addNeuron(UID neuron) {
+        return _neurons.insert(neuron).second;
     }
 
     std::optional<Node*> Node::getNode(UID uid) {

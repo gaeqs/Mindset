@@ -7,9 +7,9 @@
 
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <optional>
 #include <ranges>
+#include <unordered_set>
 
 #include <mnemea/Identifiable.h>
 #include <mnemea/util/Result.h>
@@ -25,13 +25,11 @@ namespace mnemea {
     };
 
     class Node : public Identifiable {
-
         std::string _type;
         std::unordered_map<UID, std::unique_ptr<Node>> _children;
-        std::unordered_map<UID, Neuron*> _neurons;
+        std::unordered_set<UID> _neurons;
 
     public:
-
         Node(const Node& other) = delete;
 
         Node(Node&& Other) noexcept;
@@ -48,11 +46,7 @@ namespace mnemea {
 
         [[nodiscard]] std::optional<const Node*> getNode(UID uid) const;
 
-        bool addNeuron(Neuron* neuron, bool override = false);
-
-        [[nodiscard]] std::optional<Neuron*> getNeuron(UID uid);
-
-        [[nodiscard]] std::optional<const Neuron*> getNeuron(UID uid) const;
+        bool addNeuron(UID neuron);
 
         [[nodiscard]] auto getNodes() {
             return _children | std::views::transform([](auto& pair) -> Node* {
@@ -66,15 +60,9 @@ namespace mnemea {
             });
         }
 
-        [[nodiscard]] auto getNeurons() {
-            return _neurons | std::views::transform([](const auto& pair) -> Neuron* {
-                return pair.second;
-            });
-        }
-
         [[nodiscard]] auto getNeurons() const {
-            return _neurons | std::views::transform([](const auto& pair) -> const Neuron* {
-                return pair.second;
+            return _neurons | std::views::transform([](const UID pair) -> const UID {
+                return pair;
             });
         }
     };
