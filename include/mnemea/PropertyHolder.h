@@ -32,7 +32,7 @@ namespace mnemea {
             if (!optional.has_value()) return {};
             T* v = std::any_cast<T>(&optional.value());
             if (v == nullptr) return {};
-            return *v;
+            return std::optional<T>(*v);
         }
     };
 }
