@@ -17,6 +17,8 @@
 namespace mnemea {
     class Loader : public hey::Observable<LoaderStatus> {
         virtual void load(Dataset& dataset) const = 0;
+
+        virtual void addUIDProvider(std::function<UID()> provider);
     };
 
     class LoaderFactory {
@@ -32,6 +34,8 @@ namespace mnemea {
     private:
         std::string _id;
         std::string _displayName;
+        bool _providesUIDs;
+
         SupportFilter _supportFilter;
 
         FromPath _fromPath;
@@ -39,7 +43,9 @@ namespace mnemea {
         FromIstream _fromIstream;
 
     public:
-        LoaderFactory(std::string id, std::string displayName,
+        LoaderFactory(std::string id,
+                      std::string displayName,
+                      bool providesUIDs,
                       SupportFilter supportFilter,
                       FromPath fromPath = nullptr,
                       FromLines fromLines = nullptr,
@@ -48,6 +54,8 @@ namespace mnemea {
         [[nodiscard]] std::string getId() const;
 
         [[nodiscard]] std::string getDisplayName() const;
+
+        [[nodiscard]] bool providesUIDs() const;
 
         bool supportsFile(const std::string& filename) const;
 

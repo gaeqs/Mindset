@@ -13,16 +13,11 @@
 
 
 namespace mnemea {
-    MorphoIOLoader::MorphoIOLoader(std::filesystem::path path) : _path(std::move(path)), _uid(0) {}
+    MorphoIOLoader::MorphoIOLoader(std::filesystem::path path) : _path(std::move(path)) {}
 
-    UID MorphoIOLoader::getUID() const {
-        return _uid;
+    void MorphoIOLoader::addUIDProvider(std::function<UID()> provider) {
+        _provider = provider;
     }
-
-    void MorphoIOLoader::setUID(UID uid) {
-        _uid = uid;
-    }
-
 
     void MorphoIOLoader::load(Dataset& dataset) const {
         constexpr size_t STAGES = 5;
@@ -64,22 +59,23 @@ namespace mnemea {
         }
 
         invoke({LoaderStatusType::LOADING, "Creating neuron", STAGES, 4});
-        dataset.addNeuron(Neuron(_uid, std::move(result)));
+        dataset.addNeuron(Neuron(_provider == nullptr ? 0 : _provider(), std::move(result)));
         invoke({LoaderStatusType::DONE, "Done", STAGES, 5});
     }
 
     LoaderFactory MorphoIOLoader::createFactory() {
         return LoaderFactory(
-             MORPHO_IO_LOADER_ID,
-             MORPHO_IO_LOADER_NAME,
-             [](const std::string& name) {
-                 std::string extension = std::filesystem::path(name).extension().string();
-                 return extension == ".h5" || extension == ".swc" || extension == ".arc";
-             },
-             [](LoaderFactory::FileProvider, const std::filesystem::path& path) {
-                 return LoaderFactory::Result(std::make_unique<MorphoIOLoader>(path));
-             }
-         );
+            MORPHO_IO_LOADER_ID,
+            MORPHO_IO_LOADER_NAME,
+            false,
+            [](const std::string& name) {
+                std::string extension = std::filesystem::path(name).extension().string();
+                return extension == ".h5" || extension == ".swc" || extension == ".arc";
+            },
+            [](LoaderFactory::FileProvider, const std::filesystem::path& path) {
+                return LoaderFactory::Result(std::make_unique<MorphoIOLoader>(path));
+            }
+        );
     }
 }
 

@@ -237,6 +237,7 @@ namespace mnemea {
         return LoaderFactory(
             SWC_LOADER_ID,
             SWC_LOADER_NAME,
+            true,
             [](const std::string& name) {
                 std::string extension = std::filesystem::path(name).extension().string();
                 return extension == ".xml";

@@ -21,14 +21,12 @@ namespace mnemea {
     */
     class MorphoIOLoader : public Loader {
         std::filesystem::path _path;
-        UID _uid;
+        std::function<UID()> _provider;
 
     public:
         explicit MorphoIOLoader(std::filesystem::path path);
 
-        [[nodiscard]] UID getUID() const;
-
-        void setUID(UID uid);
+        void addUIDProvider(std::function<UID()> provider) override;
 
         void load(Dataset& dataset) const override;
 

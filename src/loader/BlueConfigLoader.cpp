@@ -219,6 +219,7 @@ namespace mnemea {
         return LoaderFactory(
             BLUE_CONFIG_LOADER_ID,
             BLUE_CONFIG_LOADER_NAME,
+            true,
             [](const std::string& name) {
                 return name == "BlueConfig";
             },

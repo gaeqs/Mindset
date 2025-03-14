@@ -34,7 +34,7 @@ namespace mnemea {
             int64_t parent;
         };
 
-        UID _uid;
+        std::function<UID()> _provider;
         std::vector<std::string> _lines;
 
         [[nodiscard]] Result<SWCSegment, std::string> toSegment(size_t lineIndex) const;
@@ -48,9 +48,7 @@ namespace mnemea {
 
         explicit SWCLoader(const std::filesystem::path& path);
 
-        [[nodiscard]] UID getUID() const;
-
-        void setUID(UID uid);
+        void addUIDProvider(std::function<UID()> provider) override;
 
         Result<std::shared_ptr<Morphology>, std::string> loadMorphology(Dataset& dataset) const;
 

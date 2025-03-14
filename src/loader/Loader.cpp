@@ -18,12 +18,18 @@ namespace mnemea {
           _fromLines(fromLines),
           _fromIstream(fromIstream) {}
 
+    void Loader::addUIDProvider(std::function<UID()>) {}
+
     std::string LoaderFactory::getId() const {
         return _id;
     }
 
     std::string LoaderFactory::getDisplayName() const {
         return _displayName;
+    }
+
+    bool LoaderFactory::providesUIDs() const {
+        return _providesUIDs;
     }
 
     bool LoaderFactory::supportsFile(const std::string& filename) const {

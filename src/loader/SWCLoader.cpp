@@ -47,12 +47,8 @@ namespace mnemea {
         }
     }
 
-    UID SWCLoader::getUID() const {
-        return _uid;
-    }
-
-    void SWCLoader::setUID(UID uid) {
-        _uid = uid;
+    void SWCLoader::addUIDProvider(std::function<UID()> provider) {
+        _provider = provider;
     }
 
     Result<std::shared_ptr<Morphology>, std::string> SWCLoader::loadMorphology(Dataset& dataset) const {
@@ -110,13 +106,14 @@ namespace mnemea {
             std::cerr << result.getError() << std::endl;
             return;
         }
-        dataset.addNeuron(Neuron(_uid, result.getResult()));
+        dataset.addNeuron(Neuron(_provider == nullptr ? 0 : _provider(), result.getResult()));
     }
 
     LoaderFactory SWCLoader::createFactory() {
         return LoaderFactory(
             SWC_LOADER_ID,
             SWC_LOADER_NAME,
+            false,
             [](const std::string& name) {
                 std::string extension = std::filesystem::path(name).extension().string();
                 return extension == ".swc";
