@@ -6,17 +6,20 @@
 #define MORPHOIOLOADER_H
 
 #include <filesystem>
-#include <hey/Observable.h>
 #include <mnemea/Dataset.h>
-#include <mnemea/loader/LoaderStatus.h>
+#include <mnemea/loader/Loader.h>
 
 namespace mnemea {
+
+
+    static const std::string MORPHO_IO_LOADER_ID = "mnemea:loader_morpho_io";
+    static const std::string MORPHO_IO_LOADER_NAME = "Morpho IO";
 
     /**
     * This Loader is a wrapper for the MorphoIO file loader.
     * This loader loads .h5, .swc and .asc files.
     */
-    class MorphoIOLoader : public hey::Observable<LoaderStatus>  {
+    class MorphoIOLoader : public Loader {
         std::filesystem::path _path;
         UID _uid;
 
@@ -27,7 +30,9 @@ namespace mnemea {
 
         void setUID(UID uid);
 
-        void load(Dataset& dataset) const;
+        void load(Dataset& dataset) const override;
+
+        static LoaderFactory createFactory();
     };
 }
 

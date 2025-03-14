@@ -18,10 +18,12 @@ target_sources(mnemea PRIVATE
 
         util/NeuronTransform.cpp
 
+        loader/Loader.cpp
         loader/BlueConfigLoader.cpp
         loader/MorphoIOLoader.cpp
         loader/SWCLoader.cpp
         loader/XMLLoader.cpp
+        loader/LoaderRegistry.cpp
 )
 
 target_include_directories(mnemea

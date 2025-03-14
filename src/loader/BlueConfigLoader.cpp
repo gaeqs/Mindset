@@ -214,6 +214,19 @@ namespace mnemea {
 
         invoke({LoaderStatusType::DONE, "Done", STAGES, 5});
     }
+
+    LoaderFactory BlueConfigLoader::createFactory() {
+        return LoaderFactory(
+            BLUE_CONFIG_LOADER_ID,
+            BLUE_CONFIG_LOADER_NAME,
+            [](const std::string& name) {
+                return name == "BlueConfig";
+            },
+            [](LoaderFactory::FileProvider, const std::filesystem::path& path) {
+                return LoaderFactory::Result(std::make_unique<BlueConfigLoader>(path));
+            }
+        );
+    }
 }
 
 #endif

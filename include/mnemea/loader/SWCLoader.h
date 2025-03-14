@@ -7,20 +7,25 @@
 #include <filesystem>
 #include <string>
 #include <vector>
-#include <hey/Observable.h>
 
 #include <rush/rush.h>
 
 #include <mnemea/Dataset.h>
 #include <mnemea/UID.h>
 #include <mnemea/util/Result.h>
-#include <mnemea/loader/LoaderStatus.h>
+#include <mnemea/loader/Loader.h>
+
 
 namespace mnemea {
+
+
+    static const std::string SWC_LOADER_ID = "mnemea:loader_swc";
+    static const std::string SWC_LOADER_NAME = "SWC";
+
     /**
     * This is an auxiliary SWC Loader that doesn't require Brion to work.
     */
-    class SWCLoader : public hey::Observable<LoaderStatus> {
+    class SWCLoader : public Loader {
         struct SWCSegment {
             UID id;
             uint32_t type;
@@ -49,7 +54,9 @@ namespace mnemea {
 
         Result<std::shared_ptr<Morphology>, std::string> loadMorphology(Dataset& dataset) const;
 
-        void load(Dataset& dataset) const;
+        void load(Dataset& dataset) const override;
+
+        static LoaderFactory createFactory();
     };
 }
 

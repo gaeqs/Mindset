@@ -112,4 +112,24 @@ namespace mnemea {
         }
         dataset.addNeuron(Neuron(_uid, result.getResult()));
     }
+
+    LoaderFactory SWCLoader::createFactory() {
+        return LoaderFactory(
+            SWC_LOADER_ID,
+            SWC_LOADER_NAME,
+            [](const std::string& name) {
+                std::string extension = std::filesystem::path(name).extension().string();
+                return extension == ".swc";
+            },
+            [](LoaderFactory::FileProvider, const std::filesystem::path& path) {
+                return LoaderFactory::Result(std::make_unique<SWCLoader>(path));
+            },
+            [](LoaderFactory::FileProvider, const std::vector<std::string>& lines) {
+                return LoaderFactory::Result(std::make_unique<SWCLoader>(lines));
+            },
+            [](LoaderFactory::FileProvider, std::istream& stream) {
+                return LoaderFactory::Result(std::make_unique<SWCLoader>(stream));
+            }
+        );
+    }
 }

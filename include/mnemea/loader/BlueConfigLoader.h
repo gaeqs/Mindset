@@ -8,10 +8,9 @@
 #include <filesystem>
 #include <brain/python/types.h>
 #include <brion/brion.h>
-#include <hey/Observable.h>
 
 #include <mnemea/Dataset.h>
-#include <mnemea/loader/LoaderStatus.h>
+#include <mnemea/loader/Loader.h>
 
 namespace mnemea {
     struct BlueConfigLoaderProperties {
@@ -26,10 +25,13 @@ namespace mnemea {
         UID neuronLayer;
     };
 
+    static const std::string BLUE_CONFIG_LOADER_ID = "mnemea:loader_blue_config";
+    static const std::string BLUE_CONFIG_LOADER_NAME = "Blue Config";
+
     /**
     * This Loader loads BlueConfig files.
     */
-    class BlueConfigLoader : public hey::Observable<LoaderStatus> {
+    class BlueConfigLoader : public Loader {
         brion::BlueConfig _blueConfig;
         std::set<std::string> _targets;
         bool _loadMorphology;
@@ -56,7 +58,7 @@ namespace mnemea {
                                                           const brion::Morphology& morphology);
 
     public:
-        BlueConfigLoader(std::filesystem::path path);
+        explicit BlueConfigLoader(std::filesystem::path path);
 
         bool addTarget(std::string target);
 
@@ -72,7 +74,10 @@ namespace mnemea {
 
         void setLoadHierarchy(bool loadHierarchy);
 
-        void load(Dataset& dataset) const;
+        void load(Dataset& dataset) const override;
+
+        static LoaderFactory createFactory();
+
     };
 }
 

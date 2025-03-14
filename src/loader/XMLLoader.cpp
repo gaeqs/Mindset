@@ -232,4 +232,22 @@ namespace mnemea {
 
         invoke({LoaderStatusType::DONE, "Done", STAGES, 3});
     }
+
+    LoaderFactory XMLLoader::createFactory() {
+        return LoaderFactory(
+            SWC_LOADER_ID,
+            SWC_LOADER_NAME,
+            [](const std::string& name) {
+                std::string extension = std::filesystem::path(name).extension().string();
+                return extension == ".xml";
+            },
+            [](LoaderFactory::FileProvider provider, const std::filesystem::path& path) {
+                return LoaderFactory::Result(std::make_unique<XMLLoader>(provider, path));
+            },
+            nullptr,
+            [](LoaderFactory::FileProvider provider, std::istream& stream) {
+                return LoaderFactory::Result(std::make_unique<XMLLoader>(provider, stream));
+            }
+        );
+    }
 }

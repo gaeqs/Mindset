@@ -10,16 +10,22 @@
 #include <optional>
 
 #include <pugixml.hpp>
-#include <hey/Observable.h>
 
 #include <mnemea/Dataset.h>
 #include <mnemea/UID.h>
 #include <mnemea/util/NeuronTransform.h>
-#include <mnemea/loader/LoaderStatus.h>
-#include <mnemea/DefaultProperties.h>
+#include <mnemea/loader/Loader.h>
 
 namespace mnemea {
-    class XMLLoader : public hey::Observable<LoaderStatus> {
+
+
+    static const std::string XML_LOADER_ID = "mnemea:loader_xml";
+    static const std::string XML_LOADER_NAME = "XML";
+
+    /**
+    * This loader loads XML Scene files.
+    */
+    class XMLLoader : public Loader {
         struct XMLNeuron {
             UID id;
             std::optional<UID> column;
@@ -45,7 +51,9 @@ namespace mnemea {
 
         XMLLoader(FileProvider provider, std::filesystem::path path);
 
-        void load(Dataset& dataset) const;
+        void load(Dataset& dataset) const override;
+
+        static LoaderFactory createFactory();
     };
 }
 

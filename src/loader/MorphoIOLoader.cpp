@@ -67,6 +67,20 @@ namespace mnemea {
         dataset.addNeuron(Neuron(_uid, std::move(result)));
         invoke({LoaderStatusType::DONE, "Done", STAGES, 5});
     }
+
+    LoaderFactory MorphoIOLoader::createFactory() {
+        return LoaderFactory(
+             MORPHO_IO_LOADER_ID,
+             MORPHO_IO_LOADER_NAME,
+             [](const std::string& name) {
+                 std::string extension = std::filesystem::path(name).extension().string();
+                 return extension == ".h5" || extension == ".swc" || extension == ".arc";
+             },
+             [](LoaderFactory::FileProvider, const std::filesystem::path& path) {
+                 return LoaderFactory::Result(std::make_unique<MorphoIOLoader>(path));
+             }
+         );
+    }
 }
 
 #endif
