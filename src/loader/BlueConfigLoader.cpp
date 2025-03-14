@@ -131,7 +131,6 @@ namespace mnemea {
             size_t endNode = i + 1 >= sections.size() ? points.size() : sections[i + 1].x;
 
             if (sectionType == NeuriteType::SOMA) {
-                std::cout << "SOMAAA" << std::endl;
                 endNode = startNode + 1;
             }
 
