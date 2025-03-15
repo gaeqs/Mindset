@@ -91,4 +91,10 @@ namespace mnemea {
         if (_dirty) recalculate();
         return _positionsRadius;
     }
+
+    float Soma::getBestMeanRadius() const {
+        if (_dirty) recalculate();
+        if (std::abs(_meanRadius) < 0.0001f) return _positionsRadius;
+        return _meanRadius;
+    }
 }
