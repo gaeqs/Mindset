@@ -15,6 +15,7 @@ target_sources(mnemea PRIVATE
         Synapse.cpp
         Circuit.cpp
         Morphology.cpp
+        Soma.cpp
 
         util/NeuronTransform.cpp
 

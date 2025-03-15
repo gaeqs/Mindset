@@ -13,7 +13,7 @@ TEST_CASE("Brion load") {
     std::filesystem::path path = "/run/media/gaeqs/HDD/SynCoPaData/build/vizCa2p0_1x7/BlueConfig";
     mnemea::BlueConfigLoader loader(path);
     loader.addTarget("sergio");
-    loader.setLoadMorphology(false);
+    loader.setLoadMorphology(true);
     loader.setLoadHierarchy(true);
 
     size_t i = 0;
@@ -27,13 +27,16 @@ TEST_CASE("Brion load") {
 
     auto& properties = dataset.getProperties();
 
-    mnemea::UID position = properties.getPropertyUID(mnemea::PROPERTY_TRANSFORM).value();
-    mnemea::UID column = properties.getPropertyUID(mnemea::PROPERTY_COLUMN).value();
-    mnemea::UID miniColumn = properties.getPropertyUID(mnemea::PROPERTY_MINI_COLUMN).value();
     for (auto& neuron: dataset.getNeurons()) {
-        std::cout << neuron.getProperty<mnemea::NeuronTransform>(position).value().getPosition() << std::endl;
-        std::cout << neuron.getProperty<mnemea::UID>(column).value() << std::endl;
-        std::cout << neuron.getProperty<mnemea::UID>(miniColumn).value() << std::endl;
-        std::cout << neuron.getUID() << std::endl;
+        auto morphology = neuron.getMorphology();
+        if (!morphology.has_value()) continue;
+        auto somaOptional = morphology.value()->getSoma();
+        if (!somaOptional.has_value()) continue;
+        auto soma = somaOptional.value();
+        std::cout << "Soma nodes: " << soma->getNodes().size() << std::endl;
+        std::cout << "Soma pos: " << soma->getCenter() << std::endl;
+        std::cout << "Soma mean radius: " << soma->getMeanRadius() << std::endl;
+        std::cout << "Soma max radius: " << soma->getMaxRadius() << std::endl;
+        std::cout << "Soma min radius: " << soma->getMinRadius() << std::endl;
     }
 }

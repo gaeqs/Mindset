@@ -7,12 +7,24 @@
 
 #include <ranges>
 #include <mnemea/Neurite.h>
+#include <mnemea/Soma.h>
 
 namespace mnemea {
     class Morphology {
+        std::optional<Soma> _soma;
         std::unordered_map<UID, Neurite> _neurites;
 
     public:
+        Morphology();
+
+        [[nodiscard]] std::optional<Soma*> getSoma();
+
+        [[nodiscard]] std::optional<const Soma*> getSoma() const;
+
+        void setSoma(Soma soma);
+
+        void clearSoma();
+
         [[nodiscard]] std::optional<Neurite*> getNeurite(UID uid);
 
         [[nodiscard]] std::optional<const Neurite*> getNeurite(UID uid) const;

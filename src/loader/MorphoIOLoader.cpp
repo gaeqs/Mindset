@@ -38,23 +38,44 @@ namespace mnemea {
         invoke({LoaderStatusType::LOADING, "Parsing neurites", STAGES, 2});
 
         auto result = std::make_shared<Morphology>();
-        for (size_t i = 0; i < points.size(); ++i) {
-            Neurite neurite(i);
-            auto type = static_cast<NeuriteType>(types[i]);
 
-            neurite.setPropertyAsAny(propPosition, rush::Vec3f(points[i]));
-            neurite.setPropertyAsAny(propRadius, points[i].w / 2.0f); // Brion returns the diameter!
-            neurite.setPropertyAsAny(propType, type);
-            result->addNeurite(std::move(neurite));
-        }
+        std::vector<std::optional<UID>> lastNeurites;
+        lastNeurites.resize(sections.size(), 0);
 
-        invoke({LoaderStatusType::LOADING, "Parsing hierarchy", STAGES, 3});
+        size_t idGenerator = 0;
+        for (size_t i = 0; i < sections.size(); ++i) {
+            int fatherSectionId = sections[i].y;
+            auto sectionType = static_cast<NeuriteType>(types[i]);
 
-        for (auto& section: sections) {
-            UID from = section.x;
-            UID to = section.y;
-            if (auto neurite = result->getNeurite(to); neurite.has_value()) {
-                neurite.value()->setPropertyAsAny(propParent, from);
+            size_t startNode = sections[i].x;
+            size_t endNode = i + 1 >= sections.size() ? points.size() : sections[i + 1].x;
+
+            if (sectionType == NeuriteType::SOMA) {
+                // Handle Soma creation
+                Soma soma(idGenerator++);
+                lastNeurites[i] = soma.getUID();
+                for (size_t p = startNode; p < endNode; ++p) {
+                    auto point = points[p];
+                    soma.addNode({rush::Vec3f(point.x, point.y, point.z), point.w / 2.0f});
+                }
+                result->setSoma(std::move(soma));
+            } else {
+                auto previous = fatherSectionId >= 0 ? lastNeurites[fatherSectionId] : std::optional<UID>();
+                for (size_t p = startNode; p < endNode; ++p) {
+                    auto point = points[p];
+                    Neurite neurite(idGenerator++);
+                    neurite.setPropertyAsAny(propPosition, rush::Vec3f(point.x, point.y, point.z));
+                    neurite.setPropertyAsAny(propRadius, point.w / 2.0f); // Brion returns the diameter!
+                    if (previous.has_value()) {
+                        neurite.setPropertyAsAny(propParent, previous.value());
+                    }
+                    neurite.setPropertyAsAny(propType, sectionType);
+                    previous = neurite.getUID();
+                    result->addNeurite(std::move(neurite));
+                    if (p == startNode) {
+                        lastNeurites[i] = previous;
+                    }
+                }
             }
         }
 

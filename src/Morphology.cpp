@@ -5,6 +5,30 @@
 #include <mnemea/Morphology.h>
 
 namespace mnemea {
+    Morphology::Morphology() = default;
+
+    std::optional<Soma*> Morphology::getSoma() {
+        if (_soma.has_value()) {
+            return &_soma.value();
+        }
+        return {};
+    }
+
+    std::optional<const Soma*> Morphology::getSoma() const {
+        if (_soma.has_value()) {
+            return &_soma.value();
+        }
+        return {};
+    }
+
+    void Morphology::setSoma(Soma soma) {
+        _soma = soma;
+    }
+
+    void Morphology::clearSoma() {
+        _soma = {};
+    }
+
     std::optional<Neurite*> Morphology::getNeurite(UID uid) {
         auto it = _neurites.find(uid);
         if (it != _neurites.end()) return &it->second;

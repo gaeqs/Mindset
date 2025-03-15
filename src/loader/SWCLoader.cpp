@@ -85,16 +85,38 @@ namespace mnemea {
 
         invoke({LoaderStatusType::LOADING, "Parsing neurites", STAGES, 2});
 
+
+        std::optional<Soma> soma;
+        std::unordered_set<UID> somaUIDs;
+        // Check for somas
+        for (auto& [id, prototype]: prototypes) {
+            auto type = static_cast<NeuriteType>(prototype.type);
+            if (type != NeuriteType::SOMA) continue;
+            if (!soma.has_value()) soma = Soma(id);
+            soma.value().addNode({prototype.end, prototype.radius});
+            somaUIDs.insert(id);
+        }
+
         for (auto& [id, prototype]: prototypes) {
             Neurite neurite(id);
             auto type = static_cast<NeuriteType>(prototype.type);
+            if (type == NeuriteType::SOMA) continue;
             neurite.setPropertyAsAny(propType, type);
             neurite.setPropertyAsAny(propPosition, prototype.end);
             neurite.setPropertyAsAny(propRadius, prototype.radius);
             if (prototype.parent >= 0) {
-                neurite.setPropertyAsAny(propParent, static_cast<UID>(prototype.parent));
+                UID parentUID = static_cast<UID>(prototype.parent);
+                if (somaUIDs.contains(parentUID)) {
+                    neurite.setPropertyAsAny(propParent, soma.value().getUID());
+                } else {
+                    neurite.setPropertyAsAny(propParent, parentUID);
+                }
             }
             morphology->addNeurite(std::move(neurite));
+        }
+
+        if (soma.has_value()) {
+            morphology->setSoma(std::move(soma.value()));
         }
 
         invoke({LoaderStatusType::DONE, "Done", STAGES, 3});
