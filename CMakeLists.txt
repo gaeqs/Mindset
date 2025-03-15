@@ -6,6 +6,7 @@ include(FetchContent)
 # Configuration options
 option(MNEMEA_BUILD_SHARED "Build Mnemea as a shared library" OFF)
 option(MNEMEA_USE_BRION "Import Brion" ON)
+option(MNEMEA_EXTERNAL_BRION "Use an external version of Brion" OFF)
 option(MNEMEA_TESTS "Include Mnemea tests" ON)
 
 # Global parameters
@@ -36,14 +37,16 @@ list(APPEND LIBRARIES hey)
 
 # Import Brion
 if (MNEMEA_USE_BRION)
-    FetchContent_Declare(
-            brion
-            GIT_REPOSITORY https://github.com/BlueBrain/Brion.git
-            GIT_TAG master
-            SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/brion
-    )
-
-    FetchContent_MakeAvailable(brion)
+    message("OCHIWI ${MNEMEA_EXTERNAL_BRION}")
+    if (NOT MNEMEA_EXTERNAL_BRION)
+        FetchContent_Declare(
+                brion
+                GIT_REPOSITORY https://github.com/BlueBrain/Brion.git
+                GIT_TAG master
+                SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/brion
+        )
+        FetchContent_MakeAvailable(brion)
+    endif ()
     list(APPEND LIBRARIES Brion Brain)
 else ()
     # Import HighFive. Do not import if Brion is used.
@@ -84,23 +87,24 @@ if (NOT MNEMEA_USE_BRION)
             NAMESPACE Mnemea::
             DESTINATION lib/cmake/Mnemea
     )
+
+
+    configure_package_config_file(
+            "cmake/MnemeaConfig.cmake.in"
+            "${CMAKE_CURRENT_BINARY_DIR}/MnemeaConfig.cmake"
+            INSTALL_DESTINATION lib/cmake/Mnemea
+    )
+
+    install(
+            FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/MnemeaConfig.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/MnemeaConfigVersion.cmake"
+            DESTINATION lib/cmake/Mnemea
+    )
+
+    # Install public headers
+    install(
+            DIRECTORY include/Mnemea
+            DESTINATION include
+    )
 endif ()
-
-configure_package_config_file(
-        "cmake/MnemeaConfig.cmake.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/MnemeaConfig.cmake"
-        INSTALL_DESTINATION lib/cmake/Mnemea
-)
-
-install(
-        FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/MnemeaConfig.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/MnemeaConfigVersion.cmake"
-        DESTINATION lib/cmake/Mnemea
-)
-
-# Install public headers
-install(
-        DIRECTORY include/Mnemea
-        DESTINATION include
-)
