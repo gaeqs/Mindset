@@ -15,7 +15,7 @@
 namespace mnemea {
     BlueConfigLoaderProperties BlueConfigLoader::initProperties(Properties& properties) const {
         BlueConfigLoaderProperties result{};
-        if (_loadHierarchy) {
+        if (_loadMorphology) {
             result.neuritePosition = properties.defineProperty(PROPERTY_POSITION);
             result.neuriteRadius = properties.defineProperty(PROPERTY_RADIUS);
             result.neuriteParent = properties.defineProperty(PROPERTY_PARENT);

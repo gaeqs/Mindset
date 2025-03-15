@@ -12,22 +12,42 @@
 
 
 namespace mnemea {
-
     static const std::string SNUDDA_LOADER_ID = "mnemea:loader_snudda";
     static const std::string SNUDDA_LOADER_NAME = "Snudda";
 
+    struct SnuddaLoaderProperties {
+        UID neuritePosition;
+        UID neuriteRadius;
+        UID neuriteParent;
+        UID neuriteType;
+
+        UID neuronTransform;
+    };
+
 
     class SnuddaLoader : public Loader {
-
         HighFive::File _file;
+        std::filesystem::path _dataPath;
+        bool _loadMorphology;
+
+        SnuddaLoaderProperties initProperties(Properties& properties) const;
+
+        void loadNeurons(Dataset& dataset, const SnuddaLoaderProperties& properties) const;
+
+        std::optional<std::string> loadMorphologies(Dataset& dataset) const;
+
+        static void assignMorphology(Dataset& dataset, UID uid, std::shared_ptr<Morphology> morphology);
 
     public:
         explicit SnuddaLoader(const std::filesystem::path& path);
 
+        bool shouldLoadMorphology() const;
+
+        void setLoadMorphology(bool loadMorphology);
+
         void load(Dataset& dataset) const override;
 
         static LoaderFactory createFactory();
-
     };
 }
 

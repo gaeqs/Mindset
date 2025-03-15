@@ -5,6 +5,9 @@
 #ifndef MNEMEA_DEFAULTPARAMETERS_H
 #define MNEMEA_DEFAULTPARAMETERS_H
 
+#include <string>
+#include <cstdint>
+
 namespace mnemea {
 
     const std::string PROPERTY_PARENT = "mnemea:parent";
