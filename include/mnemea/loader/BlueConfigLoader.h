@@ -2,8 +2,10 @@
 // Created by gaeqs on 12/03/2025.
 //
 
+
 #ifndef BLUECONFIGLOADER_H
 #define BLUECONFIGLOADER_H
+#ifdef MNEMEA_BRION
 
 #include <filesystem>
 #include <brain/python/types.h>
@@ -81,4 +83,5 @@ namespace mnemea {
     };
 }
 
+#endif
 #endif //BLUECONFIGLOADER_H

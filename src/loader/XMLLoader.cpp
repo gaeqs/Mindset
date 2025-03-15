@@ -243,11 +243,11 @@ namespace mnemea {
                 return extension == ".xml";
             },
             [](LoaderFactory::FileProvider provider, const std::filesystem::path& path) {
-                return LoaderFactory::Result(std::make_unique<XMLLoader>(provider, path));
+                return LoaderFactory::FactoryResult(std::make_unique<XMLLoader>(provider, path));
             },
             nullptr,
             [](LoaderFactory::FileProvider provider, std::istream& stream) {
-                return LoaderFactory::Result(std::make_unique<XMLLoader>(provider, stream));
+                return LoaderFactory::FactoryResult(std::make_unique<XMLLoader>(provider, stream));
             }
         );
     }

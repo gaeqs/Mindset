@@ -73,7 +73,7 @@ namespace mnemea {
                 return extension == ".h5" || extension == ".swc" || extension == ".arc" || extension == ".hdf5";
             },
             [](LoaderFactory::FileProvider, const std::filesystem::path& path) {
-                return LoaderFactory::Result(std::make_unique<MorphoIOLoader>(path));
+                return LoaderFactory::FactoryResult(std::make_unique<MorphoIOLoader>(path));
             }
         );
     }

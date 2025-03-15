@@ -45,8 +45,18 @@ if (MNEMEA_USE_BRION)
 
     FetchContent_MakeAvailable(brion)
     list(APPEND LIBRARIES Brion Brain)
-    target_compile_definitions(rush INTERFACE MNEMEA_BRION)
+else ()
+    # Import HighFive. Do not import if Brion is used.
+    FetchContent_Declare(
+            highfive
+            GIT_REPOSITORY https://github.com/BlueBrain/HighFive.git
+            GIT_TAG master
+            SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/highfive
+    )
+
+    FetchContent_MakeAvailable(highfive)
 endif ()
+list(APPEND LIBRARIES HighFive)
 
 # Import pugiXML
 find_package(pugixml REQUIRED)
@@ -67,12 +77,14 @@ write_basic_package_version_file(
         COMPATIBILITY AnyNewerVersion
 )
 
-install(
-        EXPORT MnemeaTargets
-        FILE MnemeaTargets.cmake
-        NAMESPACE Mnemea::
-        DESTINATION lib/cmake/Mnemea
-)
+if (NOT MNEMEA_USE_BRION)
+    install(
+            EXPORT MnemeaTargets
+            FILE MnemeaTargets.cmake
+            NAMESPACE Mnemea::
+            DESTINATION lib/cmake/Mnemea
+    )
+endif ()
 
 configure_package_config_file(
         "cmake/MnemeaConfig.cmake.in"

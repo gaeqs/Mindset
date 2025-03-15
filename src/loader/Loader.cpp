@@ -38,7 +38,7 @@ namespace mnemea {
         return _supportFilter == nullptr ? false : _supportFilter(filename);
     }
 
-    LoaderFactory::Result LoaderFactory::create(FileProvider provider, const std::filesystem::path& path) const {
+    LoaderFactory::FactoryResult LoaderFactory::create(FileProvider provider, const std::filesystem::path& path) const {
         if (_fromPath == nullptr) {
             return {"This loader doesn't support paths."};
         }
@@ -46,7 +46,7 @@ namespace mnemea {
         return _fromPath(std::move(provider), path);
     }
 
-    LoaderFactory::Result LoaderFactory::create(FileProvider provider, const std::vector<std::string>& lines) const {
+    LoaderFactory::FactoryResult LoaderFactory::create(FileProvider provider, const std::vector<std::string>& lines) const {
         if (_fromLines == nullptr) {
             return {"This loader doesn't support lines."};
         }
@@ -54,7 +54,7 @@ namespace mnemea {
         return _fromLines(std::move(provider), lines);
     }
 
-    LoaderFactory::Result LoaderFactory::create(FileProvider provider, std::istream& stream) const {
+    LoaderFactory::FactoryResult LoaderFactory::create(FileProvider provider, std::istream& stream) const {
         if (_fromIstream == nullptr) {
             return {"This loader doesn't support streams."};
         }

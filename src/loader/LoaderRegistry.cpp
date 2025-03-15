@@ -12,8 +12,10 @@
 namespace mnemea {
     LoaderRegistry::LoaderRegistry(bool loadDefaults) {
         if (loadDefaults) {
+#ifdef MNEMEA_BRION
             add(BlueConfigLoader::createFactory());
             add(MorphoIOLoader::createFactory());
+#endif
             add(SWCLoader::createFactory());
             add(XMLLoader::createFactory());
             add(SnuddaLoader::createFactory());

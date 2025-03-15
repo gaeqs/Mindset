@@ -40,6 +40,10 @@ set_target_properties(mnemea PROPERTIES
         SUBVERSION ${PROJECT_VERSION_MAJOR}
 )
 
+if (MNEMEA_USE_BRION)
+    target_compile_definitions(mnemea PUBLIC MNEMEA_BRION)
+endif ()
+
 install(TARGETS mnemea
         EXPORT MnemeaTargets
         LIBRARY DESTINATION lib

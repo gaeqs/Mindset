@@ -241,7 +241,7 @@ namespace mnemea {
                 return name == "BlueConfig";
             },
             [](LoaderFactory::FileProvider, const std::filesystem::path& path) {
-                return LoaderFactory::Result(std::make_unique<BlueConfigLoader>(path));
+                return LoaderFactory::FactoryResult(std::make_unique<BlueConfigLoader>(path));
             }
         );
     }

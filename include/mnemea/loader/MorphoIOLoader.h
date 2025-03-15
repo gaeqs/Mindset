@@ -2,8 +2,10 @@
 // Created by gaeqs on 12/03/2025.
 //
 
+
 #ifndef MORPHOIOLOADER_H
 #define MORPHOIOLOADER_H
+#ifdef MNEMEA_BRION
 
 #include <filesystem>
 #include <mnemea/Dataset.h>
@@ -34,4 +36,5 @@ namespace mnemea {
     };
 }
 
+#endif
 #endif //MORPHOIOLOADER_H

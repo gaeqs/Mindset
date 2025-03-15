@@ -121,13 +121,13 @@ namespace mnemea {
                 return extension == ".swc";
             },
             [](LoaderFactory::FileProvider, const std::filesystem::path& path) {
-                return LoaderFactory::Result(std::make_unique<SWCLoader>(path));
+                return LoaderFactory::FactoryResult(std::make_unique<SWCLoader>(path));
             },
             [](LoaderFactory::FileProvider, const std::vector<std::string>& lines) {
-                return LoaderFactory::Result(std::make_unique<SWCLoader>(lines));
+                return LoaderFactory::FactoryResult(std::make_unique<SWCLoader>(lines));
             },
             [](LoaderFactory::FileProvider, std::istream& stream) {
-                return LoaderFactory::Result(std::make_unique<SWCLoader>(stream));
+                return LoaderFactory::FactoryResult(std::make_unique<SWCLoader>(stream));
             }
         );
     }

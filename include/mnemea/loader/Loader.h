@@ -24,12 +24,12 @@ namespace mnemea {
 
     class LoaderFactory {
     public:
-        using Result = Result<std::unique_ptr<Loader>, std::string>;
+        using FactoryResult = Result<std::unique_ptr<Loader>, std::string>;
         using FileProvider = std::function<std::optional<std::vector<std::string>>(std::filesystem::__cxx11::path)>;
 
-        using FromPath = std::function<Result(FileProvider, const std::filesystem::path&)>;
-        using FromLines = std::function<Result(FileProvider, const std::vector<std::string>&)>;
-        using FromIstream = std::function<Result(FileProvider, std::istream&)>;
+        using FromPath = std::function<FactoryResult(FileProvider, const std::filesystem::path&)>;
+        using FromLines = std::function<FactoryResult(FileProvider, const std::vector<std::string>&)>;
+        using FromIstream = std::function<FactoryResult(FileProvider, std::istream&)>;
         using SupportFilter = std::function<bool(const std::string&)>;
 
     private:
@@ -58,13 +58,13 @@ namespace mnemea {
 
         [[nodiscard]] bool providesUIDs() const;
 
-        bool supportsFile(const std::string& filename) const;
+        [[nodiscard]] bool supportsFile(const std::string& filename) const;
 
-        Result create(FileProvider provider, const std::filesystem::path& path) const;
+        FactoryResult create(FileProvider provider, const std::filesystem::path& path) const;
 
-        Result create(FileProvider provider, const std::vector<std::string>& lines) const;
+        FactoryResult create(FileProvider provider, const std::vector<std::string>& lines) const;
 
-        Result create(FileProvider provider, std::istream& stream) const;
+        FactoryResult create(FileProvider provider, std::istream& stream) const;
     };
 }
 

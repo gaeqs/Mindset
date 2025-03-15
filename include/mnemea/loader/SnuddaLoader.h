@@ -8,7 +8,7 @@
 #include <filesystem>
 
 #include <mnemea/loader/Loader.h>
-#include <deps/libsonata/extlib/HighFive/include/highfive/H5File.hpp>
+#include <highfive/H5File.hpp>
 
 
 namespace mnemea {
