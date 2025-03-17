@@ -25,6 +25,9 @@ namespace mnemea {
     };
 
 
+    /**
+    * This Loader loads Snudda projects.
+    */
     class SnuddaLoader : public Loader {
         HighFive::File _file;
         std::filesystem::path _dataPath;
