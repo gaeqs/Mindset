@@ -51,7 +51,7 @@ namespace mnemea {
             });
 
             rush::Mat4f model(rot, 1.0f);
-            model[3] = rush::Vec4f(pos, 1.0f);
+            model[3] = rush::Vec4f(pos / 0.0000003f, 1.0f);
 
             Neuron neuron(ids[i]);
             neuron.setPropertyAsAny(properties.neuronTransform, NeuronTransform(model));
@@ -89,6 +89,25 @@ namespace mnemea {
         return {};
     }
 
+    std::optional<std::string> SnuddaLoader::loadSynapses(Dataset& dataset,
+                                                          const SnuddaLoaderProperties& properties) const {
+        using Syn = std::array<int32_t, 13>;
+        auto voxelSize = _file.getDataSet("meta/voxel_size").read<double>();
+        auto synapses = _file.getDataSet("network/synapses").read<std::vector<Syn>>();
+        for (auto& synapse: synapses) {
+            UID sourceId = synapse[0];
+            UID destId = synapse[1];
+            rush::Vec3f position(synapse[2], synapse[3], synapse[4]);
+            position *= static_cast<float>(voxelSize);
+
+            Synapse syn(sourceId, destId);
+            syn.setPropertyAsAny(properties.neuritePosition, syn);
+            dataset.getCircuit().addSynapse(std::move(syn));
+        }
+
+        return {};
+    }
+
     void SnuddaLoader::assignMorphology(Dataset& dataset, UID uid, std::shared_ptr<Morphology> morphology) {
         if (auto neuron = dataset.getNeuron(uid); neuron.has_value()) {
             neuron.value()->setMorphology(std::move(morphology));
@@ -98,7 +117,8 @@ namespace mnemea {
     SnuddaLoader::SnuddaLoader(const std::filesystem::path& path)
         : _file(path, HighFive::File::ReadOnly),
           _dataPath(path.parent_path() / "data"),
-          _loadMorphology(true) {}
+          _loadMorphology(true),
+          _loadSynapses(true) {}
 
 
     bool SnuddaLoader::shouldLoadMorphology() const {
@@ -109,6 +129,15 @@ namespace mnemea {
         _loadMorphology = loadMorphology;
     }
 
+    bool SnuddaLoader::shouldLoadSynapses() const {
+        return _loadSynapses;
+    }
+
+    void SnuddaLoader::setLoadSynapses(bool loadSynapses) {
+        _loadSynapses = loadSynapses;
+    }
+
+
     void SnuddaLoader::load(Dataset& dataset) const {
         SnuddaLoaderProperties properties = initProperties(dataset.getProperties());
 
@@ -118,6 +147,15 @@ namespace mnemea {
             auto error = loadMorphologies(dataset);
             if (error.has_value()) {
                 std::cerr << error.value() << std::endl;
+                return;
+            }
+        }
+
+        if (_loadSynapses) {
+            auto error = loadSynapses(dataset, properties);
+            if (error.has_value()) {
+                std::cerr << error.value() << std::endl;
+                return;
             }
         }
     }
