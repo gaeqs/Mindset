@@ -97,10 +97,20 @@ namespace mnemea {
             somaUIDs.insert(id);
         }
 
+        rush::Sphere somaBB(soma->getCenter(), soma->getBestMeanRadius() * 1.2f);
+
         for (auto& [id, prototype]: prototypes) {
+            if (intersects(somaBB, prototype.end)) {
+                somaUIDs.insert(id);
+                std::cout << "INSIDE " << id << std::endl;
+            }
+        }
+
+        for (auto& [id, prototype]: prototypes) {
+                   auto type = static_cast<NeuriteType>(prototype.type);
+            if (somaUIDs.contains(id)) continue;
+
             Neurite neurite(id);
-            auto type = static_cast<NeuriteType>(prototype.type);
-            if (type == NeuriteType::SOMA) continue;
             neurite.setPropertyAsAny(propType, type);
             neurite.setPropertyAsAny(propPosition, prototype.end);
             neurite.setPropertyAsAny(propRadius, prototype.radius);

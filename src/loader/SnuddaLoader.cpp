@@ -9,22 +9,12 @@
 #include <rush/matrix/mat.h>
 #include <rush/vector/vec.h>
 
-struct Syn {
-    int32_t sourceCell;
-    int32_t destCell;
-    int32_t voxelX;
-    int32_t voxelY;
-    int32_t voxelZ;
-    int32_t hyperVoxelId;
-    int32_t channelModelId;
-    int32_t sourceAxonSomaDist;
-    int32_t destSegId;
-    int32_t destSegX;
-    int32_t conductance;
-    int32_t parameterId;
-};
+namespace {
+    constexpr float METER_MICROMETER_RATIO = 1000000.0f;
+}
 
 namespace mnemea {
+
     SnuddaLoaderProperties SnuddaLoader::initProperties(Properties& properties) const {
         SnuddaLoaderProperties result{};
         if (_loadMorphology) {
@@ -42,16 +32,20 @@ namespace mnemea {
         auto ids = _file.getDataSet("network/neurons/neuron_id").read<std::vector<uint32_t>>();
         auto position = _file.getDataSet("network/neurons/position").read<std::vector<std::array<double, 3>>>();
         auto rotation = _file.getDataSet("network/neurons/rotation").read<std::vector<std::array<double, 9>>>();
+        auto origo = _file.getDataSet("meta/simulation_origo").read<std::array<double, 3>>();
 
+        auto origin = rush::Vec3f(origo[0], origo[1], origo[2]) * METER_MICROMETER_RATIO;
 
         for (size_t i = 0; i < ids.size(); ++i) {
-            rush::Vec3f pos(position[i][0], position[i][1], position[i][2]);
+            rush::Vec3f pos(position[i][0], position[i][1], position[i][2]); // Position in meters
             rush::Mat3f rot([array = rotation[i]](size_t c, size_t r) {
                 return static_cast<float>(array[c + r * 3]);
             });
 
+
+
             rush::Mat4f model(rot, 1.0f);
-            model[3] = rush::Vec4f(pos / 0.0000003f, 1.0f);
+            model[3] = rush::Vec4f(pos * METER_MICROMETER_RATIO + origin, 1.0f);
 
             Neuron neuron(ids[i]);
             neuron.setPropertyAsAny(properties.neuronTransform, NeuronTransform(model));
@@ -92,13 +86,17 @@ namespace mnemea {
     std::optional<std::string> SnuddaLoader::loadSynapses(Dataset& dataset,
                                                           const SnuddaLoaderProperties& properties) const {
         using Syn = std::array<int32_t, 13>;
-        auto voxelSize = _file.getDataSet("meta/voxel_size").read<double>();
+        auto voxelSize = static_cast<float>(_file.getDataSet("meta/voxel_size").read<double>());
         auto synapses = _file.getDataSet("network/synapses").read<std::vector<Syn>>();
+        auto origo = _file.getDataSet("meta/simulation_origo").read<std::array<double, 3>>();
+
+        auto origin = rush::Vec3f(origo[0], origo[1], origo[2]) * METER_MICROMETER_RATIO;
+
         for (auto& synapse: synapses) {
             UID sourceId = synapse[0];
             UID destId = synapse[1];
-            rush::Vec3f position(synapse[2], synapse[3], synapse[4]);
-            position *= static_cast<float>(voxelSize);
+            rush::Vec3f position = rush::Vec3f(synapse[2], synapse[3], synapse[4]) * voxelSize + origin; // Meters
+            position *= METER_MICROMETER_RATIO;
 
             Synapse syn(sourceId, destId);
             syn.setPropertyAsAny(properties.neuritePosition, syn);
