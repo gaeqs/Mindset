@@ -9,7 +9,8 @@
 #include <mnemea/util/NeuronTransform.h>
 #include <rush/vector/vec.h>
 
-TEST_CASE("Brion load") {
+TEST_CASE("Brion load")
+{
     std::filesystem::path path = "/run/media/gaeqs/HDD/SynCoPaData/build/vizCa2p0_1x7/BlueConfig";
     mnemea::BlueConfigLoader loader(path);
     loader.addTarget("sergio");
@@ -27,11 +28,15 @@ TEST_CASE("Brion load") {
 
     auto& properties = dataset.getProperties();
 
-    for (auto& neuron: dataset.getNeurons()) {
+    for (auto& neuron : dataset.getNeurons()) {
         auto morphology = neuron.getMorphology();
-        if (!morphology.has_value()) continue;
+        if (!morphology.has_value()) {
+            continue;
+        }
         auto somaOptional = morphology.value()->getSoma();
-        if (!somaOptional.has_value()) continue;
+        if (!somaOptional.has_value()) {
+            continue;
+        }
         auto soma = somaOptional.value();
         std::cout << "Soma nodes: " << soma->getNodes().size() << std::endl;
         std::cout << "Soma pos: " << soma->getCenter() << std::endl;

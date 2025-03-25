@@ -14,16 +14,19 @@
 #include <mnemea/Dataset.h>
 #include <mnemea/loader/LoaderStatus.h>
 
-namespace mnemea {
-    class Loader : public hey::Observable<LoaderStatus> {
-    public:
+namespace mnemea
+{
+    class Loader : public hey::Observable<LoaderStatus>
+    {
+      public:
         virtual void load(Dataset& dataset) const = 0;
 
         virtual void addUIDProvider(std::function<UID()> provider);
     };
 
-    class LoaderFactory {
-    public:
+    class LoaderFactory
+    {
+      public:
         using FactoryResult = Result<std::unique_ptr<Loader>, std::string>;
         using FileProvider = std::function<std::optional<std::vector<std::string>>(std::filesystem::__cxx11::path)>;
 
@@ -32,7 +35,7 @@ namespace mnemea {
         using FromIstream = std::function<FactoryResult(FileProvider, std::istream&)>;
         using SupportFilter = std::function<bool(const std::string&)>;
 
-    private:
+      private:
         std::string _id;
         std::string _displayName;
         bool _providesUIDs;
@@ -43,14 +46,9 @@ namespace mnemea {
         FromLines _fromLines;
         FromIstream _fromIstream;
 
-    public:
-        LoaderFactory(std::string id,
-                      std::string displayName,
-                      bool providesUIDs,
-                      SupportFilter supportFilter,
-                      FromPath fromPath = nullptr,
-                      FromLines fromLines = nullptr,
-                      FromIstream fromIstream = nullptr);
+      public:
+        LoaderFactory(std::string id, std::string displayName, bool providesUIDs, SupportFilter supportFilter,
+                      FromPath fromPath = nullptr, FromLines fromLines = nullptr, FromIstream fromIstream = nullptr);
 
         [[nodiscard]] std::string getId() const;
 
@@ -66,6 +64,6 @@ namespace mnemea {
 
         FactoryResult create(FileProvider provider, std::istream& stream) const;
     };
-}
+} // namespace mnemea
 
 #endif //LOADER_H

@@ -10,14 +10,17 @@
 #include <mnemea/Neurite.h>
 #include <mnemea/PropertyHolder.h>
 
-namespace mnemea {
+namespace mnemea
+{
 
-    struct SomaNode {
+    struct SomaNode
+    {
         rush::Vec3f position;
         float radius;
     };
 
-    class Soma : public Identifiable, public PropertyHolder {
+    class Soma : public Identifiable, public PropertyHolder
+    {
         std::vector<SomaNode> _nodes;
 
         mutable rush::Vec3f _center;
@@ -29,7 +32,7 @@ namespace mnemea {
 
         void recalculate() const;
 
-    public:
+      public:
         explicit Soma(UID uid);
 
         const std::vector<SomaNode>& getNodes() const;
@@ -51,6 +54,6 @@ namespace mnemea {
         */
         [[nodiscard]] float getPositionsRadius() const;
     };
-}
+} // namespace mnemea
 
 #endif //SOMA_H

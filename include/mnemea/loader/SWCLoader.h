@@ -15,9 +15,8 @@
 #include <mnemea/util/Result.h>
 #include <mnemea/loader/Loader.h>
 
-
-namespace mnemea {
-
+namespace mnemea
+{
 
     static const std::string SWC_LOADER_ID = "mnemea:loader_swc";
     static const std::string SWC_LOADER_NAME = "SWC";
@@ -25,8 +24,10 @@ namespace mnemea {
     /**
     * This is an auxiliary SWC Loader that doesn't require Brion to work.
     */
-    class SWCLoader : public Loader {
-        struct SWCSegment {
+    class SWCLoader : public Loader
+    {
+        struct SWCSegment
+        {
             UID id;
             uint32_t type;
             rush::Vec3f end;
@@ -39,7 +40,7 @@ namespace mnemea {
 
         [[nodiscard]] Result<SWCSegment, std::string> toSegment(size_t lineIndex) const;
 
-    public:
+      public:
         explicit SWCLoader(const std::vector<std::string>& lines);
 
         explicit SWCLoader(std::vector<std::string>&& lines);
@@ -56,6 +57,6 @@ namespace mnemea {
 
         static LoaderFactory createFactory();
     };
-}
+} // namespace mnemea
 
 #endif //SWCLOADER_H

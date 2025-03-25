@@ -6,21 +6,33 @@
 
 #include <utility>
 
-namespace mnemea {
+namespace mnemea
+{
     Neuron::Neuron(UID uid, std::shared_ptr<Morphology> morphology) :
-        Identifiable(uid), _morphology(std::move(morphology)) {}
+        Identifiable(uid),
+        _morphology(std::move(morphology))
+    {
+    }
 
-    std::optional<Morphology*> Neuron::getMorphology() {
-        if (_morphology == nullptr) return {};
+    std::optional<Morphology*> Neuron::getMorphology()
+    {
+        if (_morphology == nullptr) {
+            return {};
+        }
         return _morphology.get();
     }
 
-    std::optional<const Morphology*> Neuron::getMorphology() const {
-        if (_morphology == nullptr) return {};
+    std::optional<const Morphology*> Neuron::getMorphology() const
+    {
+        if (_morphology == nullptr) {
+            return {};
+        }
         return _morphology.get();
     }
 
-    void Neuron::setMorphology(std::shared_ptr<Morphology> morphology) {
+    void Neuron::setMorphology(std::shared_ptr<Morphology> morphology)
+    {
         _morphology = std::move(morphology);
+        setNewVersion();
     }
-}
+} // namespace mnemea

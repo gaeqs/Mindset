@@ -10,14 +10,17 @@
 #include <vector>
 
 #include <mnemea/Synapse.h>
+#include <mnemea/Versioned.h>
 
-namespace mnemea {
-    class Circuit {
+namespace mnemea
+{
+    class Circuit : public Versioned
+    {
         std::vector<Synapse> _synapses;
         std::multimap<UID, size_t> _preSynapses;
         std::multimap<UID, size_t> _postSynapses;
 
-    public:
+      public:
         Circuit();
 
         void addSynapse(Synapse synapse);
@@ -30,38 +33,36 @@ namespace mnemea {
 
         std::span<const Synapse> getSynapses() const;
 
-        [[nodiscard]] auto getPreSynapses(UID uid) {
+        [[nodiscard]] auto getPreSynapses(UID uid)
+        {
             auto [begin, end] = _preSynapses.equal_range(uid);
             auto range = std::ranges::subrange(begin, end);
-            return range | std::views::transform([&](const auto& pair) -> Synapse& {
-                return _synapses[pair.second];
-            });
+            return range | std::views::transform([&](const auto& pair) -> Synapse& { return _synapses[pair.second]; });
         }
 
-        [[nodiscard]] auto getPreSynapses(UID uid) const {
+        [[nodiscard]] auto getPreSynapses(UID uid) const
+        {
             auto [begin, end] = _preSynapses.equal_range(uid);
             auto range = std::ranges::subrange(begin, end);
-            return range | std::views::transform([&](const auto& pair) -> const Synapse& {
-                return _synapses[pair.second];
-            });
+            return range |
+                   std::views::transform([&](const auto& pair) -> const Synapse& { return _synapses[pair.second]; });
         }
 
-        [[nodiscard]] auto getPostSynapses(UID uid) {
+        [[nodiscard]] auto getPostSynapses(UID uid)
+        {
             auto [begin, end] = _postSynapses.equal_range(uid);
             auto range = std::ranges::subrange(begin, end);
-            return range | std::views::transform([&](const auto& pair) -> Synapse& {
-                return _synapses[pair.second];
-            });
+            return range | std::views::transform([&](const auto& pair) -> Synapse& { return _synapses[pair.second]; });
         }
 
-        [[nodiscard]] auto getPostSynapses(UID uid) const {
+        [[nodiscard]] auto getPostSynapses(UID uid) const
+        {
             auto [begin, end] = _postSynapses.equal_range(uid);
             auto range = std::ranges::subrange(begin, end);
-            return range | std::views::transform([&](const auto& pair) -> const Synapse& {
-                return _synapses[pair.second];
-            });
+            return range |
+                   std::views::transform([&](const auto& pair) -> const Synapse& { return _synapses[pair.second]; });
         }
     };
-}
+} // namespace mnemea
 
 #endif //CIRCUIT_H

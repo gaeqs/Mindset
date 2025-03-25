@@ -16,20 +16,23 @@
 
 #include <mnemea/Neuron.h>
 
-namespace mnemea {
+namespace mnemea
+{
     class Node;
 
-    enum class NodeCreateError {
+    enum class NodeCreateError
+    {
         ALREADY_EXISTS,
         ERROR_WHILE_CREATING
     };
 
-    class Node : public Identifiable {
+    class Node : public Identifiable
+    {
         std::string _type;
         std::unordered_map<UID, std::unique_ptr<Node>> _children;
         std::unordered_set<UID> _neurons;
 
-    public:
+      public:
         Node(const Node& other) = delete;
 
         Node(Node&& Other) noexcept;
@@ -48,24 +51,21 @@ namespace mnemea {
 
         bool addNeuron(UID neuron);
 
-        [[nodiscard]] auto getNodes() {
-            return _children | std::views::transform([](auto& pair) -> Node* {
-                return pair.second;
-            });
+        [[nodiscard]] auto getNodes()
+        {
+            return _children | std::views::transform([](auto& pair) -> Node* { return pair.second; });
         }
 
-        [[nodiscard]] auto getNodes() const {
-            return _children | std::views::transform([](const auto& pair) -> const Node* {
-                return pair.second;
-            });
+        [[nodiscard]] auto getNodes() const
+        {
+            return _children | std::views::transform([](const auto& pair) -> const Node* { return pair.second; });
         }
 
-        [[nodiscard]] auto getNeurons() const {
-            return _neurons | std::views::transform([](const UID pair) -> const UID {
-                return pair;
-            });
+        [[nodiscard]] auto getNeurons() const
+        {
+            return _neurons | std::views::transform([](const UID pair) -> const UID { return pair; });
         }
     };
-}
+} // namespace mnemea
 
 #endif //NODE_H

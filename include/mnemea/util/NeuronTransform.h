@@ -7,8 +7,10 @@
 
 #include <rush/rush.h>
 
-namespace mnemea {
-    class NeuronTransform {
+namespace mnemea
+{
+    class NeuronTransform
+    {
         mutable rush::Mat4f _model;
         mutable rush::Mat4f _normal;
 
@@ -20,7 +22,7 @@ namespace mnemea {
 
         void recalculateIfRequired() const;
 
-    public:
+      public:
         NeuronTransform();
 
         explicit NeuronTransform(const rush::Mat4f& model);
@@ -41,7 +43,6 @@ namespace mnemea {
 
         void setScale(const rush::Vec3f& scale);
     };
-}
-
+} // namespace mnemea
 
 #endif //NEURONTRANSFORM_H

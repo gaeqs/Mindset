@@ -11,14 +11,13 @@
 
 #include <pugixml.hpp>
 
-#include <mnemea/DefaultProperties.h>
 #include <mnemea/Dataset.h>
 #include <mnemea/UID.h>
 #include <mnemea/util/NeuronTransform.h>
 #include <mnemea/loader/Loader.h>
 
-namespace mnemea {
-
+namespace mnemea
+{
 
     static const std::string XML_LOADER_ID = "mnemea:loader_xml";
     static const std::string XML_LOADER_NAME = "XML";
@@ -26,8 +25,10 @@ namespace mnemea {
     /**
     * This loader loads XML Scene files.
     */
-    class XMLLoader : public Loader {
-        struct XMLNeuron {
+    class XMLLoader : public Loader
+    {
+        struct XMLNeuron
+        {
             UID id;
             std::optional<UID> column;
             std::optional<UID> miniColumn;
@@ -37,15 +38,15 @@ namespace mnemea {
             Node* node;
         };
 
-    public:
+      public:
         using FileProvider = std::function<std::optional<std::vector<std::string>>(std::filesystem::path)>;
 
-    private:
+      private:
         FileProvider _fileProvider;
         pugi::xml_document _doc;
         bool _valid;
 
-    public:
+      public:
         XMLLoader(FileProvider provider, const void* data, size_t size);
 
         XMLLoader(FileProvider provider, std::istream& stream);
@@ -56,6 +57,6 @@ namespace mnemea {
 
         static LoaderFactory createFactory();
     };
-}
+} // namespace mnemea
 
 #endif //XMLLOADER_H

@@ -8,12 +8,14 @@
 #include <mnemea/PropertyHolder.h>
 #include <mnemea/UID.h>
 
-namespace mnemea {
-    class Synapse : public PropertyHolder {
+namespace mnemea
+{
+    class Synapse : public PropertyHolder
+    {
         UID _preSynapticNeuron;
         UID _postSynapticNeuron;
 
-    public:
+      public:
         Synapse(UID preSynapticNeuron, UID postSynapticNeuron);
 
         UID getPreSynapticNeuron() const;
@@ -24,6 +26,6 @@ namespace mnemea {
 
         void setPostSynapticNeuron(UID uid);
     };
-}
+} // namespace mnemea
 
 #endif //SYNAPSE_H

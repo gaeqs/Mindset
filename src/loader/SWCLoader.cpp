@@ -7,8 +7,10 @@
 #include <fstream>
 #include <mnemea/DefaultProperties.h>
 
-namespace mnemea {
-    Result<SWCLoader::SWCSegment, std::string> SWCLoader::toSegment(size_t lineIndex) const {
+namespace mnemea
+{
+    Result<SWCLoader::SWCSegment, std::string> SWCLoader::toSegment(size_t lineIndex) const
+    {
         SWCSegment segment;
 
         std::stringstream ss(_lines[lineIndex]);
@@ -21,25 +23,33 @@ namespace mnemea {
         ss >> segment.parent;
 
         if (ss.fail()) {
-            return "StringStream error while parsing segment " + std::to_string(lineIndex)
-                   + ". Bits: " + std::to_string(ss.rdstate()) + ".";
+            return "StringStream error while parsing segment " + std::to_string(lineIndex) +
+                   ". Bits: " + std::to_string(ss.rdstate()) + ".";
         }
 
         return segment;
     }
 
-    SWCLoader::SWCLoader(const std::vector<std::string>& lines): _lines(lines) {}
+    SWCLoader::SWCLoader(const std::vector<std::string>& lines) :
+        _lines(lines)
+    {
+    }
 
-    SWCLoader::SWCLoader(std::vector<std::string>&& lines) : _lines(std::move(lines)) {}
+    SWCLoader::SWCLoader(std::vector<std::string>&& lines) :
+        _lines(std::move(lines))
+    {
+    }
 
-    SWCLoader::SWCLoader(std::istream& stream) {
+    SWCLoader::SWCLoader(std::istream& stream)
+    {
         std::string line;
         while (std::getline(stream, line)) {
             _lines.push_back(std::move(line));
         }
     }
 
-    SWCLoader::SWCLoader(const std::filesystem::path& path) {
+    SWCLoader::SWCLoader(const std::filesystem::path& path)
+    {
         std::ifstream stream(path);
         std::string line;
         while (std::getline(stream, line)) {
@@ -47,11 +57,13 @@ namespace mnemea {
         }
     }
 
-    void SWCLoader::addUIDProvider(std::function<UID()> provider) {
+    void SWCLoader::addUIDProvider(std::function<UID()> provider)
+    {
         _provider = provider;
     }
 
-    Result<std::shared_ptr<Morphology>, std::string> SWCLoader::loadMorphology(Dataset& dataset) const {
+    Result<std::shared_ptr<Morphology>, std::string> SWCLoader::loadMorphology(Dataset& dataset) const
+    {
         constexpr size_t STAGES = 3;
 
         std::unordered_map<UID, SWCSegment> prototypes;
@@ -70,7 +82,9 @@ namespace mnemea {
         prototypes.reserve(_lines.size());
         for (size_t i = 0; i < _lines.size(); ++i) {
             auto line = _lines[i];
-            if (line.starts_with("#") || line.empty()) continue;
+            if (line.starts_with("#") || line.empty()) {
+                continue;
+            }
             auto result = toSegment(i);
             if (!result.isOk()) {
                 std::string error = "Error while converting segment " + std::to_string(i) + ". " + result.getError();
@@ -85,22 +99,27 @@ namespace mnemea {
 
         invoke({LoaderStatusType::LOADING, "Parsing neurites", STAGES, 2});
 
-
         std::optional<Soma> soma;
         std::unordered_set<UID> somaUIDs;
         // Check for somas
-        for (auto& [id, prototype]: prototypes) {
+        for (auto& [id, prototype] : prototypes) {
             auto type = static_cast<NeuriteType>(prototype.type);
-            if (type != NeuriteType::SOMA) continue;
-            if (!soma.has_value()) soma = Soma(id);
+            if (type != NeuriteType::SOMA) {
+                continue;
+            }
+            if (!soma.has_value()) {
+                soma = Soma(id);
+            }
             soma.value().addNode({prototype.end, prototype.radius});
             somaUIDs.insert(id);
         }
 
-        for (auto& [id, prototype]: prototypes) {
+        for (auto& [id, prototype] : prototypes) {
             Neurite neurite(id);
             auto type = static_cast<NeuriteType>(prototype.type);
-            if (type == NeuriteType::SOMA) continue;
+            if (type == NeuriteType::SOMA) {
+                continue;
+            }
             neurite.setPropertyAsAny(propType, type);
             neurite.setPropertyAsAny(propPosition, prototype.end);
             neurite.setPropertyAsAny(propRadius, prototype.radius);
@@ -124,7 +143,8 @@ namespace mnemea {
         return morphology;
     }
 
-    void SWCLoader::load(Dataset& dataset) const {
+    void SWCLoader::load(Dataset& dataset) const
+    {
         auto result = loadMorphology(dataset);
         if (!result.isOk()) {
             std::cerr << result.getError() << std::endl;
@@ -133,11 +153,10 @@ namespace mnemea {
         dataset.addNeuron(Neuron(_provider == nullptr ? 0 : _provider(), result.getResult()));
     }
 
-    LoaderFactory SWCLoader::createFactory() {
+    LoaderFactory SWCLoader::createFactory()
+    {
         return LoaderFactory(
-            SWC_LOADER_ID,
-            SWC_LOADER_NAME,
-            false,
+            SWC_LOADER_ID, SWC_LOADER_NAME, false,
             [](const std::string& name) {
                 std::string extension = std::filesystem::path(name).extension().string();
                 return extension == ".swc";
@@ -150,7 +169,6 @@ namespace mnemea {
             },
             [](LoaderFactory::FileProvider, std::istream& stream) {
                 return LoaderFactory::FactoryResult(std::make_unique<SWCLoader>(stream));
-            }
-        );
+            });
     }
-}
+} // namespace mnemea

@@ -9,11 +9,13 @@
 
 #include <mnemea/loader/Loader.h>
 
-namespace mnemea {
-    class LoaderRegistry {
+namespace mnemea
+{
+    class LoaderRegistry
+    {
         std::unordered_map<std::string, LoaderFactory> _factories;
 
-    public:
+      public:
         explicit LoaderRegistry(bool loadDefaults = true);
 
         bool add(LoaderFactory factory);
@@ -24,12 +26,12 @@ namespace mnemea {
 
         std::optional<LoaderFactory> get(const std::string& name) const;
 
-        [[nodiscard]] auto getAll() const {
-            return _factories | std::views::transform([](const auto& pair) -> const LoaderFactory& {
-                return pair.second;
-            });
+        [[nodiscard]] auto getAll() const
+        {
+            return _factories |
+                   std::views::transform([](const auto& pair) -> const LoaderFactory& { return pair.second; });
         }
     };
-}
+} // namespace mnemea
 
 #endif //LOADERREGISTRY_H

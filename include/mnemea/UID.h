@@ -7,7 +7,8 @@
 
 #include <cstdint>
 
-namespace mnemea {
+namespace mnemea
+{
     using UID = uint32_t;
 }
 

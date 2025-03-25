@@ -4,22 +4,27 @@
 
 #ifdef MNEMEA_BRION
 
-#include <mnemea/loader/MorphoIOLoader.h>
-#include <mnemea/DefaultProperties.h>
+    #include <mnemea/loader/MorphoIOLoader.h>
+    #include <mnemea/DefaultProperties.h>
 
-#include <brain/neuron/morphology.h>
-#include <brain/circuit.h>
-#include <rush/rush.h>
+    #include <brain/neuron/morphology.h>
+    #include <brain/circuit.h>
+    #include <rush/rush.h>
 
+namespace mnemea
+{
+    MorphoIOLoader::MorphoIOLoader(std::filesystem::path path) :
+        _path(std::move(path))
+    {
+    }
 
-namespace mnemea {
-    MorphoIOLoader::MorphoIOLoader(std::filesystem::path path) : _path(std::move(path)) {}
-
-    void MorphoIOLoader::addUIDProvider(std::function<UID()> provider) {
+    void MorphoIOLoader::addUIDProvider(std::function<UID()> provider)
+    {
         _provider = provider;
     }
 
-    void MorphoIOLoader::load(Dataset& dataset) const {
+    void MorphoIOLoader::load(Dataset& dataset) const
+    {
         constexpr size_t STAGES = 5;
         invoke({LoaderStatusType::LOADING, "Loading morphology", STAGES, 0});
         brain::neuron::Morphology morphology(brion::URI(absolute(_path).string()));
@@ -84,20 +89,18 @@ namespace mnemea {
         invoke({LoaderStatusType::DONE, "Done", STAGES, 5});
     }
 
-    LoaderFactory MorphoIOLoader::createFactory() {
+    LoaderFactory MorphoIOLoader::createFactory()
+    {
         return LoaderFactory(
-            MORPHO_IO_LOADER_ID,
-            MORPHO_IO_LOADER_NAME,
-            false,
+            MORPHO_IO_LOADER_ID, MORPHO_IO_LOADER_NAME, false,
             [](const std::string& name) {
                 std::string extension = std::filesystem::path(name).extension().string();
                 return extension == ".h5" || extension == ".swc" || extension == ".arc" || extension == ".hdf5";
             },
             [](LoaderFactory::FileProvider, const std::filesystem::path& path) {
                 return LoaderFactory::FactoryResult(std::make_unique<MorphoIOLoader>(path));
-            }
-        );
+            });
     }
-}
+} // namespace mnemea
 
 #endif

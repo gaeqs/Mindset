@@ -2,20 +2,21 @@
 // Created by gaeqs on 12/03/2025.
 //
 
-
 #ifndef BLUECONFIGLOADER_H
 #define BLUECONFIGLOADER_H
 #ifdef MNEMEA_BRION
 
-#include <filesystem>
-#include <brain/python/types.h>
-#include <brion/brion.h>
+    #include <filesystem>
+    #include <brain/python/types.h>
+    #include <brion/brion.h>
 
-#include <mnemea/Dataset.h>
-#include <mnemea/loader/Loader.h>
+    #include <mnemea/Dataset.h>
+    #include <mnemea/loader/Loader.h>
 
-namespace mnemea {
-    struct BlueConfigLoaderProperties {
+namespace mnemea
+{
+    struct BlueConfigLoaderProperties
+    {
         UID neuritePosition;
         UID neuriteRadius;
         UID neuriteParent;
@@ -33,7 +34,8 @@ namespace mnemea {
     /**
     * This Loader loads BlueConfig files.
     */
-    class BlueConfigLoader : public Loader {
+    class BlueConfigLoader : public Loader
+    {
         brion::BlueConfig _blueConfig;
         std::set<std::string> _targets;
         bool _loadMorphology;
@@ -41,25 +43,19 @@ namespace mnemea {
 
         BlueConfigLoaderProperties initProperties(Properties& properties) const;
 
-        static void loadNeurons(Dataset& dataset,
-                                const BlueConfigLoaderProperties& properties,
-                                const brion::GIDSet& ids,
-                                const brain::Circuit& circuit);
+        static void loadNeurons(Dataset& dataset, const BlueConfigLoaderProperties& properties,
+                                const brion::GIDSet& ids, const brain::Circuit& circuit);
 
-        static void loadMorphologies(Dataset& dataset,
-                                     const BlueConfigLoaderProperties& properties,
-                                     const brion::GIDSet& ids,
-                                     const brain::Circuit& circuit);
+        static void loadMorphologies(Dataset& dataset, const BlueConfigLoaderProperties& properties,
+                                     const brion::GIDSet& ids, const brain::Circuit& circuit);
 
-        static void loadHierarchy(Dataset& dataset,
-                                  const BlueConfigLoaderProperties& properties,
-                                  const brion::GIDSet& ids,
-                                  const brion::Circuit& circuit);
+        static void loadHierarchy(Dataset& dataset, const BlueConfigLoaderProperties& properties,
+                                  const brion::GIDSet& ids, const brion::Circuit& circuit);
 
         static std::shared_ptr<Morphology> loadMorphology(const BlueConfigLoaderProperties& properties,
                                                           const brion::Morphology& morphology);
 
-    public:
+      public:
         explicit BlueConfigLoader(std::filesystem::path path);
 
         bool addTarget(std::string target);
@@ -79,9 +75,8 @@ namespace mnemea {
         void load(Dataset& dataset) const override;
 
         static LoaderFactory createFactory();
-
     };
-}
+} // namespace mnemea
 
 #endif
 #endif //BLUECONFIGLOADER_H

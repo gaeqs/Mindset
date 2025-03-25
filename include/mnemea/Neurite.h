@@ -7,13 +7,13 @@
 #include <mnemea/Identifiable.h>
 #include <mnemea/PropertyHolder.h>
 
-namespace mnemea {
-    class Neurite : public Identifiable, public PropertyHolder {
-
-    public:
+namespace mnemea
+{
+    class Neurite : public Identifiable, public PropertyHolder
+    {
+      public:
         explicit Neurite(UID uid);
-
     };
-}
+} // namespace mnemea
 
 #endif //NEURITE_H

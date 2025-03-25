@@ -4,16 +4,17 @@
 
 #ifdef MNEMEA_BRION
 
-#include <mnemea/util/NeuronTransform.h>
-#include <mnemea/loader/BlueConfigLoader.h>
-#include <mnemea/DefaultProperties.h>
+    #include <mnemea/util/NeuronTransform.h>
+    #include <mnemea/loader/BlueConfigLoader.h>
+    #include <mnemea/DefaultProperties.h>
 
-#include <brain/circuit.h>
-#include <rush/rush.h>
+    #include <brain/circuit.h>
+    #include <rush/rush.h>
 
-
-namespace mnemea {
-    BlueConfigLoaderProperties BlueConfigLoader::initProperties(Properties& properties) const {
+namespace mnemea
+{
+    BlueConfigLoaderProperties BlueConfigLoader::initProperties(Properties& properties) const
+    {
         BlueConfigLoaderProperties result{};
         if (_loadMorphology) {
             result.neuritePosition = properties.defineProperty(PROPERTY_POSITION);
@@ -32,14 +33,13 @@ namespace mnemea {
         return result;
     }
 
-    void BlueConfigLoader::loadNeurons(Dataset& dataset,
-                                       const BlueConfigLoaderProperties& properties,
-                                       const brion::GIDSet& ids,
-                                       const brain::Circuit& circuit) {
+    void BlueConfigLoader::loadNeurons(Dataset& dataset, const BlueConfigLoaderProperties& properties,
+                                       const brion::GIDSet& ids, const brain::Circuit& circuit)
+    {
         auto transforms = circuit.getTransforms(ids);
         auto layers = circuit.getLayers(ids);
         size_t index = 0;
-        for (UID id: ids) {
+        for (UID id : ids) {
             auto neuron = Neuron(id);
             neuron.setPropertyAsAny(properties.neuronTransform, NeuronTransform(transforms[index]));
             neuron.setPropertyAsAny(properties.neuronLayer, std::stoi(layers[index]));
@@ -48,27 +48,26 @@ namespace mnemea {
         }
     }
 
-    void BlueConfigLoader::loadMorphologies(Dataset& dataset,
-                                            const BlueConfigLoaderProperties& properties,
-                                            const brion::GIDSet& ids,
-                                            const brain::Circuit& circuit) {
+    void BlueConfigLoader::loadMorphologies(Dataset& dataset, const BlueConfigLoaderProperties& properties,
+                                            const brion::GIDSet& ids, const brain::Circuit& circuit)
+    {
         auto uris = circuit.getMorphologyURIs(ids);
         auto transforms = circuit.getTransforms(ids);
         auto layers = circuit.getLayers(ids);
 
         std::map<std::string, brion::URI> files;
 
-        for (const auto& uri: uris) {
+        for (const auto& uri : uris) {
             files.insert({uri.getPath(), uri});
         }
 
         std::map<std::string, std::shared_ptr<Morphology>> morphologies;
-        for (auto& [file, uri]: files) {
+        for (auto& [file, uri] : files) {
             morphologies[file] = loadMorphology(properties, brion::Morphology(uri));
         }
 
         size_t index = 0;
-        for (UID id: ids) {
+        for (UID id : ids) {
             if (auto neuron = dataset.getNeuron(id); neuron.has_value()) {
                 if (auto it = morphologies.find(uris[index].getPath()); it != morphologies.end()) {
                     neuron.value()->setMorphology(it->second);
@@ -78,10 +77,9 @@ namespace mnemea {
         }
     }
 
-    void BlueConfigLoader::loadHierarchy(Dataset& dataset,
-                                         const BlueConfigLoaderProperties& properties,
-                                         const brion::GIDSet& ids,
-                                         const brion::Circuit& circuit) {
+    void BlueConfigLoader::loadHierarchy(Dataset& dataset, const BlueConfigLoaderProperties& properties,
+                                         const brion::GIDSet& ids, const brion::Circuit& circuit)
+    {
         auto data = circuit.get(ids, brion::NEURON_COLUMN_GID | brion::NEURON_MINICOLUMN_GID);
 
         Node* root = dataset.getHierarchy().value_or(nullptr);
@@ -90,7 +88,7 @@ namespace mnemea {
         }
 
         size_t index = 0;
-        for (UID id: ids) {
+        for (UID id : ids) {
             if (auto neuron = dataset.getNeuron(id); neuron.has_value()) {
                 auto sub = data[index];
 
@@ -98,8 +96,9 @@ namespace mnemea {
                 UID miniColumn = boost::lexical_cast<UID>(sub[1]);
 
                 if (auto columnResult = root->getOrCreateNode(column, "mnemea:column"); columnResult.isOk()) {
-                    if (auto miniColumnResult = columnResult.getResult()->getOrCreateNode(miniColumn,
-                        "mnemea:mini_column"); miniColumnResult.isOk()) {
+                    if (auto miniColumnResult =
+                            columnResult.getResult()->getOrCreateNode(miniColumn, "mnemea:mini_column");
+                        miniColumnResult.isOk()) {
                         miniColumnResult.getResult()->addNeuron(id);
                     }
                 }
@@ -112,7 +111,8 @@ namespace mnemea {
     }
 
     std::shared_ptr<Morphology> BlueConfigLoader::loadMorphology(const BlueConfigLoaderProperties& properties,
-                                                                 const brion::Morphology& morphology) {
+                                                                 const brion::Morphology& morphology)
+    {
         auto result = std::make_shared<Morphology>();
 
         auto& points = morphology.getPoints();
@@ -162,40 +162,50 @@ namespace mnemea {
         return result;
     }
 
-    BlueConfigLoader::BlueConfigLoader(std::filesystem::path path):
+    BlueConfigLoader::BlueConfigLoader(std::filesystem::path path) :
         _blueConfig(std::move(path)),
         _loadMorphology(true),
-        _loadHierarchy(true) {}
+        _loadHierarchy(true)
+    {
+    }
 
-    bool BlueConfigLoader::addTarget(std::string target) {
+    bool BlueConfigLoader::addTarget(std::string target)
+    {
         return _targets.insert(std::move(target)).second;
     }
 
-    std::set<std::string>& BlueConfigLoader::getTargets() {
+    std::set<std::string>& BlueConfigLoader::getTargets()
+    {
         return _targets;
     }
 
-    const std::set<std::string>& BlueConfigLoader::getTargets() const {
+    const std::set<std::string>& BlueConfigLoader::getTargets() const
+    {
         return _targets;
     }
 
-    bool BlueConfigLoader::shouldLoadMorphology() const {
+    bool BlueConfigLoader::shouldLoadMorphology() const
+    {
         return _loadMorphology;
     }
 
-    void BlueConfigLoader::setLoadMorphology(bool loadMorphology) {
+    void BlueConfigLoader::setLoadMorphology(bool loadMorphology)
+    {
         _loadMorphology = loadMorphology;
     }
 
-    bool BlueConfigLoader::shouldLoadHierarchy() const {
+    bool BlueConfigLoader::shouldLoadHierarchy() const
+    {
         return _loadHierarchy;
     }
 
-    void BlueConfigLoader::setLoadHierarchy(bool loadHierarchy) {
+    void BlueConfigLoader::setLoadHierarchy(bool loadHierarchy)
+    {
         _loadHierarchy = loadHierarchy;
     }
 
-    void BlueConfigLoader::load(Dataset& dataset) const {
+    void BlueConfigLoader::load(Dataset& dataset) const
+    {
         constexpr size_t STAGES = 5;
         if (_targets.empty()) {
             invoke({LoaderStatusType::ERROR, "No targets found", STAGES, 0});
@@ -204,7 +214,7 @@ namespace mnemea {
         invoke({LoaderStatusType::LOADING, "Loading targets", STAGES, 0});
 
         brion::GIDSet ids;
-        for (auto& target: _targets) {
+        for (auto& target : _targets) {
             brion::GIDSet targetSet = _blueConfig.parseTarget(target);
             ids.insert(targetSet.begin(), targetSet.end());
         }
@@ -238,19 +248,15 @@ namespace mnemea {
         invoke({LoaderStatusType::DONE, "Done", STAGES, 5});
     }
 
-    LoaderFactory BlueConfigLoader::createFactory() {
+    LoaderFactory BlueConfigLoader::createFactory()
+    {
         return LoaderFactory(
-            BLUE_CONFIG_LOADER_ID,
-            BLUE_CONFIG_LOADER_NAME,
-            true,
-            [](const std::string& name) {
-                return name == "BlueConfig";
-            },
+            BLUE_CONFIG_LOADER_ID, BLUE_CONFIG_LOADER_NAME, true,
+            [](const std::string& name) { return name == "BlueConfig"; },
             [](LoaderFactory::FileProvider, const std::filesystem::path& path) {
                 return LoaderFactory::FactoryResult(std::make_unique<BlueConfigLoader>(path));
-            }
-        );
+            });
     }
-}
+} // namespace mnemea
 
 #endif

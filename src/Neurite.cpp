@@ -4,6 +4,10 @@
 
 #include <mnemea/Neurite.h>
 
-namespace mnemea {
-    Neurite::Neurite(UID uid) : Identifiable(uid) {}
-}
+namespace mnemea
+{
+    Neurite::Neurite(UID uid) :
+        Identifiable(uid)
+    {
+    }
+} // namespace mnemea

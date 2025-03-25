@@ -4,9 +4,13 @@
 
 #include <mnemea/util/NeuronTransform.h>
 
-namespace mnemea {
-    void NeuronTransform::recalculateIfRequired() const {
-        if (!_dirty) return;
+namespace mnemea
+{
+    void NeuronTransform::recalculateIfRequired() const
+    {
+        if (!_dirty) {
+            return;
+        }
         auto rot = rush::Quatf::euler(_rotation);
         _model = rush::Mat4f::model(_scale, rot, _position);
         _normal = rush::Mat4f::normal(_scale, rot);
@@ -19,10 +23,13 @@ namespace mnemea {
         _normal(1),
         _position(0),
         _scale(1),
-        _dirty(false) {}
+        _dirty(false)
+    {
+    }
 
     NeuronTransform::NeuronTransform(const rush::Mat4f& model) :
-        _dirty(true) {
+        _dirty(true)
+    {
         _position = model[3](0, 1, 2);
         _scale.x() = model[0](0, 1, 2).toVec().length();
         _scale.y() = model[1](0, 1, 2).toVec().length();
@@ -36,43 +43,57 @@ namespace mnemea {
         _rotation = rush::Quatf::fromRotationMatrix(rot).euler();
     }
 
-    const rush::Mat4f& NeuronTransform::getModel() const {
+    const rush::Mat4f& NeuronTransform::getModel() const
+    {
         recalculateIfRequired();
         return _model;
     }
 
-    const rush::Mat4f& NeuronTransform::getNormal() const {
+    const rush::Mat4f& NeuronTransform::getNormal() const
+    {
         recalculateIfRequired();
         return _normal;
     }
 
-    const rush::Vec3f& NeuronTransform::getPosition() const {
+    const rush::Vec3f& NeuronTransform::getPosition() const
+    {
         return _position;
     }
 
-    void NeuronTransform::setPosition(const rush::Vec3f& position) {
-        if (_position == position) return;
+    void NeuronTransform::setPosition(const rush::Vec3f& position)
+    {
+        if (_position == position) {
+            return;
+        }
         _position = position;
         _dirty = true;
     }
 
-    const rush::Vec3f& NeuronTransform::getRotation() const {
+    const rush::Vec3f& NeuronTransform::getRotation() const
+    {
         return _rotation;
     }
 
-    void NeuronTransform::setRotation(const rush::Vec3f& rotation) {
-        if (_rotation == rotation) return;
+    void NeuronTransform::setRotation(const rush::Vec3f& rotation)
+    {
+        if (_rotation == rotation) {
+            return;
+        }
         _rotation = rotation;
         _dirty = true;
     }
 
-    const rush::Vec3f& NeuronTransform::getScale() const {
+    const rush::Vec3f& NeuronTransform::getScale() const
+    {
         return _scale;
     }
 
-    void NeuronTransform::setScale(const rush::Vec3f& scale) {
-        if (_scale == scale) return;
+    void NeuronTransform::setScale(const rush::Vec3f& scale)
+    {
+        if (_scale == scale) {
+            return;
+        }
         _scale = scale;
         _dirty = true;
     }
-}
+} // namespace mnemea

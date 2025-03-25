@@ -11,12 +11,14 @@
 
 #include <mnemea/UID.h>
 
-namespace mnemea {
-    class Properties {
+namespace mnemea
+{
+    class Properties
+    {
         std::map<std::string, UID> _properties;
         std::map<UID, std::string> _propertiesNames;
 
-    public:
+      public:
         Properties();
 
         UID defineProperty(std::string name);
@@ -31,6 +33,6 @@ namespace mnemea {
 
         [[nodiscard]] const std::map<UID, std::string>& getPropertiesNames() const;
     };
-}
+} // namespace mnemea
 
 #endif //PROPERTIES_H

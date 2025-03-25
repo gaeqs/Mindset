@@ -7,20 +7,28 @@
 #include <mnemea/loader/XMLLoader.h>
 #include <mnemea/loader/SWCLoader.h>
 
-namespace {
-    std::optional<mnemea::UID> asUID(pugi::xml_attribute attr) {
+namespace
+{
+    std::optional<mnemea::UID> asUID(pugi::xml_attribute attr)
+    {
         constexpr mnemea::UID NOT_VALID = -1;
         mnemea::UID id = attr.as_uint(NOT_VALID);
-        if (id == NOT_VALID) return {};
+        if (id == NOT_VALID) {
+            return {};
+        }
         return id;
     }
 
-    std::optional<std::string> asString(pugi::xml_attribute attr) {
-        if (attr.empty()) return {};
+    std::optional<std::string> asString(pugi::xml_attribute attr)
+    {
+        if (attr.empty()) {
+            return {};
+        }
         return attr.as_string();
     }
 
-    mnemea::Result<std::vector<float>, std::string> split(const std::string& string, char delimiter) {
+    mnemea::Result<std::vector<float>, std::string> split(const std::string& string, char delimiter)
+    {
         std::vector<float> tokens;
         std::stringstream ss(string);
 
@@ -30,8 +38,7 @@ namespace {
                 tokens.push_back(std::stof(token));
             } catch (const std::invalid_argument& e) {
                 return {"Invalid float! " + std::string(token)};
-            }
-            catch (const std::out_of_range& e) {
+            } catch (const std::out_of_range& e) {
                 return {"Number out of range! " + std::string(token)};
             }
         }
@@ -39,8 +46,8 @@ namespace {
         return tokens;
     }
 
-
-    mnemea::Result<std::vector<mnemea::UID>, std::string> splitUID(const std::string& string, char delimiter) {
+    mnemea::Result<std::vector<mnemea::UID>, std::string> splitUID(const std::string& string, char delimiter)
+    {
         std::vector<mnemea::UID> tokens;
         std::stringstream ss(string);
 
@@ -50,37 +57,41 @@ namespace {
                 tokens.push_back(std::stoi(token));
             } catch (const std::invalid_argument& e) {
                 return {"Invalid int! " + std::string(token)};
-            }
-            catch (const std::out_of_range& e) {
+            } catch (const std::out_of_range& e) {
                 return {"Number out of range! " + std::string(token)};
             }
         }
 
         return tokens;
     }
-}
+} // namespace
 
-namespace mnemea {
-    XMLLoader::XMLLoader(FileProvider provider, const void* data, size_t size)
-        : _fileProvider(provider) {
+namespace mnemea
+{
+    XMLLoader::XMLLoader(FileProvider provider, const void* data, size_t size) :
+        _fileProvider(provider)
+    {
         auto result = _doc.load_buffer(data, size);
         _valid = result.status == pugi::status_ok;
     }
 
-    XMLLoader::XMLLoader(FileProvider provider, std::istream& stream)
-        : _fileProvider(provider) {
+    XMLLoader::XMLLoader(FileProvider provider, std::istream& stream) :
+        _fileProvider(provider)
+    {
         auto result = _doc.load(stream);
         _valid = result.status == pugi::status_ok;
     }
 
-    XMLLoader::XMLLoader(FileProvider provider, std::filesystem::path path)
-        : _fileProvider(provider) {
+    XMLLoader::XMLLoader(FileProvider provider, std::filesystem::path path) :
+        _fileProvider(provider)
+    {
         std::ifstream stream(path);
         auto result = _doc.load(stream);
         _valid = result.status == pugi::status_ok;
     }
 
-    void XMLLoader::load(Dataset& dataset) const {
+    void XMLLoader::load(Dataset& dataset) const
+    {
         constexpr size_t STAGES = 3;
         invoke({LoaderStatusType::LOADING, "Validating XML file", STAGES, 0});
 
@@ -111,7 +122,7 @@ namespace mnemea {
             root = dataset.createHierarchy(0, "mnemea:root");
         }
 
-        for (auto column: scene.child("columns").children("column")) {
+        for (auto column : scene.child("columns").children("column")) {
             auto columnId = asUID(column.attribute("id"));
 
             Node* columnNode = nullptr;
@@ -121,7 +132,7 @@ namespace mnemea {
                 }
             }
 
-            for (auto miniColumn: column.children("minicolumn")) {
+            for (auto miniColumn : column.children("minicolumn")) {
                 auto miniColumnId = asUID(miniColumn.attribute("id"));
 
                 Node* miniColumnNode = nullptr;
@@ -132,8 +143,7 @@ namespace mnemea {
                     }
                 }
 
-
-                for (auto neuron: miniColumn.children("neuron")) {
+                for (auto neuron : miniColumn.children("neuron")) {
                     auto gid = asUID(neuron.attribute("gid"));
                     if (!gid.has_value()) {
                         std::cerr << "Neuron GID not found!" << std::endl;
@@ -141,15 +151,13 @@ namespace mnemea {
                         return;
                     };
 
-                    XMLNeuron xmlNeuron = {
-                        .id = gid.value(),
-                        .column = columnId,
-                        .miniColumn = miniColumnId,
-                        .layer = asUID(neuron.append_attribute("layer")),
-                        .neuronType = asString(neuron.attribute("type")),
-                        .transform = {},
-                        .node = miniColumnNode
-                    };
+                    XMLNeuron xmlNeuron = {.id = gid.value(),
+                                           .column = columnId,
+                                           .miniColumn = miniColumnId,
+                                           .layer = asUID(neuron.append_attribute("layer")),
+                                           .neuronType = asString(neuron.attribute("type")),
+                                           .transform = {},
+                                           .node = miniColumnNode};
 
                     if (auto transform = neuron.child("transform").first_child()) {
                         std::string string = transform.value();
@@ -166,9 +174,7 @@ namespace mnemea {
                             return;
                         };
 
-                        rush::Mat4f matrix([&floats](size_t c, size_t r) {
-                            return floats[r * 4 + c];
-                        });
+                        rush::Mat4f matrix([&floats](size_t c, size_t r) { return floats[r * 4 + c]; });
 
                         xmlNeuron.transform = NeuronTransform(matrix);
                     }
@@ -180,23 +186,28 @@ namespace mnemea {
 
         invoke({LoaderStatusType::LOADING, "Load morphology", STAGES, 2});
 
-        for (auto morpho: scene.child("neuronmorphologies").children("neuronmorphology")) {
+        for (auto morpho : scene.child("neuronmorphologies").children("neuronmorphology")) {
             auto att = morpho.attribute("neurons");
-            if (att.empty()) continue;
+            if (att.empty()) {
+                continue;
+            }
 
             auto fileAtt = morpho.attribute("swc");
-            if (fileAtt.empty()) continue;
+            if (fileAtt.empty()) {
+                continue;
+            }
 
             auto result = splitUID(att.as_string(""), ',');
             if (!result.isOk()) {
                 std::cerr << result.getError() << std::endl;
             }
             auto uids = std::move(result.getResult());
-            if (uids.empty()) continue;
+            if (uids.empty()) {
+                continue;
+            }
 
             auto fileName = std::string(fileAtt.as_string(""));
             auto lines = _fileProvider(fileName);
-
 
             if (!lines.has_value()) {
                 std::cerr << "File not found: " << fileName << std::endl;
@@ -213,9 +224,11 @@ namespace mnemea {
 
             auto swc = std::move(swcResult.getResult());
 
-            for (UID id: uids) {
+            for (UID id : uids) {
                 auto it = xmlNeurons.find(id);
-                if (it == xmlNeurons.end()) continue;
+                if (it == xmlNeurons.end()) {
+                    continue;
+                }
                 auto& xml = it->second;
 
                 Neuron neuron(xml.id, swc);
@@ -233,11 +246,10 @@ namespace mnemea {
         invoke({LoaderStatusType::DONE, "Done", STAGES, 3});
     }
 
-    LoaderFactory XMLLoader::createFactory() {
+    LoaderFactory XMLLoader::createFactory()
+    {
         return LoaderFactory(
-            SWC_LOADER_ID,
-            SWC_LOADER_NAME,
-            true,
+            SWC_LOADER_ID, SWC_LOADER_NAME, true,
             [](const std::string& name) {
                 std::string extension = std::filesystem::path(name).extension().string();
                 return extension == ".xml";
@@ -248,7 +260,6 @@ namespace mnemea {
             nullptr,
             [](LoaderFactory::FileProvider provider, std::istream& stream) {
                 return LoaderFactory::FactoryResult(std::make_unique<XMLLoader>(provider, stream));
-            }
-        );
+            });
     }
-}
+} // namespace mnemea

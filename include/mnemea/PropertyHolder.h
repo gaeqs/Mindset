@@ -9,13 +9,16 @@
 #include <optional>
 #include <map>
 
+#include <mnemea/Versioned.h>
 #include <mnemea/UID.h>
 
-namespace mnemea {
-    class PropertyHolder {
+namespace mnemea
+{
+    class PropertyHolder : public Versioned
+    {
         std::map<UID, std::any> _properties;
 
-    public:
+      public:
         PropertyHolder();
 
         void setPropertyAsAny(UID uid, std::any value);
@@ -27,14 +30,19 @@ namespace mnemea {
         bool deleteProperty(UID uid);
 
         template<typename T>
-        [[nodiscard]] std::optional<T> getProperty(UID uid) const {
+        [[nodiscard]] std::optional<T> getProperty(UID uid) const
+        {
             auto optional = getPropertyAsAny(uid);
-            if (!optional.has_value()) return {};
+            if (!optional.has_value()) {
+                return {};
+            }
             T* v = std::any_cast<T>(&optional.value());
-            if (v == nullptr) return {};
+            if (v == nullptr) {
+                return {};
+            }
             return std::optional<T>(*v);
         }
     };
-}
+} // namespace mnemea
 
 #endif //PROPERTYHOLDER_H

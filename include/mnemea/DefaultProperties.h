@@ -8,7 +8,8 @@
 #include <string>
 #include <cstdint>
 
-namespace mnemea {
+namespace mnemea
+{
 
     const std::string PROPERTY_PARENT = "mnemea:parent";
     const std::string PROPERTY_RADIUS = "mnemea:radius";
@@ -20,7 +21,8 @@ namespace mnemea {
     const std::string PROPERTY_LAYER = "mnemea:layer";
     const std::string PROPERTY_NAME = "mnemea:name";
 
-    enum class NeuriteType : uint8_t {
+    enum class NeuriteType : uint8_t
+    {
         UNDEFINED = 0,
         SOMA = 1,
         AXON = 2,
@@ -30,6 +32,6 @@ namespace mnemea {
         UNSPECIFIED_NEURITE = 6,
         GLIA_PROCESSES = 7
     };
-}
+} // namespace mnemea
 
 #endif //MNEMEA_DEFAULTPARAMETERS_H

@@ -8,20 +8,23 @@
 #include <optional>
 #include <unordered_map>
 
+#include <mnemea/Versioned.h>
 #include <mnemea/Neuron.h>
 #include <mnemea/Node.h>
 #include <mnemea/UID.h>
 #include <mnemea/Properties.h>
 #include <mnemea/Circuit.h>
 
-namespace mnemea {
-    class Dataset {
+namespace mnemea
+{
+    class Dataset : public Versioned
+    {
         std::unordered_map<UID, Neuron> _neurons;
         Properties _properties;
         Circuit _circuit;
         std::optional<Node> _hierarchy;
 
-    public:
+      public:
         Dataset();
 
         void reserveSpaceForNeurons(size_t amount);
@@ -48,18 +51,16 @@ namespace mnemea {
 
         Node* createHierarchy(UID uid, std::string type);
 
-        [[nodiscard]] auto getNeurons() {
-            return _neurons | std::views::transform([](auto& pair) -> Neuron& {
-                return pair.second;
-            });
+        [[nodiscard]] auto getNeurons()
+        {
+            return _neurons | std::views::transform([](auto& pair) -> Neuron& { return pair.second; });
         }
 
-        [[nodiscard]] auto getNeurons() const {
-            return _neurons | std::views::transform([](const auto& pair) -> const Neuron& {
-                return pair.second;
-            });
+        [[nodiscard]] auto getNeurons() const
+        {
+            return _neurons | std::views::transform([](const auto& pair) -> const Neuron& { return pair.second; });
         }
     };
-}
+} // namespace mnemea
 
 #endif //DATASET_H

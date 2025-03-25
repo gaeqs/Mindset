@@ -10,11 +10,13 @@
 #include <mnemea/PropertyHolder.h>
 #include <mnemea/Morphology.h>
 
-namespace mnemea {
-    class Neuron : public Identifiable, public PropertyHolder {
+namespace mnemea
+{
+    class Neuron : public Identifiable, public PropertyHolder
+    {
         std::shared_ptr<Morphology> _morphology;
 
-    public:
+      public:
         explicit Neuron(UID uid, std::shared_ptr<Morphology> morphology = nullptr);
 
         [[nodiscard]] std::optional<Morphology*> getMorphology();
@@ -23,7 +25,6 @@ namespace mnemea {
 
         void setMorphology(std::shared_ptr<Morphology> morphology);
     };
-}
-
+} // namespace mnemea
 
 #endif //NEURON_H
