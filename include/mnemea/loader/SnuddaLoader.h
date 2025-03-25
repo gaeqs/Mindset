@@ -10,12 +10,13 @@
 #include <mnemea/loader/Loader.h>
 #include <highfive/H5File.hpp>
 
-
-namespace mnemea {
+namespace mnemea
+{
     static const std::string SNUDDA_LOADER_ID = "mnemea:loader_snudda";
     static const std::string SNUDDA_LOADER_NAME = "Snudda";
 
-    struct SnuddaLoaderProperties {
+    struct SnuddaLoaderProperties
+    {
         UID neuritePosition;
         UID neuriteRadius;
         UID neuriteParent;
@@ -24,11 +25,11 @@ namespace mnemea {
         UID neuronTransform;
     };
 
-
     /**
     * This Loader loads Snudda projects.
     */
-    class SnuddaLoader : public Loader {
+    class SnuddaLoader : public Loader
+    {
         HighFive::File _file;
         std::filesystem::path _dataPath;
         bool _loadMorphology;
@@ -44,7 +45,7 @@ namespace mnemea {
 
         static void assignMorphology(Dataset& dataset, UID uid, std::shared_ptr<Morphology> morphology);
 
-    public:
+      public:
         explicit SnuddaLoader(const std::filesystem::path& path);
 
         [[nodiscard]] bool shouldLoadMorphology() const;
@@ -59,6 +60,6 @@ namespace mnemea {
 
         static LoaderFactory createFactory();
     };
-}
+} // namespace mnemea
 
 #endif //SNUDDALOADER_H
