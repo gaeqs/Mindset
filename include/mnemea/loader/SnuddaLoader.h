@@ -10,13 +10,12 @@
 #include <mnemea/loader/Loader.h>
 #include <highfive/H5File.hpp>
 
-namespace mnemea
-{
+
+namespace mnemea {
     static const std::string SNUDDA_LOADER_ID = "mnemea:loader_snudda";
     static const std::string SNUDDA_LOADER_NAME = "Snudda";
 
-    struct SnuddaLoaderProperties
-    {
+    struct SnuddaLoaderProperties {
         UID neuritePosition;
         UID neuriteRadius;
         UID neuriteParent;
@@ -25,11 +24,15 @@ namespace mnemea
         UID neuronTransform;
     };
 
-    class SnuddaLoader : public Loader
-    {
+
+    /**
+    * This Loader loads Snudda projects.
+    */
+    class SnuddaLoader : public Loader {
         HighFive::File _file;
         std::filesystem::path _dataPath;
         bool _loadMorphology;
+        bool _loadSynapses;
 
         SnuddaLoaderProperties initProperties(Properties& properties) const;
 
@@ -37,19 +40,25 @@ namespace mnemea
 
         std::optional<std::string> loadMorphologies(Dataset& dataset) const;
 
+        std::optional<std::string> loadSynapses(Dataset& dataset, const SnuddaLoaderProperties& properties) const;
+
         static void assignMorphology(Dataset& dataset, UID uid, std::shared_ptr<Morphology> morphology);
 
-      public:
+    public:
         explicit SnuddaLoader(const std::filesystem::path& path);
 
-        bool shouldLoadMorphology() const;
+        [[nodiscard]] bool shouldLoadMorphology() const;
 
         void setLoadMorphology(bool loadMorphology);
+
+        [[nodiscard]] bool shouldLoadSynapses() const;
+
+        void setLoadSynapses(bool loadSynapses);
 
         void load(Dataset& dataset) const override;
 
         static LoaderFactory createFactory();
     };
-} // namespace mnemea
+}
 
 #endif //SNUDDALOADER_H

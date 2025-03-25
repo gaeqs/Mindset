@@ -53,6 +53,11 @@ namespace mnemea
         * A special radius calculated using the distance of the positions to the center.
         */
         [[nodiscard]] float getPositionsRadius() const;
+
+        /**
+        * If the soma doesn't provide a radius, this method returns getPositionsRadius.
+        */
+        [[nodiscard]] float getBestMeanRadius() const;
     };
 } // namespace mnemea
 
