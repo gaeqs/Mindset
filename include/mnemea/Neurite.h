@@ -9,9 +9,17 @@
 
 namespace mnemea
 {
+    /**
+     * The Neurite class represents a neuronal neurite, such as an axon or dendrite,
+     * and can store additional properties.
+     */
     class Neurite : public Identifiable, public PropertyHolder
     {
       public:
+        /**
+         * Constructs a Neurite with the given UID.
+         * @param uid Unique identifier for the neurite.
+         */
         explicit Neurite(UID uid);
     };
 } // namespace mnemea

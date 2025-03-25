@@ -12,37 +12,81 @@
 
 namespace mnemea
 {
+    /**
+     * The Morphology class represents the structural morphology of a neuron,
+     * including its soma and neurites.
+     */
     class Morphology : public Versioned
     {
         std::optional<Soma> _soma;
         std::unordered_map<UID, Neurite> _neurites;
 
       public:
+        /**
+         * Constructs an empty Morphology object.
+         */
         Morphology();
 
+        /**
+         * Returns a mutable pointer to the soma if it exists.
+         */
         [[nodiscard]] std::optional<Soma*> getSoma();
 
+        /**
+         * Returns a const pointer to the soma if it exists.
+         */
         [[nodiscard]] std::optional<const Soma*> getSoma() const;
 
+        /**
+         * Sets the soma of the neuron.
+         * @param soma Soma to assign.
+         */
         void setSoma(Soma soma);
 
+        /**
+         * Removes the soma from the morphology.
+         */
         void clearSoma();
 
+        /**
+         * Returns a mutable pointer to the neurite with the specified UID.
+         */
         [[nodiscard]] std::optional<Neurite*> getNeurite(UID uid);
 
+        /**
+         * Returns a const pointer to the neurite with the specified UID.
+         */
         [[nodiscard]] std::optional<const Neurite*> getNeurite(UID uid) const;
 
+        /**
+         * Reserves space for a specified number of neurites.
+         * @param amount Number of neurites to reserve space for.
+         */
         void reserveSpaceForNeurites(size_t amount);
 
+        /**
+         * Adds a neurite to the morphology.
+         * @param neurite Neurite to add.
+         * @return Pair containing a pointer to the inserted neurite and a boolean indicating success.
+         */
         std::pair<Neurite*, bool> addNeurite(Neurite neurite);
 
+        /**
+         * Returns the number of neurites in the morphology.
+         */
         [[nodiscard]] size_t getNeuritesAmount() const;
 
+        /**
+         * Returns a mutable view of neurites.
+         */
         [[nodiscard]] auto getNeurites()
         {
             return _neurites | std::views::transform([](auto& pair) -> Neurite& { return pair.second; });
         }
 
+        /**
+         * Returns a const view of neurites.
+         */
         [[nodiscard]] auto getNeurites() const
         {
             return _neurites | std::views::transform([](const auto& pair) -> const Neurite& { return pair.second; });
