@@ -3,6 +3,7 @@
 //
 
 #include <fstream>
+#include <mnemea/DefaultProperties.h>
 
 #include <mnemea/loader/XMLLoader.h>
 #include <mnemea/loader/SWCLoader.h>
