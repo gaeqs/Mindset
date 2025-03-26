@@ -3,6 +3,7 @@
 //
 
 #include <fstream>
+#include <mnemea/DefaultProperties.h>
 
 #include <mindset/DefaultProperties.h>
 #include <mindset/loader/XMLLoader.h>
