@@ -17,8 +17,8 @@ Mnemea is a C++ library designed for efficient representation, management, and a
 
 ### Required:
 - C++20 compatible compiler
-- [Rush](https://your.rush.lib.url) (Mathematical operations and transformations)
-- [Hey!](https://your.hey.lib.url) (Observability pattern)
+- [Rush](https://github.com/gaeqs/Rush) (Mathematical operations and transformations)
+- [Hey!](https://github.com/gaeqs/Hey) (Observability pattern)
 
 ### Optional:
 - Brion (for loading BlueConfig and MorphoIO file types)
