@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <rush/rush.h>
-#include <mnemea/Neurite.h>
+#include <mnemea/Identifiable.h>
 #include <mnemea/PropertyHolder.h>
 
 namespace mnemea
@@ -33,30 +33,56 @@ namespace mnemea
         void recalculate() const;
 
       public:
+
+        /**
+        * Creates a new soma using the provided UID.
+        * @param the UID.
+        */
         explicit Soma(UID uid);
 
+        /**
+         * Retrieves the soma nodes defining its geometry.
+         */
         const std::vector<SomaNode>& getNodes() const;
 
+        /**
+         * Adds a node to the soma.
+         */
         void addNode(SomaNode node);
 
+        /**
+         * Clears all nodes from the soma.
+         */
         void clearNodes();
 
+        /**
+         * Returns the center of the soma geometry.
+         */
         [[nodiscard]] rush::Vec3f getCenter() const;
 
+        /**
+         * Returns the minimum radius among soma nodes.
+         */
         [[nodiscard]] float getMinRadius() const;
 
+        /**
+         * Returns the maximum radius among soma nodes.
+         */
         [[nodiscard]] float getMaxRadius() const;
 
+        /**
+         * Returns the mean radius among soma nodes.
+         */
         [[nodiscard]] float getMeanRadius() const;
 
         /**
-        * A special radius calculated using the distance of the positions to the center.
-        */
+         * Calculates the radius based on the positions of soma nodes relative to the center.
+         */
         [[nodiscard]] float getPositionsRadius() const;
 
         /**
-        * If the soma doesn't provide a radius, this method returns getPositionsRadius.
-        */
+         * Provides a robust radius estimation, falling back to positions-based radius if necessary.
+         */
         [[nodiscard]] float getBestMeanRadius() const;
     };
 } // namespace mnemea

@@ -10,20 +10,43 @@
 
 namespace mnemea
 {
+    /**
+     * Represents a synaptic connection between two neurons.
+     * Each synapse has associated pre- and post-synaptic neurons.
+     */
     class Synapse : public PropertyHolder
     {
         UID _preSynapticNeuron;
         UID _postSynapticNeuron;
 
       public:
+        /**
+         * Constructs a synapse between specified pre- and post-synaptic neurons.
+         * @param preSynapticNeuron UID of the pre-synaptic neuron.
+         * @param postSynapticNeuron UID of the post-synaptic neuron.
+         */
         Synapse(UID preSynapticNeuron, UID postSynapticNeuron);
 
-        UID getPreSynapticNeuron() const;
+        /**
+         * Retrieves the UID of the pre-synaptic neuron.
+         */
+        [[nodiscard]] UID getPreSynapticNeuron() const;
 
+        /**
+         * Sets the UID of the pre-synaptic neuron.
+         * @param uid UID of the neuron.
+         */
         void setPreSynapticNeuron(UID uid);
 
-        UID getPostSynapticNeuron() const;
+        /**
+         * Retrieves the UID of the post-synaptic neuron.
+         */
+        [[nodiscard]] UID getPostSynapticNeuron() const;
 
+        /**
+         * Sets the UID of the post-synaptic neuron.
+         * @param uid UID of the neuron.
+         */
         void setPostSynapticNeuron(UID uid);
     };
 } // namespace mnemea

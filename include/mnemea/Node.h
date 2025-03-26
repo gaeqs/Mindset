@@ -26,6 +26,9 @@ namespace mnemea
         ERROR_WHILE_CREATING
     };
 
+    /**
+     * Represents a hierarchical node structure containing child nodes and associated neurons.
+     */
     class Node : public Identifiable
     {
         std::string _type;
@@ -35,32 +38,67 @@ namespace mnemea
       public:
         Node(const Node& other) = delete;
 
-        Node(Node&& Other) noexcept;
+        Node(Node&& other) noexcept;
 
-        Node& operator=(Node&& Other) noexcept;
+        Node& operator=(Node&& other) noexcept;
 
+        /**
+         * Constructs a Node with a unique identifier and type.
+         * @param uid Unique identifier of the node.
+         * @param type String representing the node type.
+         */
         Node(UID uid, std::string type);
 
+        /**
+         * Creates a child node under this node.
+         * @param uid UID for the new child node.
+         * @param type Type of the child node.
+         */
         [[nodiscard]] Result<Node*, NodeCreateError> createNode(UID uid, std::string type);
 
+        /**
+         * Retrieves or creates a child node.
+         * @param uid UID for the node.
+         * @param type Type of the node.
+         */
         [[nodiscard]] Result<Node*, NodeCreateError> getOrCreateNode(UID uid, std::string type);
 
+        /**
+         * Retrieves a mutable child node, if it exists.
+         */
         [[nodiscard]] std::optional<Node*> getNode(UID uid);
 
+        /**
+         * Retrieves a const child node, if it exists.
+         */
         [[nodiscard]] std::optional<const Node*> getNode(UID uid) const;
 
+        /**
+         * Associates a neuron with this node.
+         * @param neuron UID of the neuron.
+         * @return True if the neuron was added; false if it already existed.
+         */
         bool addNeuron(UID neuron);
 
+        /**
+         * Returns a mutable range view of child nodes.
+         */
         [[nodiscard]] auto getNodes()
         {
             return _children | std::views::transform([](auto& pair) -> Node* { return pair.second; });
         }
 
+        /**
+         * Returns a const range view of child nodes.
+         */
         [[nodiscard]] auto getNodes() const
         {
             return _children | std::views::transform([](const auto& pair) -> const Node* { return pair.second; });
         }
 
+        /**
+         * Returns a const range view of associated neuron UIDs.
+         */
         [[nodiscard]] auto getNeurons() const
         {
             return _neurons | std::views::transform([](const UID pair) -> const UID { return pair; });

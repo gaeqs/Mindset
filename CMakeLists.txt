@@ -37,7 +37,6 @@ list(APPEND LIBRARIES hey)
 
 # Import Brion
 if (MNEMEA_USE_BRION)
-    message("OCHIWI ${MNEMEA_EXTERNAL_BRION}")
     if (NOT MNEMEA_EXTERNAL_BRION)
         FetchContent_Declare(
                 brion

@@ -14,21 +14,51 @@
 
 namespace mnemea
 {
+    /**
+     * Holds a set of properties, each associated with a UID and stored as any type.
+     */
     class PropertyHolder : public Versioned
     {
         std::map<UID, std::any> _properties;
 
       public:
+
+        /**
+        * Creates a new property holder.
+        */
         PropertyHolder();
 
+        /**
+         * Sets a property value by UID.
+         * @param uid UID of the property.
+         * @param value Property value (stored as std::any).
+         */
         void setPropertyAsAny(UID uid, std::any value);
 
+        /**
+         * Retrieves the property value as std::any, if present.
+         * @param uid UID of the property.
+         */
         [[nodiscard]] std::optional<std::any> getPropertyAsAny(UID uid) const;
 
+        /**
+         * Checks if the property exists.
+         * @param uid UID of the property.
+         */
         [[nodiscard]] bool hasProperty(UID uid) const;
 
+        /**
+         * Deletes a property by UID.
+         * @param uid UID of the property.
+         * @return True if deleted successfully, false otherwise.
+         */
         bool deleteProperty(UID uid);
 
+        /**
+         * Retrieves the property as a specific type, if present.
+         * @tparam T Expected type of the property.
+         * @param uid UID of the property.
+         */
         template<typename T>
         [[nodiscard]] std::optional<T> getProperty(UID uid) const
         {
