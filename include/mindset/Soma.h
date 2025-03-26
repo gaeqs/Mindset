@@ -7,10 +7,10 @@
 
 #include <vector>
 #include <rush/rush.h>
-#include <mnemea/Identifiable.h>
-#include <mnemea/PropertyHolder.h>
+#include <mindset/Identifiable.h>
+#include <mindset/PropertyHolder.h>
 
-namespace mnemea
+namespace mindset
 {
 
     struct SomaNode
@@ -85,6 +85,6 @@ namespace mnemea
          */
         [[nodiscard]] float getBestMeanRadius() const;
     };
-} // namespace mnemea
+} // namespace mindset
 
 #endif //SOMA_H

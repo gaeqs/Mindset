@@ -9,9 +9,9 @@
 #include <string>
 #include <optional>
 
-#include <mnemea/UID.h>
+#include <mindset/UID.h>
 
-namespace mnemea
+namespace mindset
 {
     /**
      * Manages a set of named properties with associated unique identifiers.
@@ -63,6 +63,6 @@ namespace mnemea
          */
         [[nodiscard]] const std::map<UID, std::string>& getPropertiesNames() const;
     };
-} // namespace mnemea
+} // namespace mindset
 
 #endif //PROPERTIES_H

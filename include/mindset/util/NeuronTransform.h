@@ -7,7 +7,7 @@
 
 #include <rush/rush.h>
 
-namespace mnemea
+namespace mindset
 {
     /**
      * Manages spatial transformations (position, rotation, scale) of a neuron and computes corresponding matrices.
@@ -80,6 +80,6 @@ namespace mnemea
          */
         void setScale(const rush::Vec3f& scale);
     };
-} // namespace mnemea
+} // namespace mindset
 
 #endif //NEURONTRANSFORM_H

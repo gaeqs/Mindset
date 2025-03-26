@@ -2,9 +2,9 @@
 // Created by gaeqs on 12/03/25.
 //
 
-#include <mnemea/Morphology.h>
+#include <mindset/Morphology.h>
 
-namespace mnemea
+namespace mindset
 {
     Morphology::Morphology() = default;
 
@@ -73,4 +73,4 @@ namespace mnemea
     {
         return _neurites.size();
     }
-} // namespace mnemea
+} // namespace mindset

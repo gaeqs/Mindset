@@ -7,12 +7,12 @@
 
 #include <filesystem>
 
-#include <mnemea/loader/Loader.h>
+#include <mindset/loader/Loader.h>
 #include <highfive/H5File.hpp>
 
-namespace mnemea
+namespace mindset
 {
-    static const std::string SNUDDA_LOADER_ID = "mnemea:loader_snudda";
+    static const std::string SNUDDA_LOADER_ID = "mindset:loader_snudda";
     static const std::string SNUDDA_LOADER_NAME = "Snudda";
 
     struct SnuddaLoaderProperties
@@ -60,6 +60,6 @@ namespace mnemea
 
         static LoaderFactory createFactory();
     };
-} // namespace mnemea
+} // namespace mindset
 
 #endif //SNUDDALOADER_H

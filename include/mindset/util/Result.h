@@ -2,13 +2,13 @@
 // Created by grial on 19/10/22.
 //
 
-#ifndef MNEMEA_RESULT_H
-#define MNEMEA_RESULT_H
+#ifndef MINDSET_RESULT_H
+#define MINDSET_RESULT_H
 
 #include <cstdint>
 #include <functional>
 
-namespace mnemea
+namespace mindset
 {
 
     /**
@@ -184,6 +184,6 @@ namespace mnemea
             return mapper(getError());
         }
     };
-} // namespace mnemea
+} // namespace mindset
 
-#endif //MNEMEA_RESULT_H
+#endif //MINDSET_RESULT_H

@@ -2,9 +2,9 @@
 // Created by gaeqs on 15/03/25.
 //
 
-#include <mnemea/Soma.h>
+#include <mindset/Soma.h>
 
-namespace mnemea {
+namespace mindset {
     void Soma::recalculate() const {
         if (_nodes.empty()) {
             _center = rush::Vec3f(0.0f);

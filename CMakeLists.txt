@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.16)
-project(Mnemea LANGUAGES CXX VERSION 1.2.3)
+project(Mindset LANGUAGES CXX VERSION 1.2.3)
 
 include(FetchContent)
 
 # Configuration options
-option(MNEMEA_BUILD_SHARED "Build Mnemea as a shared library" OFF)
-option(MNEMEA_USE_BRION "Import Brion" ON)
-option(MNEMEA_EXTERNAL_BRION "Use an external version of Brion" OFF)
-option(MNEMEA_TESTS "Include Mnemea tests" ON)
+option(MINDSET_BUILD_SHARED "Build Mindset as a shared library" OFF)
+option(MINDSET_USE_BRION "Import Brion" ON)
+option(MINDSET_EXTERNAL_BRION "Use an external version of Brion" OFF)
+option(MINDSET_TESTS "Include Mindset tests" ON)
 
 # Global parameters
 set(CMAKE_CXX_STANDARD 20)
@@ -36,8 +36,8 @@ FetchContent_MakeAvailable(hey)
 list(APPEND LIBRARIES hey)
 
 # Import Brion
-if (MNEMEA_USE_BRION)
-    if (NOT MNEMEA_EXTERNAL_BRION)
+if (MINDSET_USE_BRION)
+    if (NOT MINDSET_EXTERNAL_BRION)
         FetchContent_Declare(
                 brion
                 GIT_REPOSITORY https://github.com/BlueBrain/Brion.git
@@ -67,43 +67,43 @@ list(APPEND LIBRARIES pugixml)
 # Create the library
 add_subdirectory(src)
 
-if (MNEMEA_TESTS)
+if (MINDSET_TESTS)
     add_subdirectory(test)
 endif ()
 
 # Installation and export
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-        "${CMAKE_CURRENT_BINARY_DIR}/MnemeaConfigVersion.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/MindsetConfigVersion.cmake"
         VERSION ${PROJECT_VERSION}
         COMPATIBILITY AnyNewerVersion
 )
 
-if (NOT MNEMEA_USE_BRION)
+if (NOT MINDSET_USE_BRION)
     install(
-            EXPORT MnemeaTargets
-            FILE MnemeaTargets.cmake
-            NAMESPACE Mnemea::
-            DESTINATION lib/cmake/Mnemea
+            EXPORT MindsetTargets
+            FILE MindsetTargets.cmake
+            NAMESPACE Mindset::
+            DESTINATION lib/cmake/Mindset
     )
 
 
     configure_package_config_file(
-            "cmake/MnemeaConfig.cmake.in"
-            "${CMAKE_CURRENT_BINARY_DIR}/MnemeaConfig.cmake"
-            INSTALL_DESTINATION lib/cmake/Mnemea
+            "cmake/MindsetConfig.cmake.in"
+            "${CMAKE_CURRENT_BINARY_DIR}/MindsetConfig.cmake"
+            INSTALL_DESTINATION lib/cmake/Mindset
     )
 
     install(
             FILES
-            "${CMAKE_CURRENT_BINARY_DIR}/MnemeaConfig.cmake"
-            "${CMAKE_CURRENT_BINARY_DIR}/MnemeaConfigVersion.cmake"
-            DESTINATION lib/cmake/Mnemea
+            "${CMAKE_CURRENT_BINARY_DIR}/MindsetConfig.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/MindsetConfigVersion.cmake"
+            DESTINATION lib/cmake/Mindset
     )
 
     # Install public headers
     install(
-            DIRECTORY include/Mnemea
+            DIRECTORY include/mindset
             DESTINATION include
     )
 endif ()

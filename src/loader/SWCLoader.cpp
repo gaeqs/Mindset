@@ -2,12 +2,12 @@
 // Created by gaeqs on 13/03/25.
 //
 
-#include <mnemea/loader/SWCLoader.h>
+#include <mindset/loader/SWCLoader.h>
 
 #include <fstream>
-#include <mnemea/DefaultProperties.h>
+#include <mindset/DefaultProperties.h>
 
-namespace mnemea {
+namespace mindset {
     Result<SWCLoader::SWCSegment, std::string> SWCLoader::toSegment(size_t lineIndex) const {
         SWCSegment segment;
 

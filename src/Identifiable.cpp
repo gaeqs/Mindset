@@ -2,9 +2,9 @@
 // Created by gaeqs on 09/03/2025.
 //
 
-#include <mnemea/Identifiable.h>
+#include <mindset/Identifiable.h>
 
-namespace mnemea
+namespace mindset
 {
     Identifiable::Identifiable(UID id) :
         _id(id)
@@ -30,4 +30,4 @@ namespace mnemea
     {
         return _id != other._id;
     }
-} // namespace mnemea
+} // namespace mindset

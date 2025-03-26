@@ -2,9 +2,9 @@
 // Created by gaeqs on 14/03/25.
 //
 
-#include <mnemea/loader/Loader.h>
+#include <mindset/loader/Loader.h>
 
-namespace mnemea
+namespace mindset
 {
     LoaderFactory::LoaderFactory(std::string id, std::string displayName, bool providesUIDs,
                                  SupportFilter supportFilter, FromPath fromPath, FromLines fromLines,
@@ -70,4 +70,4 @@ namespace mnemea
 
         return _fromIstream(std::move(provider), stream);
     }
-} // namespace mnemea
+} // namespace mindset

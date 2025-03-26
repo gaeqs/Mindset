@@ -4,15 +4,16 @@
 
 #include <fstream>
 
-#include <mnemea/loader/XMLLoader.h>
-#include <mnemea/loader/SWCLoader.h>
+#include <mindset/DefaultProperties.h>
+#include <mindset/loader/XMLLoader.h>
+#include <mindset/loader/SWCLoader.h>
 
 namespace
 {
-    std::optional<mnemea::UID> asUID(pugi::xml_attribute attr)
+    std::optional<mindset::UID> asUID(pugi::xml_attribute attr)
     {
-        constexpr mnemea::UID NOT_VALID = -1;
-        mnemea::UID id = attr.as_uint(NOT_VALID);
+        constexpr mindset::UID NOT_VALID = -1;
+        mindset::UID id = attr.as_uint(NOT_VALID);
         if (id == NOT_VALID) {
             return {};
         }
@@ -27,7 +28,7 @@ namespace
         return attr.as_string();
     }
 
-    mnemea::Result<std::vector<float>, std::string> split(const std::string& string, char delimiter)
+    mindset::Result<std::vector<float>, std::string> split(const std::string& string, char delimiter)
     {
         std::vector<float> tokens;
         std::stringstream ss(string);
@@ -46,9 +47,9 @@ namespace
         return tokens;
     }
 
-    mnemea::Result<std::vector<mnemea::UID>, std::string> splitUID(const std::string& string, char delimiter)
+    mindset::Result<std::vector<mindset::UID>, std::string> splitUID(const std::string& string, char delimiter)
     {
-        std::vector<mnemea::UID> tokens;
+        std::vector<mindset::UID> tokens;
         std::stringstream ss(string);
 
         std::string token;
@@ -66,7 +67,7 @@ namespace
     }
 } // namespace
 
-namespace mnemea
+namespace mindset
 {
     XMLLoader::XMLLoader(FileProvider provider, const void* data, size_t size) :
         _fileProvider(provider)
@@ -119,7 +120,7 @@ namespace mnemea
 
         Node* root = dataset.getHierarchy().value_or(nullptr);
         if (root == nullptr) {
-            root = dataset.createHierarchy(0, "mnemea:root");
+            root = dataset.createHierarchy(0, "mindset:root");
         }
 
         for (auto column : scene.child("columns").children("column")) {
@@ -127,7 +128,7 @@ namespace mnemea
 
             Node* columnNode = nullptr;
             if (columnId.has_value()) {
-                if (auto result = root->getOrCreateNode(columnId.value(), "mnemea:column"); result.isOk()) {
+                if (auto result = root->getOrCreateNode(columnId.value(), "mindset:column"); result.isOk()) {
                     columnNode = result.getResult();
                 }
             }
@@ -137,7 +138,7 @@ namespace mnemea
 
                 Node* miniColumnNode = nullptr;
                 if (columnNode != nullptr && columnId.has_value()) {
-                    auto result = columnNode->getOrCreateNode(columnId.value(), "mnemea:mini_column");
+                    auto result = columnNode->getOrCreateNode(columnId.value(), "mindset:mini_column");
                     if (result.isOk()) {
                         miniColumnNode = result.getResult();
                     }
@@ -262,4 +263,4 @@ namespace mnemea
                 return LoaderFactory::FactoryResult(std::make_unique<XMLLoader>(provider, stream));
             });
     }
-} // namespace mnemea
+} // namespace mindset

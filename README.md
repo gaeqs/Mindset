@@ -1,10 +1,10 @@
-# Mnemea - Neuronal scene Representation and Management Library
+# Mindset - Neuronal scene Representation and Management Library
 
 © 2025. VG-Lab / URJC
 
 ## Introduction
 
-Mnemea is a C++ library designed for efficient representation, management, and analysis of complex neural scenes. It provides robust data structures and utility functions to manage datasets consisting of neurons, synapses, morphologies, hierarchical node structures, and associated properties.
+Mindset is a C++ library designed for efficient representation, management, and analysis of complex neural scenes. It provides robust data structures and utility functions to manage datasets consisting of neurons, synapses, morphologies, hierarchical node structures, and associated properties.
 
 ### Key Features:
 - Efficient neuron and synapse management
@@ -25,37 +25,37 @@ Mnemea is a C++ library designed for efficient representation, management, and a
 
 ## Building
 
-Mnemea has been successfully built on Linux (Ubuntu 22.04), MacOS (Monterey, Sonoma), and Windows (Visual Studio 2022).
+Mindset has been successfully built on Linux (Ubuntu 22.04), MacOS (Monterey, Sonoma), and Windows (Visual Studio 2022).
 
 Build steps:
 ```bash
-git clone https://gitlab.gmrv.es/g.rial/mnemea
-mkdir mnemea/build && cd mnemea/build
+git clone https://gitlab.gmrv.es/g.rial/mindset
+mkdir mindset/build && cd mindset/build
 cmake .. -DCMAKE_BUILD_TYPE=Release
 make
 ```
 
 ## Usage
 
-After building Mnemea, you can integrate it directly into your project by linking against the generated library:
+After building Mindset, you can integrate it directly into your project by linking against the generated library:
 
 ```cmake
-find_package(mnemea REQUIRED)
-target_link_libraries(your_target PRIVATE mnemea)
+find_package(mindset REQUIRED)
+target_link_libraries(your_target PRIVATE mindset)
 ```
 
 ## Example
 
 ```cpp
-#include <mnemea/Dataset.h>
+#include <mindset/Dataset.h>
 
 int main()
 {
-    mnemea::Dataset dataset;
+    mindset::Dataset dataset;
     dataset.reserveSpaceForNeurons(100);
     
     // Add a neuron
-    mnemea::Neuron neuron(mnemea::UID(1));
+    mindset::Neuron neuron(mindset::UID(1));
     dataset.addNeuron(std::move(neuron));
 
     // Manage neurons...

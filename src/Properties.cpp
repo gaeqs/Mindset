@@ -4,9 +4,9 @@
 
 #include <ranges>
 
-#include <mnemea/Properties.h>
+#include <mindset/Properties.h>
 
-namespace mnemea
+namespace mindset
 {
     Properties::Properties() = default;
 
@@ -57,4 +57,4 @@ namespace mnemea
     {
         return _propertiesNames;
     }
-} // namespace mnemea
+} // namespace mindset

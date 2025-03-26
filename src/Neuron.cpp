@@ -2,11 +2,11 @@
 // Created by gaeqs on 09/03/2025.
 //
 
-#include <mnemea/Neuron.h>
+#include <mindset/Neuron.h>
 
 #include <utility>
 
-namespace mnemea
+namespace mindset
 {
     Neuron::Neuron(UID uid, std::shared_ptr<Morphology> morphology) :
         Identifiable(uid),
@@ -35,4 +35,4 @@ namespace mnemea
         _morphology = std::move(morphology);
         setNewVersion();
     }
-} // namespace mnemea
+} // namespace mindset

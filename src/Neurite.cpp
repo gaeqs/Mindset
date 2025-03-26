@@ -2,12 +2,12 @@
 // Created by gaeqs on 11/03/2025.
 //
 
-#include <mnemea/Neurite.h>
+#include <mindset/Neurite.h>
 
-namespace mnemea
+namespace mindset
 {
     Neurite::Neurite(UID uid) :
         Identifiable(uid)
     {
     }
-} // namespace mnemea
+} // namespace mindset

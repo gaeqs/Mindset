@@ -9,10 +9,10 @@
 #include <ranges>
 #include <vector>
 
-#include <mnemea/Synapse.h>
-#include <mnemea/Versioned.h>
+#include <mindset/Synapse.h>
+#include <mindset/Versioned.h>
 
-namespace mnemea
+namespace mindset
 {
     /**
      * The Circuit class represents the neural connectivity within a dataset.
@@ -110,6 +110,6 @@ namespace mnemea
                    std::views::transform([&](const auto& pair) -> const Synapse& { return _synapses[pair.second]; });
         }
     };
-} // namespace mnemea
+} // namespace mindset
 
 #endif //CIRCUIT_H

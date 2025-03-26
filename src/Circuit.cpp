@@ -2,9 +2,9 @@
 // Created by gaeqs on 11/03/2025.
 //
 
-#include <mnemea/Circuit.h>
+#include <mindset/Circuit.h>
 
-namespace mnemea
+namespace mindset
 {
     Circuit::Circuit() = default;
 
@@ -43,4 +43,4 @@ namespace mnemea
     {
         return _synapses;
     }
-} // namespace mnemea
+} // namespace mindset

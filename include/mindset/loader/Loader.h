@@ -11,10 +11,10 @@
 
 #include <hey/Observable.h>
 
-#include <mnemea/Dataset.h>
-#include <mnemea/loader/LoaderStatus.h>
+#include <mindset/Dataset.h>
+#include <mindset/loader/LoaderStatus.h>
 
-namespace mnemea
+namespace mindset
 {
     /**
      * Abstract class defining an interface for dataset loaders, allowing the loading of data into a Dataset instance.
@@ -106,6 +106,6 @@ namespace mnemea
          */
         [[nodiscard]] FactoryResult create(FileProvider provider, std::istream& stream) const;
     };
-} // namespace mnemea
+} // namespace mindset
 
 #endif //LOADER_H

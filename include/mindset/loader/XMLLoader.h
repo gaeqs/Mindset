@@ -11,15 +11,15 @@
 
 #include <pugixml.hpp>
 
-#include <mnemea/Dataset.h>
-#include <mnemea/UID.h>
-#include <mnemea/util/NeuronTransform.h>
-#include <mnemea/loader/Loader.h>
+#include <mindset/Dataset.h>
+#include <mindset/UID.h>
+#include <mindset/util/NeuronTransform.h>
+#include <mindset/loader/Loader.h>
 
-namespace mnemea
+namespace mindset
 {
 
-    static const std::string XML_LOADER_ID = "mnemea:loader_xml";
+    static const std::string XML_LOADER_ID = "mindset:loader_xml";
     static const std::string XML_LOADER_NAME = "XML";
 
     /**
@@ -57,6 +57,6 @@ namespace mnemea
 
         static LoaderFactory createFactory();
     };
-} // namespace mnemea
+} // namespace mindset
 
 #endif //XMLLOADER_H

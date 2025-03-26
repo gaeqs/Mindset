@@ -11,12 +11,12 @@
 #include <ranges>
 #include <unordered_set>
 
-#include <mnemea/Identifiable.h>
-#include <mnemea/util/Result.h>
+#include <mindset/Identifiable.h>
+#include <mindset/util/Result.h>
 
-#include <mnemea/Neuron.h>
+#include <mindset/Neuron.h>
 
-namespace mnemea
+namespace mindset
 {
     class Node;
 
@@ -104,6 +104,6 @@ namespace mnemea
             return _neurons | std::views::transform([](const UID pair) -> const UID { return pair; });
         }
     };
-} // namespace mnemea
+} // namespace mindset
 
 #endif //NODE_H

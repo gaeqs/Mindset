@@ -6,11 +6,11 @@
 #define NEURON_H
 
 #include <memory>
-#include <mnemea/Identifiable.h>
-#include <mnemea/PropertyHolder.h>
-#include <mnemea/Morphology.h>
+#include <mindset/Identifiable.h>
+#include <mindset/PropertyHolder.h>
+#include <mindset/Morphology.h>
 
-namespace mnemea
+namespace mindset
 {
     /**
      * Represents a neuron, holding a unique identifier, properties, and optional morphology.
@@ -43,6 +43,6 @@ namespace mnemea
          */
         void setMorphology(std::shared_ptr<Morphology> morphology);
     };
-} // namespace mnemea
+} // namespace mindset
 
 #endif //NEURON_H

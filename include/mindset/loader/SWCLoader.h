@@ -10,15 +10,15 @@
 
 #include <rush/rush.h>
 
-#include <mnemea/Dataset.h>
-#include <mnemea/UID.h>
-#include <mnemea/util/Result.h>
-#include <mnemea/loader/Loader.h>
+#include <mindset/Dataset.h>
+#include <mindset/UID.h>
+#include <mindset/util/Result.h>
+#include <mindset/loader/Loader.h>
 
-namespace mnemea
+namespace mindset
 {
 
-    static const std::string SWC_LOADER_ID = "mnemea:loader_swc";
+    static const std::string SWC_LOADER_ID = "mindset:loader_swc";
     static const std::string SWC_LOADER_NAME = "SWC";
 
     /**
@@ -57,6 +57,6 @@ namespace mnemea
 
         static LoaderFactory createFactory();
     };
-} // namespace mnemea
+} // namespace mindset
 
 #endif //SWCLOADER_H

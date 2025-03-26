@@ -4,16 +4,16 @@
 
 #ifndef BLUECONFIGLOADER_H
 #define BLUECONFIGLOADER_H
-#ifdef MNEMEA_BRION
+#ifdef MINDSET_BRION
 
     #include <filesystem>
     #include <brain/python/types.h>
     #include <brion/brion.h>
 
-    #include <mnemea/Dataset.h>
-    #include <mnemea/loader/Loader.h>
+    #include <mindset/Dataset.h>
+    #include <mindset/loader/Loader.h>
 
-namespace mnemea
+namespace mindset
 {
     struct BlueConfigLoaderProperties
     {
@@ -28,7 +28,7 @@ namespace mnemea
         UID neuronLayer;
     };
 
-    static const std::string BLUE_CONFIG_LOADER_ID = "mnemea:loader_blue_config";
+    static const std::string BLUE_CONFIG_LOADER_ID = "mindset:loader_blue_config";
     static const std::string BLUE_CONFIG_LOADER_NAME = "Blue Config";
 
     /**
@@ -76,7 +76,7 @@ namespace mnemea
 
         static LoaderFactory createFactory();
     };
-} // namespace mnemea
+} // namespace mindset
 
 #endif
 #endif //BLUECONFIGLOADER_H

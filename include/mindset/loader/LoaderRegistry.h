@@ -7,9 +7,9 @@
 #include <string>
 #include <unordered_map>
 
-#include <mnemea/loader/Loader.h>
+#include <mindset/loader/Loader.h>
 
-namespace mnemea
+namespace mindset
 {
     /**
      * Registry maintaining available LoaderFactory instances, enabling easy retrieval and management of loaders.
@@ -59,6 +59,6 @@ namespace mnemea
                    std::views::transform([](const auto& pair) -> const LoaderFactory& { return pair.second; });
         }
     };
-} // namespace mnemea
+} // namespace mindset
 
 #endif //LOADERREGISTRY_H

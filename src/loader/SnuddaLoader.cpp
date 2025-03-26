@@ -2,10 +2,10 @@
 // Created by gaeqs on 14/03/25.
 //
 
-#include <mnemea/DefaultProperties.h>
-#include <mnemea/loader/SnuddaLoader.h>
-#include <mnemea/loader/SWCLoader.h>
-#include <mnemea/util/NeuronTransform.h>
+#include <mindset/DefaultProperties.h>
+#include <mindset/loader/SnuddaLoader.h>
+#include <mindset/loader/SWCLoader.h>
+#include <mindset/util/NeuronTransform.h>
 #include <rush/matrix/mat.h>
 #include <rush/vector/vec.h>
 
@@ -14,7 +14,7 @@ namespace
     constexpr float METER_MICROMETER_RATIO = 1000000.0f;
 }
 
-namespace mnemea
+namespace mindset
 {
 
     SnuddaLoaderProperties SnuddaLoader::initProperties(Properties& properties) const
@@ -118,7 +118,7 @@ namespace mnemea
     }
 
     SnuddaLoader::SnuddaLoader(const std::filesystem::path& path) :
-        _file(path, HighFive::File::ReadOnly),
+        _file(path.string(), HighFive::File::ReadOnly),
         _dataPath(path.parent_path() / "data"),
         _loadMorphology(true),
         _loadSynapses(true)
@@ -180,4 +180,4 @@ namespace mnemea
                 return LoaderFactory::FactoryResult(std::make_unique<SnuddaLoader>(path));
             });
     }
-} // namespace mnemea
+} // namespace mindset

@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-namespace mnemea
+namespace mindset
 {
     /**
      * Provides versioning capabilities for derived objects.
@@ -38,6 +38,6 @@ namespace mnemea
         void setNewVersion();
     };
 
-} // namespace mnemea
+} // namespace mindset
 
 #endif // VERSIONED_H

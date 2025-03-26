@@ -5,10 +5,10 @@
 #ifndef SYNAPSE_H
 #define SYNAPSE_H
 
-#include <mnemea/PropertyHolder.h>
-#include <mnemea/UID.h>
+#include <mindset/PropertyHolder.h>
+#include <mindset/UID.h>
 
-namespace mnemea
+namespace mindset
 {
     /**
      * Represents a synaptic connection between two neurons.
@@ -49,6 +49,6 @@ namespace mnemea
          */
         void setPostSynapticNeuron(UID uid);
     };
-} // namespace mnemea
+} // namespace mindset
 
 #endif //SYNAPSE_H

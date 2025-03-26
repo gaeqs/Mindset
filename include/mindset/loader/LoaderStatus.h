@@ -5,7 +5,7 @@
 #ifndef LOADERSTATUS_H
 #define LOADERSTATUS_H
 
-namespace mnemea
+namespace mindset
 {
 
     /**
@@ -38,6 +38,6 @@ namespace mnemea
         size_t stagesCompleted;
     };
 
-} // namespace mnemea
+} // namespace mindset
 
 #endif //LOADERSTATUS_H

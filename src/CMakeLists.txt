@@ -1,10 +1,10 @@
-if (MNEMEA_BUILD_SHARED)
-    add_library(mnemea STATIC)
+if (MINDSET_BUILD_SHARED)
+    add_library(mindset STATIC)
 else ()
-    add_library(mnemea SHARED)
+    add_library(mindset SHARED)
 endif ()
 
-target_sources(mnemea PRIVATE
+target_sources(mindset PRIVATE
         Identifiable.cpp
         Neuron.cpp
         Dataset.cpp
@@ -29,25 +29,25 @@ target_sources(mnemea PRIVATE
         loader/LoaderRegistry.cpp
 )
 
-target_include_directories(mnemea
+target_include_directories(mindset
         PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(mnemea PUBLIC ${LIBRARIES})
+target_link_libraries(mindset PUBLIC ${LIBRARIES})
 
-set_target_properties(mnemea PROPERTIES
+set_target_properties(mindset PROPERTIES
         VERSION ${PROJECT_VERSION}
         SUBVERSION ${PROJECT_VERSION_MAJOR}
 )
 
-if (MNEMEA_USE_BRION)
-    target_compile_definitions(mnemea PUBLIC MNEMEA_BRION)
+if (MINDSET_USE_BRION)
+    target_compile_definitions(mindset PUBLIC MINDSET_BRION)
 endif ()
 
-install(TARGETS mnemea
-        EXPORT MnemeaTargets
+install(TARGETS mindset
+        EXPORT MindsetTargets
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin

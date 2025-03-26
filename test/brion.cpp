@@ -3,27 +3,27 @@
 //
 
 #include <catch2/catch_all.hpp>
-#include <mnemea/DefaultProperties.h>
+#include <mindset/DefaultProperties.h>
 
-#include <mnemea/loader/BlueConfigLoader.h>
-#include <mnemea/util/NeuronTransform.h>
+#include <mindset/loader/BlueConfigLoader.h>
+#include <mindset/util/NeuronTransform.h>
 #include <rush/vector/vec.h>
 
 TEST_CASE("Brion load")
 {
     std::filesystem::path path = "/run/media/gaeqs/HDD/SynCoPaData/build/vizCa2p0_1x7/BlueConfig";
-    mnemea::BlueConfigLoader loader(path);
+    mindset::BlueConfigLoader loader(path);
     loader.addTarget("sergio");
     loader.setLoadMorphology(true);
     loader.setLoadHierarchy(true);
 
     size_t i = 0;
-    auto listener = loader.createListener([&](const mnemea::LoaderStatus& result) {
+    auto listener = loader.createListener([&](const mindset::LoaderStatus& result) {
         ++i;
         std::cout << result.currentTask << " (" << result.stagesCompleted << "/" << result.stages << ")" << std::endl;
     });
 
-    mnemea::Dataset dataset;
+    mindset::Dataset dataset;
     loader.load(dataset);
 
     auto& properties = dataset.getProperties();

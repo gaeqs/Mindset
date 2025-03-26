@@ -2,9 +2,9 @@
 // Created by gaeqs on 09/03/2025.
 //
 
-#include <mnemea/Dataset.h>
+#include <mindset/Dataset.h>
 
-namespace mnemea
+namespace mindset
 {
     Dataset::Dataset()
     {
@@ -91,4 +91,4 @@ namespace mnemea
         setNewVersion();
         return &_hierarchy.value();
     }
-} // namespace mnemea
+} // namespace mindset

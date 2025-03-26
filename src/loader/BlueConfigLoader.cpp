@@ -2,16 +2,16 @@
 // Created by gaeqs on 12/03/25.
 //
 
-#ifdef MNEMEA_BRION
+#ifdef MINDSET_BRION
 
-    #include <mnemea/util/NeuronTransform.h>
-    #include <mnemea/loader/BlueConfigLoader.h>
-    #include <mnemea/DefaultProperties.h>
+    #include <mindset/util/NeuronTransform.h>
+    #include <mindset/loader/BlueConfigLoader.h>
+    #include <mindset/DefaultProperties.h>
 
     #include <brain/circuit.h>
     #include <rush/rush.h>
 
-namespace mnemea
+namespace mindset
 {
     BlueConfigLoaderProperties BlueConfigLoader::initProperties(Properties& properties) const
     {
@@ -84,7 +84,7 @@ namespace mnemea
 
         Node* root = dataset.getHierarchy().value_or(nullptr);
         if (root == nullptr) {
-            root = dataset.createHierarchy(0, "mnemea:root");
+            root = dataset.createHierarchy(0, "mindset:root");
         }
 
         size_t index = 0;
@@ -95,9 +95,9 @@ namespace mnemea
                 UID column = boost::lexical_cast<UID>(sub[0]);
                 UID miniColumn = boost::lexical_cast<UID>(sub[1]);
 
-                if (auto columnResult = root->getOrCreateNode(column, "mnemea:column"); columnResult.isOk()) {
+                if (auto columnResult = root->getOrCreateNode(column, "mindset:column"); columnResult.isOk()) {
                     if (auto miniColumnResult =
-                            columnResult.getResult()->getOrCreateNode(miniColumn, "mnemea:mini_column");
+                            columnResult.getResult()->getOrCreateNode(miniColumn, "mindset:mini_column");
                         miniColumnResult.isOk()) {
                         miniColumnResult.getResult()->addNeuron(id);
                     }
@@ -257,6 +257,6 @@ namespace mnemea
                 return LoaderFactory::FactoryResult(std::make_unique<BlueConfigLoader>(path));
             });
     }
-} // namespace mnemea
+} // namespace mindset
 
 #endif

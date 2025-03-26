@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-namespace mnemea
+namespace mindset
 {
     /**
     * Unique identifier of an element.
@@ -16,6 +16,6 @@ namespace mnemea
     * but elements of different types may share UIDs.
     */
     using UID = uint32_t;
-} // namespace mnemea
+} // namespace mindset
 
 #endif //UID_H

@@ -8,17 +8,17 @@
 #include <optional>
 #include <unordered_map>
 
-#include <mnemea/Versioned.h>
-#include <mnemea/Neuron.h>
-#include <mnemea/Node.h>
-#include <mnemea/UID.h>
-#include <mnemea/Properties.h>
-#include <mnemea/Circuit.h>
+#include <mindset/Versioned.h>
+#include <mindset/Neuron.h>
+#include <mindset/Node.h>
+#include <mindset/UID.h>
+#include <mindset/Properties.h>
+#include <mindset/Circuit.h>
 
-namespace mnemea
+namespace mindset
 {
     /**
-     * The Dataset class serves as the primary container for scene data within the Mnemea library.
+     * The Dataset class serves as the primary container for scene data within the Mindset library.
      *
      * This class encapsulates all essential elements of a neural scene representation, including neurons,
      * their associated properties, circuit definitions, and an optional hierarchical structure.
@@ -133,6 +133,6 @@ namespace mnemea
             return _neurons | std::views::transform([](const auto& pair) -> const Neuron& { return pair.second; });
         }
     };
-} // namespace mnemea
+} // namespace mindset
 
 #endif //DATASET_H

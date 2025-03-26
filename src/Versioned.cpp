@@ -3,14 +3,14 @@
 //
 
 #include <atomic>
-#include <mnemea/Versioned.h>
+#include <mindset/Versioned.h>
 
 namespace
 {
     std::atomic_uint64_t VERSION_GENERATOR = 0;
 }
 
-namespace mnemea
+namespace mindset
 {
 
     Versioned::Versioned() :
@@ -25,4 +25,4 @@ namespace mnemea
     {
         _version = VERSION_GENERATOR++;
     }
-} // namespace mnemea
+} // namespace mindset

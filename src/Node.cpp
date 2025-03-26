@@ -2,11 +2,11 @@
 // Created by gaeqs on 09/03/2025.
 //
 
-#include <mnemea/Node.h>
+#include <mindset/Node.h>
 
 #include <utility>
 
-namespace mnemea
+namespace mindset
 {
     Node::Node(Node&& Other) noexcept :
         Identifiable(std::move(Other)),
@@ -82,4 +82,4 @@ namespace mnemea
         }
         return it->second.get();
     }
-} // namespace mnemea
+} // namespace mindset

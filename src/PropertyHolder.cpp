@@ -2,9 +2,9 @@
 // Created by gaeqs on 11/03/2025.
 //
 
-#include <mnemea/PropertyHolder.h>
+#include <mindset/PropertyHolder.h>
 
-namespace mnemea
+namespace mindset
 {
     PropertyHolder::PropertyHolder() = default;
 
@@ -36,4 +36,4 @@ namespace mnemea
         }
         return updated;
     }
-} // namespace mnemea
+} // namespace mindset

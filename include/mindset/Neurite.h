@@ -4,10 +4,10 @@
 
 #ifndef NEURITE_H
 #define NEURITE_H
-#include <mnemea/Identifiable.h>
-#include <mnemea/PropertyHolder.h>
+#include <mindset/Identifiable.h>
+#include <mindset/PropertyHolder.h>
 
-namespace mnemea
+namespace mindset
 {
     /**
      * The Neurite class represents a neuronal neurite, such as an axon or dendrite,
@@ -22,6 +22,6 @@ namespace mnemea
          */
         explicit Neurite(UID uid);
     };
-} // namespace mnemea
+} // namespace mindset
 
 #endif //NEURITE_H

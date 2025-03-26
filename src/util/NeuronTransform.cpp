@@ -2,9 +2,9 @@
 // Created by gaeqs on 18/12/2024.
 //
 
-#include <mnemea/util/NeuronTransform.h>
+#include <mindset/util/NeuronTransform.h>
 
-namespace mnemea
+namespace mindset
 {
     void NeuronTransform::recalculateIfRequired() const
     {
@@ -96,4 +96,4 @@ namespace mnemea
         _scale = scale;
         _dirty = true;
     }
-} // namespace mnemea
+} // namespace mindset

@@ -2,16 +2,16 @@
 // Created by gaeqs on 12/03/25.
 //
 
-#ifdef MNEMEA_BRION
+#ifdef MINDSET_BRION
 
-    #include <mnemea/loader/MorphoIOLoader.h>
-    #include <mnemea/DefaultProperties.h>
+    #include <mindset/loader/MorphoIOLoader.h>
+    #include <mindset/DefaultProperties.h>
 
     #include <brain/neuron/morphology.h>
     #include <brain/circuit.h>
     #include <rush/rush.h>
 
-namespace mnemea
+namespace mindset
 {
     MorphoIOLoader::MorphoIOLoader(std::filesystem::path path) :
         _path(std::move(path))
@@ -101,6 +101,6 @@ namespace mnemea
                 return LoaderFactory::FactoryResult(std::make_unique<MorphoIOLoader>(path));
             });
     }
-} // namespace mnemea
+} // namespace mindset
 
 #endif

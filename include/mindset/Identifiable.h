@@ -7,10 +7,10 @@
 
 #include <functional>
 
-#include <mnemea/UID.h>
+#include <mindset/UID.h>
 
 
-namespace mnemea
+namespace mindset
 {
     /**
      * The Identifiable class provides a unique identifier to objects.
@@ -41,15 +41,15 @@ namespace mnemea
 
         bool operator!=(const Identifiable& other) const;
     };
-} // namespace mnemea
+} // namespace mindset
 
 template<typename T>
-    requires std::is_base_of_v<mnemea::Identifiable, T>
+    requires std::is_base_of_v<mindset::Identifiable, T>
 struct std::hash<T>
 {
     size_t operator()(const T& s) const noexcept
     {
-        return std::hash<mnemea::UID>()(s.getUID());
+        return std::hash<mindset::UID>()(s.getUID());
     }
 };
 

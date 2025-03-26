@@ -2,9 +2,9 @@
 // Created by gaeqs on 11/03/2025.
 //
 
-#include <mnemea/Synapse.h>
+#include <mindset/Synapse.h>
 
-namespace mnemea
+namespace mindset
 {
     Synapse::Synapse(UID preSynapticNeuron, UID postSynapticNeuron) :
         _preSynapticNeuron(preSynapticNeuron),
@@ -31,4 +31,4 @@ namespace mnemea
     {
         _postSynapticNeuron = uid;
     }
-} // namespace mnemea
+} // namespace mindset

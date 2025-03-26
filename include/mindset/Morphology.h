@@ -6,11 +6,11 @@
 #define MORPHOLOGY_H
 
 #include <ranges>
-#include <mnemea/Neurite.h>
-#include <mnemea/Soma.h>
-#include <mnemea/Versioned.h>
+#include <mindset/Neurite.h>
+#include <mindset/Soma.h>
+#include <mindset/Versioned.h>
 
-namespace mnemea
+namespace mindset
 {
     /**
      * The Morphology class represents the structural morphology of a neuron,
@@ -92,6 +92,6 @@ namespace mnemea
             return _neurites | std::views::transform([](const auto& pair) -> const Neurite& { return pair.second; });
         }
     };
-} // namespace mnemea
+} // namespace mindset
 
 #endif //MORPHOLOGY_H

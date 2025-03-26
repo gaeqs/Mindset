@@ -4,16 +4,16 @@
 
 #ifndef MORPHOIOLOADER_H
 #define MORPHOIOLOADER_H
-#ifdef MNEMEA_BRION
+#ifdef MINDSET_BRION
 
     #include <filesystem>
-    #include <mnemea/Dataset.h>
-    #include <mnemea/loader/Loader.h>
+    #include <mindset/Dataset.h>
+    #include <mindset/loader/Loader.h>
 
-namespace mnemea
+namespace mindset
 {
 
-    static const std::string MORPHO_IO_LOADER_ID = "mnemea:loader_morpho_io";
+    static const std::string MORPHO_IO_LOADER_ID = "mindset:loader_morpho_io";
     static const std::string MORPHO_IO_LOADER_NAME = "Morpho IO";
 
     /**
@@ -34,7 +34,7 @@ namespace mnemea
 
         static LoaderFactory createFactory();
     };
-} // namespace mnemea
+} // namespace mindset
 
 #endif
 #endif //MORPHOIOLOADER_H

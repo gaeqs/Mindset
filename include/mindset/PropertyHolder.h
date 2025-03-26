@@ -9,10 +9,10 @@
 #include <optional>
 #include <map>
 
-#include <mnemea/Versioned.h>
-#include <mnemea/UID.h>
+#include <mindset/Versioned.h>
+#include <mindset/UID.h>
 
-namespace mnemea
+namespace mindset
 {
     /**
      * Holds a set of properties, each associated with a UID and stored as any type.
@@ -73,6 +73,6 @@ namespace mnemea
             return std::optional<T>(*v);
         }
     };
-} // namespace mnemea
+} // namespace mindset
 
 #endif //PROPERTYHOLDER_H
