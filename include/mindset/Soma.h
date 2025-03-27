@@ -6,6 +6,7 @@
 #define SOMA_H
 
 #include <vector>
+
 #include <rush/rush.h>
 #include <mindset/Identifiable.h>
 #include <mindset/PropertyHolder.h>

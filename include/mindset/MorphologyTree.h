@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <optional>
 
-#include "MorphologyTreeSection.h"
+#include <mindset/MorphologyTreeSection.h>
 
 namespace mindset
 {

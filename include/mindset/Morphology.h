@@ -6,6 +6,7 @@
 #define MORPHOLOGY_H
 
 #include <ranges>
+
 #include <mindset/Neurite.h>
 #include <mindset/Soma.h>
 #include <mindset/Versioned.h>

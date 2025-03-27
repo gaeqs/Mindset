@@ -2,11 +2,12 @@
 // Created by gaeqs on 26/03/2025.
 //
 
+#include <mindset/MorphologyTree.h>
+
 #include <queue>
 #include <mindset/Dataset.h>
 #include <mindset/DefaultProperties.h>
 #include <mindset/Morphology.h>
-#include <mindset/MorphologyTree.h>
 
 namespace mindset
 {

@@ -9,7 +9,6 @@
 
 #include <mindset/UID.h>
 
-
 namespace mindset
 {
     /**
@@ -53,4 +52,4 @@ struct std::hash<T>
     }
 };
 
-#endif //IDENTIFIABLE_H
+#endif // IDENTIFIABLE_H

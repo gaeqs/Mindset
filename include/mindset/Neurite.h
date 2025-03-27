@@ -4,6 +4,7 @@
 
 #ifndef NEURITE_H
 #define NEURITE_H
+
 #include <mindset/Identifiable.h>
 #include <mindset/PropertyHolder.h>
 
@@ -24,4 +25,4 @@ namespace mindset
     };
 } // namespace mindset
 
-#endif //NEURITE_H
+#endif // NEURITE_H

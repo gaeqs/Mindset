@@ -2,9 +2,9 @@
 // Created by gaeqs on 10/03/2025.
 //
 
-#include <ranges>
-
 #include <mindset/Properties.h>
+
+#include <ranges>
 
 namespace mindset
 {

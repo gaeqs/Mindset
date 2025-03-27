@@ -6,7 +6,6 @@
 #define VERSIONED_H
 
 #include <cstdint>
-#include <mindset/version.h>
 
 namespace mindset
 {

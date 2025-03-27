@@ -6,6 +6,7 @@
 #define NEURON_H
 
 #include <memory>
+
 #include <mindset/Identifiable.h>
 #include <mindset/PropertyHolder.h>
 #include <mindset/Morphology.h>
