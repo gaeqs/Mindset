@@ -82,7 +82,7 @@ else()
 endif()
 
 configure_file(
-        ${CMAKE_SOURCE_DIR}/cmake/version.h.in
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.h.in
         ${MINDSET_GENERATED_DIR}/mindset/version.h
 )
 
