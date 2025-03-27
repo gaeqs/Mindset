@@ -4,25 +4,23 @@
 
 #include <atomic>
 #include <mindset/Versioned.h>
-
-namespace
-{
-    std::atomic_uint64_t VERSION_GENERATOR = 0;
-}
+#include <mindset/version.h>
 
 namespace mindset
 {
 
     Versioned::Versioned() :
-        _version(VERSION_GENERATOR++)
+        _version(0)
     {
     }
+
     uint64_t Versioned::getVersion() const
     {
         return _version;
     }
-    void Versioned::setNewVersion()
+
+    void Versioned::incrementVersion()
     {
-        _version = VERSION_GENERATOR++;
+        ++_version;
     }
 } // namespace mindset

@@ -33,6 +33,6 @@ namespace mindset
     void Neuron::setMorphology(std::shared_ptr<Morphology> morphology)
     {
         _morphology = std::move(morphology);
-        setNewVersion();
+        incrementVersion();
     }
 } // namespace mindset

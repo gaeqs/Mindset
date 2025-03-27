@@ -102,7 +102,6 @@ namespace mindset {
         for (auto& [id, prototype]: prototypes) {
             if (intersects(somaBB, prototype.end)) {
                 somaUIDs.insert(id);
-                std::cout << "INSIDE " << id << std::endl;
             }
         }
 

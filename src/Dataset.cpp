@@ -18,7 +18,7 @@ namespace mindset
     std::pair<Neuron*, bool> Dataset::addNeuron(Neuron neuron)
     {
         auto [it, result] = _neurons.insert({neuron.getUID(), std::move(neuron)});
-        setNewVersion();
+        incrementVersion();
         return {&it->second, result};
     }
 
@@ -26,7 +26,7 @@ namespace mindset
     {
         bool result = _neurons.erase(uid) > 0;
         if (result) {
-            setNewVersion();
+            incrementVersion();
         }
         return result;
     }
@@ -88,7 +88,7 @@ namespace mindset
     Node* Dataset::createHierarchy(UID uid, std::string type)
     {
         _hierarchy.emplace(uid, type);
-        setNewVersion();
+        incrementVersion();
         return &_hierarchy.value();
     }
 } // namespace mindset

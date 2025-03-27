@@ -6,6 +6,7 @@
 #define VERSIONED_H
 
 #include <cstdint>
+#include <mindset/version.h>
 
 namespace mindset
 {
@@ -35,7 +36,7 @@ namespace mindset
         /**
          * Sets a new unique version number, typically after modification.
          */
-        void setNewVersion();
+        void incrementVersion();
     };
 
 } // namespace mindset

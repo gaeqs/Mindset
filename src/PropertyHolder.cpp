@@ -10,7 +10,7 @@ namespace mindset
 
     void PropertyHolder::setPropertyAsAny(UID uid, std::any value)
     {
-        setNewVersion();
+        incrementVersion();
         _properties[uid] = std::move(value);
     }
 
@@ -32,7 +32,7 @@ namespace mindset
     {
         bool updated = _properties.erase(uid) > 0;
         if (updated) {
-            setNewVersion();
+            incrementVersion();
         }
         return updated;
     }

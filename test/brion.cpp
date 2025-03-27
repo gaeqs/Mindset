@@ -2,12 +2,14 @@
 // Created by gaeqs on 12/03/25.
 //
 
-#include <catch2/catch_all.hpp>
-#include <mindset/DefaultProperties.h>
+#ifdef MINDSET_BRION
+    #include <catch2/catch_all.hpp>
+    #include <mindset/Dataset.h>
+    #include <mindset/DefaultProperties.h>
 
-#include <mindset/loader/BlueConfigLoader.h>
-#include <mindset/util/NeuronTransform.h>
-#include <rush/vector/vec.h>
+    #include <mindset/loader/BlueConfigLoader.h>
+    #include <mindset/util/NeuronTransform.h>
+    #include <rush/vector/vec.h>
 
 TEST_CASE("Brion load")
 {
@@ -33,6 +35,15 @@ TEST_CASE("Brion load")
         if (!morphology.has_value()) {
             continue;
         }
+        for (auto& neurite : morphology.value()->getNeurites()) {
+        }
+    }
+
+    for (auto& neuron : dataset.getNeurons()) {
+        auto morphology = neuron.getMorphology();
+        if (!morphology.has_value()) {
+            continue;
+        }
         auto somaOptional = morphology.value()->getSoma();
         if (!somaOptional.has_value()) {
             continue;
@@ -45,3 +56,5 @@ TEST_CASE("Brion load")
         std::cout << "Soma min radius: " << soma->getMinRadius() << std::endl;
     }
 }
+
+#endif

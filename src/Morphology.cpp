@@ -26,7 +26,7 @@ namespace mindset
 
     void Morphology::setSoma(Soma soma)
     {
-        setNewVersion();
+        incrementVersion();
         _soma = soma;
     }
 
@@ -35,7 +35,7 @@ namespace mindset
         if (!_soma.has_value()) {
             return;
         }
-        setNewVersion();
+        incrementVersion();
         _soma = {};
     }
 
@@ -65,12 +65,46 @@ namespace mindset
     std::pair<Neurite*, bool> Morphology::addNeurite(Neurite neurite)
     {
         auto [it, result] = _neurites.insert({neurite.getUID(), std::move(neurite)});
-        setNewVersion();
+        incrementVersion();
         return {&it->second, result};
+    }
+    bool Morphology::removeNeurite(UID uid)
+    {
+        auto result = _neurites.erase(uid) > 0;
+        if (result) {
+            incrementVersion();
+        }
+        return result;
     }
 
     size_t Morphology::getNeuritesAmount() const
     {
         return _neurites.size();
+    }
+
+    std::optional<MorphologyTree*> Morphology::getMorphologyTree()
+    {
+        if (_tree.has_value()) {
+            return &_tree.value();
+        }
+        return {};
+    }
+
+    std::optional<const MorphologyTree*> Morphology::getMorphologyTree() const
+    {
+        if (_tree.has_value()) {
+            return &_tree.value();
+        }
+        return {};
+    }
+
+    MorphologyTree* Morphology::getOrCreateMorphologyTree(const Dataset& dataset)
+    {
+        if (!_tree.has_value() || _tree.value().getMorphologyVersion() != getVersion()) {
+            // Recompute tree
+            _tree = MorphologyTree(this, dataset);
+        }
+
+        return &_tree.value();
     }
 } // namespace mindset

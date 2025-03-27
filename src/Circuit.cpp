@@ -15,7 +15,7 @@ namespace mindset
         _synapses.push_back(std::move(synapse));
         _preSynapses.insert({pre, _synapses.size()});
         _postSynapses.insert({post, _synapses.size()});
-        setNewVersion();
+        incrementVersion();
     }
 
     void Circuit::addSynapses(std::vector<Synapse> synapses)
@@ -23,7 +23,7 @@ namespace mindset
         for (auto& synapse : synapses) {
             addSynapse(std::move(synapse));
         }
-        setNewVersion();
+        incrementVersion();
     }
 
     void Circuit::clear()
@@ -31,7 +31,7 @@ namespace mindset
         _synapses.clear();
         _preSynapses.clear();
         _postSynapses.clear();
-        setNewVersion();
+        incrementVersion();
     }
 
     std::span<Synapse> Circuit::getSynapses()

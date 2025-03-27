@@ -9,6 +9,7 @@
 #include <mindset/Neurite.h>
 #include <mindset/Soma.h>
 #include <mindset/Versioned.h>
+#include <mindset/MorphologyTree.h>
 
 namespace mindset
 {
@@ -20,6 +21,7 @@ namespace mindset
     {
         std::optional<Soma> _soma;
         std::unordered_map<UID, Neurite> _neurites;
+        std::optional<MorphologyTree> _tree;
 
       public:
         /**
@@ -72,9 +74,22 @@ namespace mindset
         std::pair<Neurite*, bool> addNeurite(Neurite neurite);
 
         /**
+         * Removes the neurite that matches the given UID from the morphology.
+         * @param uid UID of the neurite.
+         * @return Whether a neurite was removed.
+         */
+        bool removeNeurite(UID uid);
+
+        /**
          * Returns the number of neurites in the morphology.
          */
         [[nodiscard]] size_t getNeuritesAmount() const;
+
+        std::optional<MorphologyTree*> getMorphologyTree();
+
+        std::optional<const MorphologyTree*> getMorphologyTree() const;
+
+        MorphologyTree* getOrCreateMorphologyTree(const Dataset& dataset);
 
         /**
          * Returns a mutable view of neurites.
@@ -94,4 +109,4 @@ namespace mindset
     };
 } // namespace mindset
 
-#endif //MORPHOLOGY_H
+#endif // MORPHOLOGY_H

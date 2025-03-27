@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(Mindset LANGUAGES CXX VERSION 1.2.3)
+project(Mindset LANGUAGES CXX VERSION 0.0.1)
 
 include(FetchContent)
 
@@ -12,6 +12,9 @@ option(MINDSET_TESTS "Include Mindset tests" ON)
 # Global parameters
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(MINDSET_GENERATED_DIR ${CMAKE_BINARY_DIR}/generated)
+set(MINDSET_SINGLE_HEADER_PATH ${CMAKE_BINARY_DIR}/generated/mindset/mindset.h)
 
 # Import Rush
 FetchContent_Declare(
@@ -64,6 +67,25 @@ list(APPEND LIBRARIES HighFive)
 find_package(pugixml REQUIRED)
 list(APPEND LIBRARIES pugixml)
 
+# Create version.h
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
+    execute_process(
+            COMMAND git rev-parse --short HEAD
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            OUTPUT_VARIABLE GIT_COMMIT
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
+    )
+else()
+    set(GIT_COMMIT "unknown")
+endif()
+
+configure_file(
+        ${CMAKE_SOURCE_DIR}/cmake/version.h.in
+        ${MINDSET_GENERATED_DIR}/mindset/version.h
+)
+
 # Create the library
 add_subdirectory(src)
 
@@ -87,7 +109,6 @@ if (NOT MINDSET_USE_BRION)
             DESTINATION lib/cmake/Mindset
     )
 
-
     configure_package_config_file(
             "cmake/MindsetConfig.cmake.in"
             "${CMAKE_CURRENT_BINARY_DIR}/MindsetConfig.cmake"
@@ -104,6 +125,11 @@ if (NOT MINDSET_USE_BRION)
     # Install public headers
     install(
             DIRECTORY include/mindset
+            DESTINATION include
+    )
+
+    install(
+            DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/mindset
             DESTINATION include
     )
 endif ()
