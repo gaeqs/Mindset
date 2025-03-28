@@ -94,7 +94,7 @@ namespace mindset
         {
             auto [begin, end] = _postSynapses.equal_range(uid);
             auto range = std::ranges::subrange(begin, end);
-            return range | std::views::transform([&](const auto& pair) -> Synapse& { return _synapses[pair.second]; });
+            return range | std::views::transform([&](const auto& pair) -> Synapse* { return &_synapses[pair.second]; });
         }
 
         /**
@@ -107,9 +107,9 @@ namespace mindset
             auto [begin, end] = _postSynapses.equal_range(uid);
             auto range = std::ranges::subrange(begin, end);
             return range |
-                   std::views::transform([&](const auto& pair) -> const Synapse& { return _synapses[pair.second]; });
+                   std::views::transform([&](const auto& pair) -> const Synapse* { return &_synapses[pair.second]; });
         }
     };
 } // namespace mindset
 
-#endif //CIRCUIT_H
+#endif // CIRCUIT_H

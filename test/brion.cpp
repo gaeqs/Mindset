@@ -30,17 +30,17 @@ TEST_CASE("Brion load")
 
     auto& properties = dataset.getProperties();
 
-    for (auto& neuron : dataset.getNeurons()) {
-        auto morphology = neuron.getMorphology();
+    for (auto neuron : dataset.getNeurons()) {
+        auto morphology = neuron->getMorphology();
         if (!morphology.has_value()) {
             continue;
         }
-        for (auto& neurite : morphology.value()->getNeurites()) {
+        for (auto* neurite : morphology.value()->getNeurites()) {
         }
     }
 
-    for (auto& neuron : dataset.getNeurons()) {
-        auto morphology = neuron.getMorphology();
+    for (auto neuron : dataset.getNeurons()) {
+        auto morphology = neuron->getMorphology();
         if (!morphology.has_value()) {
             continue;
         }

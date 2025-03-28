@@ -41,8 +41,9 @@ namespace mindset
         size_t index = 0;
         for (UID id : ids) {
             auto neuron = Neuron(id);
-            neuron.setPropertyAsAny(properties.neuronTransform, NeuronTransform(transforms[index]));
-            neuron.setPropertyAsAny(properties.neuronLayer, std::stoi(layers[index]));
+            UID layer = std::stoi(layers[index]);
+            neuron.setProperty(properties.neuronTransform, NeuronTransform(transforms[index]));
+            neuron.setProperty(properties.neuronLayer, layer);
             dataset.addNeuron(std::move(neuron));
             ++index;
         }
@@ -103,8 +104,8 @@ namespace mindset
                     }
                 }
 
-                neuron.value()->setPropertyAsAny(properties.neuronColumn, column);
-                neuron.value()->setPropertyAsAny(properties.neuronMiniColumn, miniColumn);
+                neuron.value()->setProperty(properties.neuronColumn, column);
+                neuron.value()->setProperty(properties.neuronMiniColumn, miniColumn);
             }
             ++index;
         }
@@ -144,12 +145,12 @@ namespace mindset
                 for (size_t p = startNode; p < endNode; ++p) {
                     auto point = points[p];
                     Neurite neurite(idGenerator++);
-                    neurite.setPropertyAsAny(properties.neuritePosition, rush::Vec3f(point.x, point.y, point.z));
-                    neurite.setPropertyAsAny(properties.neuriteRadius, point.w / 2.0f); // Brion returns the diameter!
+                    neurite.setProperty(properties.neuritePosition, rush::Vec3f(point.x, point.y, point.z));
+                    neurite.setProperty(properties.neuriteRadius, point.w / 2.0f); // Brion returns the diameter!
                     if (previous.has_value()) {
-                        neurite.setPropertyAsAny(properties.neuriteParent, previous.value());
+                        neurite.setProperty(properties.neuriteParent, previous.value());
                     }
-                    neurite.setPropertyAsAny(properties.neuriteType, sectionType);
+                    neurite.setProperty(properties.neuriteType, sectionType);
                     previous = neurite.getUID();
                     result->addNeurite(std::move(neurite));
                     if (p == startNode) {

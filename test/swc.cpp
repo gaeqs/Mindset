@@ -4,6 +4,7 @@
 
 #include <catch2/catch_all.hpp>
 #include <mindset/mindset.h>
+#include <mindset/Contextualized.h>
 
 TEST_CASE("Test")
 {
@@ -13,12 +14,16 @@ TEST_CASE("Test")
 
     REQUIRE(dataset.getNeurons().size() == 1);
 
-    for (auto& neuron : dataset.getNeurons()) {
-        REQUIRE(neuron.getMorphology().has_value());
-        auto* morphology = neuron.getMorphology().value();
-        auto* tree = morphology->getOrCreateMorphologyTree(dataset);
-        REQUIRE(tree->getRoot().has_value());
-        std::cout << tree->getRoot().value()->getUID() << std::endl;
+    for (const auto neuron : dataset.getNeurons()) {
+        // Neurons are already contextualized.
+        for (auto neurite : neuron->getMorphology().value()->getNeurites() | dataset) {
+            // Pipe "|" operator contextualizes the neurites.
+            if (auto pos = neurite.getPosition()) {
+                std::cout << *pos << std::endl;
+            } else {
+                std::cout << " - " << std::endl;
+            }
+        }
     }
 }
 
@@ -42,17 +47,25 @@ std::vector<rush::Vec3f> walkSynapse(mindset::Dataset& dataset, mindset::Neuron&
     std::vector<rush::Vec3f> positions;
     for (mindset::UID sectionId : preToSoma | std::views::reverse) {
         auto section = preTree->getSection(sectionId);
-        if (!section.has_value()) continue; // No section!
+        if (!section.has_value()) {
+            continue; // No section!
+        }
         auto position = section.value()->getProperty<rush::Vec3f>(posProperty);
-        if (!position.has_value()) continue; // No position!
+        if (!position.has_value()) {
+            continue; // No position!
+        }
         positions.push_back(position.value());
     }
 
     for (mindset::UID sectionId : postToSoma) {
         auto section = preTree->getSection(sectionId);
-        if (!section.has_value()) continue; // No section!
+        if (!section.has_value()) {
+            continue; // No section!
+        }
         auto position = section.value()->getProperty<rush::Vec3f>(posProperty);
-        if (!position.has_value()) continue; // No position!
+        if (!position.has_value()) {
+            continue; // No position!
+        }
         positions.push_back(position.value());
     }
 

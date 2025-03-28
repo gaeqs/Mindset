@@ -82,7 +82,8 @@ namespace mindset
         bool removeNeurite(UID uid);
 
         /**
-         * Returns the number of neurites in the morphology.
+         * Returns the amount of neurites this morphology has.
+         * This doesn't include the soma!
          */
         [[nodiscard]] size_t getNeuritesAmount() const;
 
@@ -93,19 +94,30 @@ namespace mindset
         MorphologyTree* getOrCreateMorphologyTree(const Dataset& dataset);
 
         /**
-         * Returns a mutable view of neurites.
+         * Returns a view to iterate over all stored neurites' UIDs.
+         * @returns A range view of UIDs.
          */
-        [[nodiscard]] auto getNeurites()
+        [[nodiscard]] auto getNeuritesUIDs() const
         {
-            return _neurites | std::views::transform([](auto& pair) -> Neurite& { return pair.second; });
+            return _neurites | std::views::keys;
         }
 
         /**
-         * Returns a const view of neurites.
+         * Returns a view to iterate over all stored neurites in a mutable context.
+         * @return A range view of mutable neurites references.
+         */
+        [[nodiscard]] auto getNeurites()
+        {
+            return _neurites | std::views::transform([](auto& pair) -> Neurite* { return &pair.second; });
+        }
+
+        /**
+         * Returns a view to iterate over all stored neurites in a const context.
+         * @return A range view of const neurites references.
          */
         [[nodiscard]] auto getNeurites() const
         {
-            return _neurites | std::views::transform([](const auto& pair) -> const Neurite& { return pair.second; });
+            return _neurites | std::views::transform([](const auto& pair) -> const Neurite* { return &pair.second; });
         }
     };
 } // namespace mindset

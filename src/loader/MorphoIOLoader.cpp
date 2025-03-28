@@ -69,12 +69,12 @@ namespace mindset
                 for (size_t p = startNode; p < endNode; ++p) {
                     auto point = points[p];
                     Neurite neurite(idGenerator++);
-                    neurite.setPropertyAsAny(propPosition, rush::Vec3f(point.x, point.y, point.z));
-                    neurite.setPropertyAsAny(propRadius, point.w / 2.0f); // Brion returns the diameter!
+                    neurite.setProperty(propPosition, rush::Vec3f(point.x, point.y, point.z));
+                    neurite.setProperty(propRadius, point.w / 2.0f); // Brion returns the diameter!
                     if (previous.has_value()) {
-                        neurite.setPropertyAsAny(propParent, previous.value());
+                        neurite.setProperty(propParent, previous.value());
                     }
-                    neurite.setPropertyAsAny(propType, sectionType);
+                    neurite.setProperty(propType, sectionType);
                     previous = neurite.getUID();
                     result->addNeurite(std::move(neurite));
                     if (p == startNode) {

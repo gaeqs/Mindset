@@ -110,15 +110,15 @@ namespace mindset {
             if (somaUIDs.contains(id)) continue;
 
             Neurite neurite(id);
-            neurite.setPropertyAsAny(propType, type);
-            neurite.setPropertyAsAny(propPosition, prototype.end);
-            neurite.setPropertyAsAny(propRadius, prototype.radius);
+            neurite.setProperty(propType, type);
+            neurite.setProperty(propPosition, prototype.end);
+            neurite.setProperty(propRadius, prototype.radius);
             if (prototype.parent >= 0) {
                 UID parentUID = static_cast<UID>(prototype.parent);
                 if (somaUIDs.contains(parentUID)) {
-                    neurite.setPropertyAsAny(propParent, soma.value().getUID());
+                    neurite.setProperty(propParent, soma.value().getUID());
                 } else {
-                    neurite.setPropertyAsAny(propParent, parentUID);
+                    neurite.setProperty(propParent, parentUID);
                 }
             }
             morphology->addNeurite(std::move(neurite));

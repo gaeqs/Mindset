@@ -15,6 +15,11 @@ namespace mindset
         _neurons.reserve(amount);
     }
 
+    size_t Dataset::getNeuronsAmount() const
+    {
+        return _neurons.size();
+    }
+
     std::pair<Neuron*, bool> Dataset::addNeuron(Neuron neuron)
     {
         auto [it, result] = _neurons.insert({neuron.getUID(), std::move(neuron)});

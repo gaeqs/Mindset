@@ -31,8 +31,8 @@ namespace mindset
         // First, let's compute every child of all neurites.
         std::multimap<UID, UID> _children;
 
-        for (auto& neurite : morphology->getNeurites()) {
-            if (auto parent = neurite.getProperty<UID>(parentProp); parent.has_value()) {
+        for (auto* neurite : morphology->getNeurites()) {
+            if (auto parent = neurite->getProperty<UID>(parentProp); parent.has_value()) {
                 _children.insert({parentProp, parentProp});
             }
         }

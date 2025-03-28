@@ -234,7 +234,7 @@ namespace mindset
 
                 Neuron neuron(xml.id, swc);
                 if (xml.transform.has_value()) {
-                    neuron.setPropertyAsAny(transformProp, xml.transform.value());
+                    neuron.setProperty(transformProp, xml.transform.value());
                 }
 
                 auto [neuronInDataset, result] = dataset.addNeuron(std::move(neuron));

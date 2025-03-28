@@ -8,7 +8,7 @@ namespace mindset
 {
     PropertyHolder::PropertyHolder() = default;
 
-    void PropertyHolder::setPropertyAsAny(UID uid, std::any value)
+    void PropertyHolder::setProperty(UID uid, std::any value)
     {
         incrementVersion();
         _properties[uid] = std::move(value);

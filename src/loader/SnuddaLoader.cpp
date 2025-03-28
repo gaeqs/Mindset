@@ -48,7 +48,7 @@ namespace mindset
             model[3] = rush::Vec4f(pos * METER_MICROMETER_RATIO + origin, 1.0f);
 
             Neuron neuron(ids[i]);
-            neuron.setPropertyAsAny(properties.neuronTransform, NeuronTransform(model));
+            neuron.setProperty(properties.neuronTransform, NeuronTransform(model));
             dataset.addNeuron(std::move(neuron));
         }
     }
@@ -103,7 +103,7 @@ namespace mindset
             position *= METER_MICROMETER_RATIO;
 
             Synapse syn(sourceId, destId);
-            syn.setPropertyAsAny(properties.neuritePosition, syn);
+            syn.setProperty(properties.neuritePosition, syn);
             dataset.getCircuit().addSynapse(std::move(syn));
         }
 

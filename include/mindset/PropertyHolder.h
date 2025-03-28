@@ -22,10 +22,9 @@ namespace mindset
         std::map<UID, std::any> _properties;
 
       public:
-
         /**
-        * Creates a new property holder.
-        */
+         * Creates a new property holder.
+         */
         PropertyHolder();
 
         /**
@@ -33,7 +32,7 @@ namespace mindset
          * @param uid UID of the property.
          * @param value Property value (stored as std::any).
          */
-        void setPropertyAsAny(UID uid, std::any value);
+        void setProperty(UID uid, std::any value);
 
         /**
          * Retrieves the property value as std::any, if present.
@@ -75,4 +74,4 @@ namespace mindset
     };
 } // namespace mindset
 
-#endif //PROPERTYHOLDER_H
+#endif // PROPERTYHOLDER_H

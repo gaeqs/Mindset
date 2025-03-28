@@ -8,12 +8,14 @@
 #include <optional>
 #include <unordered_map>
 
+#include <mindset/Contextualized.h>
 #include <mindset/Versioned.h>
 #include <mindset/Neuron.h>
 #include <mindset/Node.h>
 #include <mindset/UID.h>
 #include <mindset/Properties.h>
 #include <mindset/Circuit.h>
+#include <mindset/Context.h>
 
 namespace mindset
 {
@@ -23,7 +25,7 @@ namespace mindset
      * This class encapsulates all essential elements of a neural scene representation, including neurons,
      * their associated properties, circuit definitions, and an optional hierarchical structure.
      */
-    class Dataset : public Versioned
+    class Dataset final : public Versioned, public Context
     {
         std::unordered_map<UID, Neuron> _neurons;
         Properties _properties;
@@ -41,6 +43,11 @@ namespace mindset
          * @param amount The number of neurons to reserve space for.
          */
         void reserveSpaceForNeurons(size_t amount);
+
+        /**
+         * Returns the amount of neurons inside this dataset.
+         */
+        [[nodiscard]] size_t getNeuronsAmount() const;
 
         /**
          * Adds a new neuron to the dataset.
@@ -74,13 +81,13 @@ namespace mindset
          * Retrieves a mutable reference to the dataset's properties.
          * @return Reference to the properties object.
          */
-        [[nodiscard]] Properties& getProperties();
+        [[nodiscard]] Properties& getProperties() override;
 
         /**
          * Retrieves a const reference to the dataset's properties.
          * @return Const reference to the properties object.
          */
-        [[nodiscard]] const Properties& getProperties() const;
+        [[nodiscard]] const Properties& getProperties() const override;
 
         /**
          * Retrieves a mutable reference to the circuit representing neuron connectivity.
@@ -116,12 +123,21 @@ namespace mindset
         Node* createHierarchy(UID uid, std::string type);
 
         /**
+         * Returns a view to iterate over all stored neurons' UIDs.
+         * @returns A range view of UIDs.
+         */
+        [[nodiscard]] auto getNeuronsUIDs() const
+        {
+            return _neurons | std::views::keys;
+        }
+
+        /**
          * Returns a view to iterate over all stored neurons in a mutable context.
          * @return A range view of mutable neuron references.
          */
         [[nodiscard]] auto getNeurons()
         {
-            return _neurons | std::views::transform([](auto& pair) -> Neuron& { return pair.second; });
+            return _neurons | std::views::transform([this](auto& pair) { return Contextualized(&pair.second, this); });
         }
 
         /**
@@ -130,9 +146,9 @@ namespace mindset
          */
         [[nodiscard]] auto getNeurons() const
         {
-            return _neurons | std::views::transform([](const auto& pair) -> const Neuron& { return pair.second; });
+            return _neurons | std::views::transform([this](auto& pair) { return Contextualized(&pair.second, this); });
         }
     };
 } // namespace mindset
 
-#endif //DATASET_H
+#endif // DATASET_H
