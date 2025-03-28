@@ -168,6 +168,17 @@ namespace mindset
                    return Contextualized<ElemType, C>(element, &context);
                });
     }
+
+    template<std::ranges::range R, typename C>
+        requires std::is_base_of_v<Context, C>
+    auto operator|(R&& range, C* context)
+    {
+        return std::forward<R>(range) | std::views::transform([context](auto&& element) {
+                   using PtrType = std::remove_reference_t<decltype(element)>;
+                   using ElemType = std::remove_pointer_t<PtrType>;
+                   return Contextualized<ElemType, C>(element, context);
+               });
+    }
 } // namespace mindset
 
 #endif // CONTEXTUALIZED_H

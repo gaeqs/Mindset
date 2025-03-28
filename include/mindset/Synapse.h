@@ -5,6 +5,8 @@
 #ifndef SYNAPSE_H
 #define SYNAPSE_H
 
+#include "Identifiable.h"
+
 #include <mindset/PropertyHolder.h>
 #include <mindset/UID.h>
 
@@ -14,7 +16,7 @@ namespace mindset
      * Represents a synaptic connection between two neurons.
      * Each synapse has associated pre- and post-synaptic neurons.
      */
-    class Synapse : public PropertyHolder
+    class Synapse : public Identifiable, public PropertyHolder
     {
         UID _preSynapticNeuron;
         UID _postSynapticNeuron;
@@ -25,7 +27,7 @@ namespace mindset
          * @param preSynapticNeuron UID of the pre-synaptic neuron.
          * @param postSynapticNeuron UID of the post-synaptic neuron.
          */
-        Synapse(UID preSynapticNeuron, UID postSynapticNeuron);
+        Synapse(UID uid, UID preSynapticNeuron, UID postSynapticNeuron);
 
         /**
          * Retrieves the UID of the pre-synaptic neuron.

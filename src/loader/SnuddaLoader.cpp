@@ -6,6 +6,7 @@
 #include <mindset/loader/SnuddaLoader.h>
 #include <mindset/loader/SWCLoader.h>
 #include <mindset/util/NeuronTransform.h>
+#include <mindset/util/MorphologyUtils.h>
 #include <rush/matrix/mat.h>
 #include <rush/vector/vec.h>
 
@@ -25,6 +26,11 @@ namespace mindset
             result.neuriteRadius = properties.defineProperty(PROPERTY_RADIUS);
             result.neuriteParent = properties.defineProperty(PROPERTY_PARENT);
             result.neuriteType = properties.defineProperty(PROPERTY_NEURITE_TYPE);
+        }
+
+        if (_loadSynapses) {
+            result.synapsePreSection = properties.defineProperty(PROPERTY_SYNAPSE_PRE_SECTION);
+            result.synapsePostSection = properties.defineProperty(PROPERTY_SYNAPSE_POST_SECTION);
         }
 
         result.neuronTransform = properties.defineProperty(PROPERTY_TRANSFORM);
@@ -69,6 +75,7 @@ namespace mindset
                 assignMorphology(dataset, id, loaded[name]);
                 continue;
             }
+
             std::string modified = name;
             modified.replace(0, SNUDDA_PREFIX.length(), _dataPath.string());
             std::filesystem::path path(modified);
@@ -96,15 +103,64 @@ namespace mindset
 
         auto origin = rush::Vec3f(origo[0], origo[1], origo[2]) * METER_MICROMETER_RATIO;
 
-        for (auto& synapse : synapses) {
+        std::unordered_multimap<UID, std::pair<UID, rush::Vec3f>> synapsesMap;
+
+        UID uidGenerator = 0;
+
+        for (const auto& synapse : synapses) {
             UID sourceId = synapse[0];
             UID destId = synapse[1];
-            rush::Vec3f position = rush::Vec3f(synapse[2], synapse[3], synapse[4]) * voxelSize + origin; // Meters
-            position *= METER_MICROMETER_RATIO;
+            int32_t destSegId = synapse[9];
 
-            Synapse syn(sourceId, destId);
-            syn.setProperty(properties.neuritePosition, syn);
+            rush::Vec3f position =
+                (rush::Vec3f(synapse[2], synapse[3], synapse[4]) * voxelSize + origin) * METER_MICROMETER_RATIO;
+
+            Synapse syn(uidGenerator++, sourceId, destId);
+            syn.setProperty(properties.neuritePosition, position);
+
+            if (destSegId >= 0) {
+                syn.setProperty(properties.synapsePostSection, static_cast<UID>(destSegId) + 1);
+            }
+
+            synapsesMap.insert({
+                sourceId, {syn.getUID(), position}
+            });
             dataset.getCircuit().addSynapse(std::move(syn));
+        }
+
+        for (auto it = synapsesMap.begin(); it != synapsesMap.end();) {
+            const UID neuronUID = it->first;
+            auto range = synapsesMap.equal_range(neuronUID);
+            auto neuronOpt = dataset.getNeuron(neuronUID);
+
+            if (neuronOpt.has_value() && neuronOpt.value()->getMorphology().has_value()) {
+                auto neuron = neuronOpt.value();
+                std::vector<rush::Vec3f> points;
+                auto transformOpt = neuron->getProperty<NeuronTransform>(properties.neuronTransform);
+
+                for (auto gIt = range.first; gIt != range.second; ++gIt) {
+                    points.push_back(gIt->second.second);
+                }
+
+                auto results = closestNeuriteToPosition(dataset, *neuron->getMorphology().value(), points,
+                                                        transformOpt ? &transformOpt.value() : nullptr);
+
+                size_t idx = 0;
+                for (auto gIt = range.first; gIt != range.second; ++gIt, ++idx) {
+                    if (!results[idx].valid) {
+                        continue;
+                    }
+
+                    auto synapseOpt = dataset.getCircuit().getSynapse(gIt->second.first);
+                    if (!synapseOpt) {
+                        continue;
+                    }
+
+                    synapseOpt.value()->setProperty(properties.synapsePreSection, results[idx].uid);
+                }
+            }
+
+            it = range.second;
         }
 
         return {};

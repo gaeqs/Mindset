@@ -6,7 +6,8 @@
 
 namespace mindset
 {
-    Synapse::Synapse(UID preSynapticNeuron, UID postSynapticNeuron) :
+    Synapse::Synapse(UID uid, UID preSynapticNeuron, UID postSynapticNeuron) :
+        Identifiable(uid),
         _preSynapticNeuron(preSynapticNeuron),
         _postSynapticNeuron(postSynapticNeuron)
     {

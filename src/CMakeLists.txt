@@ -34,6 +34,7 @@ target_sources(mindset PRIVATE
         MorphologyTreeSection.cpp
 
         util/NeuronTransform.cpp
+        util/MorphologyUtils.cpp
 
         loader/Loader.cpp
         loader/BlueConfigLoader.cpp

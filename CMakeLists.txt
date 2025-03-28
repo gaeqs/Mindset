@@ -21,7 +21,6 @@ FetchContent_Declare(
         rush
         GIT_REPOSITORY https://github.com/gaeqs/Rush.git
         GIT_TAG master
-        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/rush
 )
 
 FetchContent_MakeAvailable(rush)
@@ -32,7 +31,6 @@ FetchContent_Declare(
         hey
         GIT_REPOSITORY https://github.com/gaeqs/Hey.git
         GIT_TAG master
-        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/hey
 )
 
 FetchContent_MakeAvailable(hey)
@@ -43,9 +41,8 @@ if (MINDSET_USE_BRION)
     if (NOT MINDSET_EXTERNAL_BRION)
         FetchContent_Declare(
                 brion
-                GIT_REPOSITORY https://github.com/BlueBrain/Brion.git
+                GIT_REPOSITORY https://github.com/gaeqs/Brion.git
                 GIT_TAG master
-                SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/brion
         )
         FetchContent_MakeAvailable(brion)
     endif ()
@@ -56,7 +53,6 @@ else ()
             highfive
             GIT_REPOSITORY https://github.com/BlueBrain/HighFive.git
             GIT_TAG master
-            SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/highfive
     )
 
     FetchContent_MakeAvailable(highfive)

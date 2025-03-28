@@ -2,20 +2,25 @@
 // Created by gaeqs on 11/03/2025.
 //
 
+#include <unistd.h>
 #include <mindset/Circuit.h>
 
 namespace mindset
 {
     Circuit::Circuit() = default;
 
-    void Circuit::addSynapse(Synapse synapse)
+    std::pair<Synapse*, bool> Circuit::addSynapse(Synapse synapse)
     {
         UID pre = synapse.getPreSynapticNeuron();
         UID post = synapse.getPostSynapticNeuron();
-        _synapses.push_back(std::move(synapse));
-        _preSynapses.insert({pre, _synapses.size()});
-        _postSynapses.insert({post, _synapses.size()});
-        incrementVersion();
+        UID uid = synapse.getUID();
+        auto [it, result] = _synapses.insert({uid, std::move(synapse)});
+        if (result) {
+            _preSynapses.insert({pre, uid});
+            _postSynapses.insert({post, uid});
+            incrementVersion();
+        }
+        return {&it->second, result};
     }
 
     void Circuit::addSynapses(std::vector<Synapse> synapses)
@@ -34,13 +39,22 @@ namespace mindset
         incrementVersion();
     }
 
-    std::span<Synapse> Circuit::getSynapses()
+    std::optional<Synapse*> Circuit::getSynapse(UID uid)
     {
-        return _synapses;
+        auto it = _synapses.find(uid);
+        if (it != _synapses.end()) {
+            return &it->second;
+        }
+        return {};
     }
 
-    std::span<const Synapse> Circuit::getSynapses() const
+    std::optional<const Synapse*> Circuit::getSynapse(UID uid) const
     {
-        return _synapses;
+        auto it = _synapses.find(uid);
+        if (it != _synapses.end()) {
+            return &it->second;
+        }
+        return {};
     }
+
 } // namespace mindset

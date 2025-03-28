@@ -23,6 +23,9 @@ namespace mindset
         UID neuriteType;
 
         UID neuronTransform;
+
+        UID synapsePreSection;
+        UID synapsePostSection;
     };
 
     /**

@@ -6,7 +6,7 @@ include(Catch)
 project(mindset-tests)
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(mindset-tests brion.cpp swc.cpp)
+add_executable(mindset-tests brion.cpp swc.cpp snudda.cpp)
 
 add_dependencies(mindset-tests mindset)
 

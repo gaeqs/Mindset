@@ -14,6 +14,7 @@ namespace mindset
      */
     class NeuronTransform
     {
+        mutable rush::Quatf _quat;
         mutable rush::Mat4f _model;
         mutable rush::Mat4f _normal;
 
@@ -79,7 +80,52 @@ namespace mindset
          * @param scale The new scale values.
          */
         void setScale(const rush::Vec3f& scale);
+
+        /**
+         * Transforms a position vector from local to global coordinate space.
+         *
+         * @param local The position vector defined in local coordinates.
+         * @return The transformed position vector in global coordinates.
+         *
+         * This transformation applies scaling, rotation (by quaternion), and translation,
+         * converting a position from the local frame of the NeuronTransform to the global frame.
+         */
+        rush::Vec3f positionToGlobalCoordinates(rush::Vec3f local) const;
+
+        /**
+         * Transforms a direction vector from local to global coordinate space.
+         *
+         * @param local The direction vector defined in local coordinates.
+         * @return The transformed direction vector in global coordinates.
+         *
+         * This method applies scaling and rotation (by quaternion) without translation.
+         * It's intended for vectors representing directions, velocities, or similar.
+         */
+        rush::Vec3f vectorToGlobalCoordinates(rush::Vec3f local) const;
+
+        /**
+         * Transforms a position vector from global to local coordinate space.
+         *
+         * @param global The position vector defined in global coordinates.
+         * @return The transformed position vector in local coordinates.
+         *
+         * The method reverses the global-to-local transformation by first removing the translation,
+         * followed by applying the inverse rotation (quaternion conjugate) and inverse scaling.
+         */
+        rush::Vec3f positionToLocalCoordinates(rush::Vec3f global) const;
+
+        /**
+         * Transforms a direction vector from global to local coordinate space.
+         *
+         * @param global The direction vector defined in global coordinates.
+         * @return The transformed direction vector in local coordinates.
+         *
+         * Similar to positionToLocalCoordinates(), but excludes translation.
+         * It applies inverse rotation (quaternion conjugate) and inverse scaling,
+         * suitable for transforming directions or velocities.
+         */
+        rush::Vec3f vectorToLocalCoordinates(rush::Vec3f global) const;
     };
 } // namespace mindset
 
-#endif //NEURONTRANSFORM_H
+#endif // NEURONTRANSFORM_H

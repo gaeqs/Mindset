@@ -57,6 +57,28 @@ namespace mindset
     }
 
     template<typename Type>
+    std::unordered_map<UID, Type> getNeuritesProperties(const Dataset& dataset, const Morphology& morphology,
+                                                        const std::string& propertyName)
+    {
+        auto optional = dataset.getProperties().getPropertyUID(propertyName);
+        if (!optional) {
+            return {};
+        }
+        UID property = *optional;
+
+        std::unordered_map<UID, Type> result;
+
+        for (auto neurite : morphology.getNeurites()) {
+            auto value = neurite->getProperty<Type>(property);
+            if (value) {
+                result[neurite->getUID()] = std::move(*value);
+            }
+        }
+
+        return result;
+    }
+
+    template<typename Type>
     std::vector<std::optional<Type>> getNeuritesProperties(const Dataset& dataset, const Morphology& morphology,
                                                            const std::vector<UID>& neurites,
                                                            const std::string& propertyName)

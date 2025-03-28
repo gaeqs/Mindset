@@ -7,7 +7,7 @@
 
 #include <span>
 #include <ranges>
-#include <vector>
+#include <unordered_map>
 
 #include <mindset/Synapse.h>
 #include <mindset/Versioned.h>
@@ -21,9 +21,9 @@ namespace mindset
      */
     class Circuit : public Versioned
     {
-        std::vector<Synapse> _synapses;
-        std::multimap<UID, size_t> _preSynapses;
-        std::multimap<UID, size_t> _postSynapses;
+        std::unordered_map<UID, Synapse> _synapses;
+        std::unordered_multimap<UID, UID> _preSynapses;
+        std::unordered_multimap<UID, UID> _postSynapses;
 
       public:
         /**
@@ -34,8 +34,9 @@ namespace mindset
         /**
          * Adds a single synapse to the circuit.
          * @param synapse The synapse to add.
+         * @return Pair containing a pointer to the inserted synapse and a boolean indicating success.
          */
-        void addSynapse(Synapse synapse);
+        std::pair<Synapse*, bool> addSynapse(Synapse synapse);
 
         /**
          * Adds multiple synapses to the circuit.
@@ -47,18 +48,34 @@ namespace mindset
          * Clears all synapses from the circuit.
          */
         void clear();
+        
+        /**
+         * Returns a mutable pointer to the synapse with the specified UID.
+         */
+        [[nodiscard]] std::optional<Synapse*> getSynapse(UID uid);
 
         /**
-         * Gets a mutable view of all synapses in the circuit.
-         * @return Span containing mutable synapses.
+         * Returns a const pointer to the synapses with the specified UID.
          */
-        std::span<Synapse> getSynapses();
+        [[nodiscard]] std::optional<const Synapse*> getSynapse(UID uid) const;
+        
+        /**
+         * Returns a view to iterate over all stored synapses in a mutable context.
+         * @return A range view of mutable synapses references.
+         */
+        [[nodiscard]] auto getSynapses()
+        {
+            return _synapses | std::views::transform([](auto& pair) -> Synapse* { return &pair.second; });
+        }
 
         /**
-         * Gets a read-only view of all synapses in the circuit.
-         * @return Span containing const synapses.
+         * Returns a view to iterate over all stored synapses in a const context.
+         * @return A range view of const synapses references.
          */
-        std::span<const Synapse> getSynapses() const;
+        [[nodiscard]] auto getSynapses() const
+        {
+            return _synapses | std::views::transform([](const auto& pair) -> const Synapse* { return &pair.second; });
+        }
 
         /**
          * Gets mutable synapses that have the given neuron as pre-synaptic.

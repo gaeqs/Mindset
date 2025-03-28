@@ -11,9 +11,9 @@ namespace mindset
         if (!_dirty) {
             return;
         }
-        auto rot = rush::Quatf::euler(_rotation);
-        _model = rush::Mat4f::model(_scale, rot, _position);
-        _normal = rush::Mat4f::normal(_scale, rot);
+        _quat = rush::Quatf::euler(_rotation);
+        _model = rush::Mat4f::model(_scale, _quat, _position);
+        _normal = rush::Mat4f::normal(_scale, _quat);
 
         _dirty = false;
     }
@@ -96,4 +96,27 @@ namespace mindset
         _scale = scale;
         _dirty = true;
     }
+
+    rush::Vec3f NeuronTransform::positionToGlobalCoordinates(rush::Vec3f local) const
+    {
+        recalculateIfRequired();
+        return _quat * (_scale * local) + _position;
+    }
+
+    rush::Vec3f NeuronTransform::vectorToGlobalCoordinates(rush::Vec3f local) const
+    {
+        recalculateIfRequired();
+        return _quat * (_scale * local);
+    }
+
+    rush::Vec3f NeuronTransform::positionToLocalCoordinates(rush::Vec3f global) const
+    {
+        return _quat.conjugate() * (global - _position) / _scale;
+    }
+
+    rush::Vec3f NeuronTransform::vectorToLocalCoordinates(rush::Vec3f global) const
+    {
+        return _quat.conjugate() * global / _scale;
+    }
+
 } // namespace mindset

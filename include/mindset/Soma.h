@@ -6,6 +6,7 @@
 #define SOMA_H
 
 #include <vector>
+#include <set>
 
 #include <rush/rush.h>
 #include <mindset/Identifiable.h>
@@ -22,6 +23,7 @@ namespace mindset
 
     class Soma : public Identifiable, public PropertyHolder
     {
+        std::set<UID> _extraIds;
         std::vector<SomaNode> _nodes;
 
         mutable rush::Vec3f _center;
@@ -34,12 +36,33 @@ namespace mindset
         void recalculate() const;
 
       public:
+        /**
+         * Creates a new soma using the provided UID.
+         * @param uid The UID.
+         */
+        explicit Soma(UID uid);
 
         /**
-        * Creates a new soma using the provided UID.
-        * @param the UID.
-        */
-        explicit Soma(UID uid);
+         * Retrieves the extra id defining this soma.
+         * In some datasets, Somas can be defined using multiple sections,
+         * each one with a unique UID. This vector provides these extra UIDs.
+         */
+        const std::set<UID>& getExtraId() const;
+
+        /**
+         * Adds an extra id to the soma.
+         */
+        void addExtraId(UID uid);
+
+        /**
+         * Clears all extra ids from the soma.
+         */
+        void clearExtraIds();
+
+        /**
+         * Returns whether this soma is represented by the given UID.
+         */
+        bool isRepresentedById(UID uid) const;
 
         /**
          * Retrieves the soma nodes defining its geometry.
@@ -88,4 +111,4 @@ namespace mindset
     };
 } // namespace mindset
 
-#endif //SOMA_H
+#endif // SOMA_H
