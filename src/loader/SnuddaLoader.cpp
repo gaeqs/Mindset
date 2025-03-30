@@ -37,12 +37,15 @@ namespace mindset
         return result;
     }
 
-    void SnuddaLoader::loadNeurons(Dataset& dataset, const SnuddaLoaderProperties& properties) const
+    void SnuddaLoader::loadNeurons(Dataset& dataset,
+                                   const std::unordered_map<std::string, std::shared_ptr<Morphology>>& morphologies,
+                                   const SnuddaLoaderProperties& properties) const
     {
         auto ids = _file.getDataSet("network/neurons/neuron_id").read<std::vector<uint32_t>>();
         auto position = _file.getDataSet("network/neurons/position").read<std::vector<std::array<double, 3>>>();
         auto rotation = _file.getDataSet("network/neurons/rotation").read<std::vector<std::array<double, 9>>>();
         auto origo = _file.getDataSet("meta/simulation_origo").read<std::array<double, 3>>();
+        auto morphologiesNames = _file.getDataSet("network/neurons/morphology").read<std::vector<std::string>>();
 
         auto origin = rush::Vec3f(origo[0], origo[1], origo[2]) * METER_MICROMETER_RATIO;
 
@@ -53,13 +56,22 @@ namespace mindset
             rush::Mat4f model(rot, 1.0f);
             model[3] = rush::Vec4f(pos * METER_MICROMETER_RATIO + origin, 1.0f);
 
+            auto morphologyName = morphologiesNames[i];
+            auto morphology = morphologies.find(morphologyName);
+
             Neuron neuron(ids[i]);
+
+            if (morphology != morphologies.end()) {
+                neuron.setMorphology(morphology->second);
+            }
+
             neuron.setProperty(properties.neuronTransform, NeuronTransform(model));
             dataset.addNeuron(std::move(neuron));
         }
     }
 
-    std::optional<std::string> SnuddaLoader::loadMorphologies(Dataset& dataset) const
+    Result<std::unordered_map<std::string, std::shared_ptr<Morphology>>, std::string> SnuddaLoader::loadMorphologies(
+        Dataset& dataset) const
     {
         static const std::string SNUDDA_PREFIX = "$SNUDDA_DATA";
 
@@ -72,7 +84,6 @@ namespace mindset
             auto id = ids[i];
             auto& name = morphologies[i];
             if (loaded.contains(name)) {
-                assignMorphology(dataset, id, loaded[name]);
                 continue;
             }
 
@@ -87,10 +98,9 @@ namespace mindset
                 return swc.getError();
             }
             loaded[name] = swc.getResult();
-            assignMorphology(dataset, id, swc.getResult());
         }
 
-        return {};
+        return std::move(loaded);
     }
 
     std::optional<std::string> SnuddaLoader::loadSynapses(Dataset& dataset,
@@ -166,13 +176,6 @@ namespace mindset
         return {};
     }
 
-    void SnuddaLoader::assignMorphology(Dataset& dataset, UID uid, std::shared_ptr<Morphology> morphology)
-    {
-        if (auto neuron = dataset.getNeuron(uid); neuron.has_value()) {
-            neuron.value()->setMorphology(std::move(morphology));
-        }
-    }
-
     SnuddaLoader::SnuddaLoader(const std::filesystem::path& path) :
         _file(path.string(), HighFive::File::ReadOnly),
         _dataPath(path.parent_path() / "data"),
@@ -205,15 +208,19 @@ namespace mindset
     {
         SnuddaLoaderProperties properties = initProperties(dataset.getProperties());
 
-        loadNeurons(dataset, properties);
+        std::unordered_map<std::string, std::shared_ptr<Morphology>> morphologies;
 
         if (_loadMorphology) {
-            auto error = loadMorphologies(dataset);
-            if (error.has_value()) {
-                std::cerr << error.value() << std::endl;
+            auto result = loadMorphologies(dataset);
+            if (!result.isOk()) {
+                std::cerr << result.getError() << std::endl;
                 return;
             }
+
+            morphologies = std::move(result.getResult());
         }
+
+        loadNeurons(dataset, morphologies, properties);
 
         if (_loadSynapses) {
             auto error = loadSynapses(dataset, properties);

@@ -32,8 +32,8 @@ namespace mindset
     static const std::string BLUE_CONFIG_LOADER_NAME = "Blue Config";
 
     /**
-    * This Loader loads BlueConfig files.
-    */
+     * This Loader loads BlueConfig files.
+     */
     class BlueConfigLoader : public Loader
     {
         brion::BlueConfig _blueConfig;
@@ -44,10 +44,11 @@ namespace mindset
         BlueConfigLoaderProperties initProperties(Properties& properties) const;
 
         static void loadNeurons(Dataset& dataset, const BlueConfigLoaderProperties& properties,
-                                const brion::GIDSet& ids, const brain::Circuit& circuit);
+                                const brion::GIDSet& ids, const brain::Circuit& circuit,
+                                const std::map<std::string, std::shared_ptr<Morphology>>& morphologies);
 
-        static void loadMorphologies(Dataset& dataset, const BlueConfigLoaderProperties& properties,
-                                     const brion::GIDSet& ids, const brain::Circuit& circuit);
+        static std::map<std::string, std::shared_ptr<Morphology>> loadMorphologies(
+            const BlueConfigLoaderProperties& properties, const brion::GIDSet& ids, const brain::Circuit& circuit);
 
         static void loadHierarchy(Dataset& dataset, const BlueConfigLoaderProperties& properties,
                                   const brion::GIDSet& ids, const brion::Circuit& circuit);
@@ -79,4 +80,4 @@ namespace mindset
 } // namespace mindset
 
 #endif
-#endif //BLUECONFIGLOADER_H
+#endif // BLUECONFIGLOADER_H

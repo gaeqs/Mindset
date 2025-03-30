@@ -34,23 +34,31 @@ namespace mindset
     }
 
     void BlueConfigLoader::loadNeurons(Dataset& dataset, const BlueConfigLoaderProperties& properties,
-                                       const brion::GIDSet& ids, const brain::Circuit& circuit)
+                                       const brion::GIDSet& ids, const brain::Circuit& circuit,
+                                       const std::map<std::string, std::shared_ptr<Morphology>>& morphologies)
     {
         auto transforms = circuit.getTransforms(ids);
         auto layers = circuit.getLayers(ids);
+        auto uris = circuit.getMorphologyURIs(ids);
+
         size_t index = 0;
         for (UID id : ids) {
             auto neuron = Neuron(id);
             UID layer = std::stoi(layers[index]);
             neuron.setProperty(properties.neuronTransform, NeuronTransform(transforms[index]));
             neuron.setProperty(properties.neuronLayer, layer);
+
+            if (auto morphology = morphologies.find(uris[index].getPath()); morphology != morphologies.end()) {
+                neuron.setMorphology(morphology->second);
+            }
+
             dataset.addNeuron(std::move(neuron));
             ++index;
         }
     }
 
-    void BlueConfigLoader::loadMorphologies(Dataset& dataset, const BlueConfigLoaderProperties& properties,
-                                            const brion::GIDSet& ids, const brain::Circuit& circuit)
+    std::map<std::string, std::shared_ptr<Morphology>> BlueConfigLoader::loadMorphologies(
+        const BlueConfigLoaderProperties& properties, const brion::GIDSet& ids, const brain::Circuit& circuit)
     {
         auto uris = circuit.getMorphologyURIs(ids);
         auto transforms = circuit.getTransforms(ids);
@@ -67,15 +75,7 @@ namespace mindset
             morphologies[file] = loadMorphology(properties, brion::Morphology(uri));
         }
 
-        size_t index = 0;
-        for (UID id : ids) {
-            if (auto neuron = dataset.getNeuron(id); neuron.has_value()) {
-                if (auto it = morphologies.find(uris[index].getPath()); it != morphologies.end()) {
-                    neuron.value()->setMorphology(it->second);
-                }
-            }
-            ++index;
-        }
+        return morphologies;
     }
 
     void BlueConfigLoader::loadHierarchy(Dataset& dataset, const BlueConfigLoaderProperties& properties,
@@ -230,14 +230,17 @@ namespace mindset
 
         invoke({LoaderStatusType::LOADING, "Loading global neuron data", STAGES, 2});
 
-        /**/ {
+        {
             auto circuit = brain::Circuit(_blueConfig);
-            loadNeurons(dataset, properties, ids, circuit);
+
+            std::map<std::string, std::shared_ptr<Morphology>> morphologies;
 
             if (_loadMorphology) {
                 invoke({LoaderStatusType::LOADING, "Loading morphologies", STAGES, 3});
-                loadMorphologies(dataset, properties, ids, circuit);
+                morphologies = loadMorphologies(properties, ids, circuit);
             }
+
+            loadNeurons(dataset, properties, ids, circuit, morphologies);
         }
 
         if (_loadHierarchy) {

@@ -29,8 +29,8 @@ namespace mindset
     };
 
     /**
-    * This Loader loads Snudda projects.
-    */
+     * This Loader loads Snudda projects.
+     */
     class SnuddaLoader : public Loader
     {
         HighFive::File _file;
@@ -40,13 +40,14 @@ namespace mindset
 
         SnuddaLoaderProperties initProperties(Properties& properties) const;
 
-        void loadNeurons(Dataset& dataset, const SnuddaLoaderProperties& properties) const;
+        void loadNeurons(Dataset& dataset,
+                         const std::unordered_map<std::string, std::shared_ptr<Morphology>>& morphologies,
+                         const SnuddaLoaderProperties& properties) const;
 
-        std::optional<std::string> loadMorphologies(Dataset& dataset) const;
+        Result<std::unordered_map<std::string, std::shared_ptr<Morphology>>, std::string> loadMorphologies(
+            Dataset& dataset) const;
 
         std::optional<std::string> loadSynapses(Dataset& dataset, const SnuddaLoaderProperties& properties) const;
-
-        static void assignMorphology(Dataset& dataset, UID uid, std::shared_ptr<Morphology> morphology);
 
       public:
         explicit SnuddaLoader(const std::filesystem::path& path);
@@ -65,4 +66,4 @@ namespace mindset
     };
 } // namespace mindset
 
-#endif //SNUDDALOADER_H
+#endif // SNUDDALOADER_H
