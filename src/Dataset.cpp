@@ -101,6 +101,16 @@ namespace mindset
         return &_hierarchy.value();
     }
 
+    void Dataset::clear()
+    {
+        _neurons.clear();
+        _properties.clear();
+        _circuit.clear();
+        _hierarchy = {};
+        _clearEvent.invoke();
+        incrementVersion();
+    }
+
     hey::Observable<Neuron*>& Dataset::getNeuronAddedEvent()
     {
         return _neuronAddedEvent;

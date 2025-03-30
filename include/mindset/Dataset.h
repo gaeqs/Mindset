@@ -35,6 +35,7 @@ namespace mindset
 
         hey::Observable<Neuron*> _neuronAddedEvent;
         hey::Observable<UID> _neuronRemovedEvent;
+        hey::Observable<void> _clearEvent;
 
       public:
         /**
@@ -127,6 +128,11 @@ namespace mindset
         Node* createHierarchy(UID uid, std::string type);
 
         /**
+         * Clears this dataset. This includes all properties, neurons, synapses and hierarchy.
+         */
+        void clear();
+
+        /**
          * The observable that manages the event triggered when a neuron is added.
          */
         hey::Observable<Neuron*>& getNeuronAddedEvent();
@@ -135,6 +141,11 @@ namespace mindset
          * The observable that manages the event triggered when a neuron is removed.
          */
         hey::Observable<UID>& getNeuronRemovedEvent();
+
+        /**
+         * The observable that manages the event triggered when the dataset is cleared.
+         */
+        hey::Observable<UID>& getClearEvent();
 
         /**
          * Returns a view to iterate over all stored neurons' UIDs.

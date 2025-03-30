@@ -20,8 +20,20 @@ namespace mindset
     const std::string PROPERTY_MINI_COLUMN = "mindset:mini_column";
     const std::string PROPERTY_LAYER = "mindset:layer";
     const std::string PROPERTY_NAME = "mindset:name";
+
     const std::string PROPERTY_SYNAPSE_PRE_SECTION = "mindset:synapse_pre_section";
     const std::string PROPERTY_SYNAPSE_POST_SECTION = "mindset:synapse_post_section";
+
+    const std::string PROPERTY_SYNAPSE_PRE_POSITION = "mindset:synapse_pre_position";
+    const std::string PROPERTY_SYNAPSE_POST_POSITION = "mindset:synapse_post_position";
+
+    const std::string PROPERTY_SYNAPSE_DELAY = "mindset:synapse_delay";
+    const std::string PROPERTY_SYNAPSE_CONDUCTANCE = "mindset:synapse_conductance";
+    const std::string PROPERTY_SYNAPSE_UTILIZATION = "mindset:synapse_utilization";
+    const std::string PROPERTY_SYNAPSE_DEPRESSION = "mindset:synapse_depression";
+    const std::string PROPERTY_SYNAPSE_FACILITATION = "mindset:synapse_facilitation";
+    const std::string PROPERTY_SYNAPSE_DECAY = "mindset:synapse_decay";
+    const std::string PROPERTY_SYNAPSE_EFFICACY = "mindset:synapse_efficacy";
 
     enum class NeuriteType : uint8_t
     {

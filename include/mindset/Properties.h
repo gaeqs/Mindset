@@ -23,8 +23,8 @@ namespace mindset
 
       public:
         /**
-        * Creates a new Properties instance.
-        */
+         * Creates a new Properties instance.
+         */
         Properties();
 
         /**
@@ -48,6 +48,12 @@ namespace mindset
         [[nodiscard]] bool isPropertyDefined(const std::string& name) const;
 
         /**
+         * Removes the property with the given name.
+         * @return Whether a property was erased.
+         */
+        bool removeProperty(const std::string& name);
+
+        /**
          * Retrieves the UID of a property by name, if defined.
          * @param name Name of the property.
          */
@@ -62,7 +68,12 @@ namespace mindset
          * Returns a map of UIDs to their corresponding property names.
          */
         [[nodiscard]] const std::map<UID, std::string>& getPropertiesNames() const;
+
+        /**
+         * Clears all properties.
+         */
+        void clear();
     };
 } // namespace mindset
 
-#endif //PROPERTIES_H
+#endif // PROPERTIES_H

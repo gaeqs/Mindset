@@ -39,6 +39,16 @@ namespace mindset
         return _properties.contains(name);
     }
 
+    bool Properties::removeProperty(const std::string& name)
+    {
+        auto optional = getPropertyUID(name);
+        if (!optional) {
+            return false;
+        }
+        _propertiesNames.erase(optional.value());
+        return _properties.erase(name) > 0;
+    }
+
     std::optional<UID> Properties::getPropertyUID(const std::string& name) const
     {
         auto it = _properties.find(name);
@@ -56,5 +66,11 @@ namespace mindset
     const std::map<UID, std::string>& Properties::getPropertiesNames() const
     {
         return _propertiesNames;
+    }
+
+    void Properties::clear()
+    {
+        _propertiesNames.clear();
+        _properties.clear();
     }
 } // namespace mindset

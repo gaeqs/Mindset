@@ -8,7 +8,7 @@
     #include <mindset/loader/BlueConfigLoader.h>
     #include <mindset/DefaultProperties.h>
 
-    #include <brain/circuit.h>
+    #include <brain/brain.h>
     #include <rush/rush.h>
 
 namespace mindset
@@ -16,8 +16,14 @@ namespace mindset
     BlueConfigLoaderProperties BlueConfigLoader::initProperties(Properties& properties) const
     {
         BlueConfigLoaderProperties result{};
+
+        // Used for neurites and synapses.
+
+        if (_loadMorphology || _loadSynapses) {
+            result.position = properties.defineProperty(PROPERTY_POSITION);
+        }
+
         if (_loadMorphology) {
-            result.neuritePosition = properties.defineProperty(PROPERTY_POSITION);
             result.neuriteRadius = properties.defineProperty(PROPERTY_RADIUS);
             result.neuriteParent = properties.defineProperty(PROPERTY_PARENT);
             result.neuriteType = properties.defineProperty(PROPERTY_NEURITE_TYPE);
@@ -30,6 +36,21 @@ namespace mindset
             result.neuronColumn = properties.defineProperty(PROPERTY_COLUMN);
             result.neuronMiniColumn = properties.defineProperty(PROPERTY_MINI_COLUMN);
         }
+
+        if (_loadSynapses) {
+            result.synapsePreSection = properties.defineProperty(PROPERTY_SYNAPSE_PRE_SECTION);
+            result.synapsePostSection = properties.defineProperty(PROPERTY_SYNAPSE_POST_SECTION);
+            result.synapsePrePosition = properties.defineProperty(PROPERTY_SYNAPSE_PRE_POSITION);
+            result.synapsePostPosition = properties.defineProperty(PROPERTY_SYNAPSE_POST_POSITION);
+            result.synapseDelay = properties.defineProperty(PROPERTY_SYNAPSE_DELAY);
+            result.synapseConductance = properties.defineProperty(PROPERTY_SYNAPSE_CONDUCTANCE);
+            result.synapseUtilization = properties.defineProperty(PROPERTY_SYNAPSE_UTILIZATION);
+            result.synapseDepression = properties.defineProperty(PROPERTY_SYNAPSE_DEPRESSION);
+            result.synapseFacilitation = properties.defineProperty(PROPERTY_SYNAPSE_FACILITATION);
+            result.synapseDecay = properties.defineProperty(PROPERTY_SYNAPSE_DECAY);
+            result.synapseEfficacy = properties.defineProperty(PROPERTY_SYNAPSE_EFFICACY);
+        }
+
         return result;
     }
 
@@ -76,6 +97,37 @@ namespace mindset
         }
 
         return morphologies;
+    }
+
+    void BlueConfigLoader::loadSynapses(Dataset& dataset, const BlueConfigLoaderProperties& properties,
+                                        const brion::GIDSet& ids, const brain::Circuit& circuit)
+    {
+        auto brainSynapses = circuit.getAfferentSynapses(ids, brain::SynapsePrefetch::attributes);
+        auto future = brainSynapses.read(brainSynapses.getRemaining());
+        auto synapses = future.get();
+
+        auto& outCircuit = dataset.getCircuit();
+
+        UID uidGenerator = 0;
+        for (auto synapse : synapses) {
+            Synapse result(uidGenerator++, synapse.getPresynapticGID(), synapse.getPostsynapticGID());
+
+            result.setProperty(properties.position, synapse.getPresynapticCenterPosition());
+            result.setProperty(properties.synapsePreSection, synapse.getPresynapticSectionID());
+            result.setProperty(properties.synapsePostSection, synapse.getPostsynapticSectionID());
+            result.setProperty(properties.synapsePrePosition, synapse.getPresynapticSurfacePosition());
+            result.setProperty(properties.synapsePrePosition, synapse.getPostsynapticSurfacePosition());
+
+            result.setProperty(properties.synapseDelay, synapse.getDelay());
+            result.setProperty(properties.synapseConductance, synapse.getConductance());
+            result.setProperty(properties.synapseUtilization, synapse.getUtilization());
+            result.setProperty(properties.synapseDepression, synapse.getDepression());
+            result.setProperty(properties.synapseFacilitation, synapse.getFacilitation());
+            result.setProperty(properties.synapseDecay, synapse.getDecay());
+            result.setProperty(properties.synapseEfficacy, synapse.getEfficacy());
+
+            outCircuit.addSynapse(std::move(result));
+        }
     }
 
     void BlueConfigLoader::loadHierarchy(Dataset& dataset, const BlueConfigLoaderProperties& properties,
@@ -145,7 +197,7 @@ namespace mindset
                 for (size_t p = startNode; p < endNode; ++p) {
                     auto point = points[p];
                     Neurite neurite(idGenerator++);
-                    neurite.setProperty(properties.neuritePosition, rush::Vec3f(point.x, point.y, point.z));
+                    neurite.setProperty(properties.position, rush::Vec3f(point.x, point.y, point.z));
                     neurite.setProperty(properties.neuriteRadius, point.w / 2.0f); // Brion returns the diameter!
                     if (previous.has_value()) {
                         neurite.setProperty(properties.neuriteParent, previous.value());
@@ -166,7 +218,8 @@ namespace mindset
     BlueConfigLoader::BlueConfigLoader(std::filesystem::path path) :
         _blueConfig(std::move(path)),
         _loadMorphology(true),
-        _loadHierarchy(true)
+        _loadHierarchy(true),
+        _loadSynapses(true)
     {
     }
 
@@ -205,6 +258,16 @@ namespace mindset
         _loadHierarchy = loadHierarchy;
     }
 
+    bool BlueConfigLoader::shouldLoadSynapses() const
+    {
+        return _loadSynapses;
+    }
+
+    void BlueConfigLoader::setLoadSynapses(bool loadSynapses)
+    {
+        _loadSynapses = loadSynapses;
+    }
+
     void BlueConfigLoader::load(Dataset& dataset) const
     {
         constexpr size_t STAGES = 5;
@@ -238,6 +301,10 @@ namespace mindset
             if (_loadMorphology) {
                 invoke({LoaderStatusType::LOADING, "Loading morphologies", STAGES, 3});
                 morphologies = loadMorphologies(properties, ids, circuit);
+            }
+
+            if (_loadSynapses) {
+                loadSynapses(dataset, properties, ids, circuit);
             }
 
             loadNeurons(dataset, properties, ids, circuit, morphologies);
