@@ -35,7 +35,7 @@ namespace mindset
 
         hey::Observable<Neuron*> _neuronAddedEvent;
         hey::Observable<UID> _neuronRemovedEvent;
-        hey::Observable<void> _clearEvent;
+        hey::Observable<void*> _clearEvent;
 
       public:
         /**

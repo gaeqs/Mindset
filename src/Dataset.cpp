@@ -107,7 +107,7 @@ namespace mindset
         _properties.clear();
         _circuit.clear();
         _hierarchy = {};
-        _clearEvent.invoke();
+        _clearEvent.invoke(nullptr);
         incrementVersion();
     }
 
