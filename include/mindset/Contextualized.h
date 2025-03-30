@@ -50,6 +50,11 @@ namespace mindset
         {
         }
 
+        Holder* getRaw() const
+        {
+            return _holder;
+        }
+
         [[nodiscard]] std::optional<ContextualizedError> setProperty(const std::string& name, std::any value) const
         {
             if constexpr (std::is_const_v<Holder>) {
