@@ -10,6 +10,7 @@ TEST_CASE("Snudda load")
 {
     auto cPath = getenv("SNUDDA_PATH");
     if (cPath == nullptr) {
+        FAIL("SNUDDA_PATH environment variable not set.");
         return;
     }
 

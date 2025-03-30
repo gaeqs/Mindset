@@ -7,6 +7,7 @@
 
 #include <optional>
 #include <unordered_map>
+#include <hey/Observable.h>
 
 #include <mindset/Contextualized.h>
 #include <mindset/Versioned.h>
@@ -31,6 +32,9 @@ namespace mindset
         Properties _properties;
         Circuit _circuit;
         std::optional<Node> _hierarchy;
+
+        hey::Observable<Neuron*> _neuronAddedEvent;
+        hey::Observable<UID> _neuronRemovedEvent;
 
       public:
         /**
@@ -121,6 +125,16 @@ namespace mindset
          * @return Pointer to the newly created hierarchy node.
          */
         Node* createHierarchy(UID uid, std::string type);
+
+        /**
+         * The observable that manages the event triggered when a neuron is added.
+         */
+        hey::Observable<Neuron*>& getNeuronAddedEvent();
+
+        /**
+         * The observable that manages the event triggered when a neuron is removed.
+         */
+        hey::Observable<UID>& getNeuronRemovedEvent();
 
         /**
          * Returns a view to iterate over all stored neurons' UIDs.

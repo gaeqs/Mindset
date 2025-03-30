@@ -23,7 +23,10 @@ namespace mindset
     std::pair<Neuron*, bool> Dataset::addNeuron(Neuron neuron)
     {
         auto [it, result] = _neurons.insert({neuron.getUID(), std::move(neuron)});
-        incrementVersion();
+        if (result) {
+            _neuronAddedEvent.invoke(&it->second);
+            incrementVersion();
+        }
         return {&it->second, result};
     }
 
@@ -31,6 +34,7 @@ namespace mindset
     {
         bool result = _neurons.erase(uid) > 0;
         if (result) {
+            _neuronRemovedEvent.invoke(uid);
             incrementVersion();
         }
         return result;
@@ -95,5 +99,15 @@ namespace mindset
         _hierarchy.emplace(uid, type);
         incrementVersion();
         return &_hierarchy.value();
+    }
+
+    hey::Observable<Neuron*>& Dataset::getNeuronAddedEvent()
+    {
+        return _neuronAddedEvent;
+    }
+
+    hey::Observable<UID>& Dataset::getNeuronRemovedEvent()
+    {
+        return _neuronRemovedEvent;
     }
 } // namespace mindset
