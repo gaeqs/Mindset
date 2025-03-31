@@ -120,4 +120,9 @@ namespace mindset
     {
         return _neuronRemovedEvent;
     }
+
+    hey::Observable<void*>& Dataset::getClearEvent()
+    {
+        return _clearEvent;
+    }
 } // namespace mindset
