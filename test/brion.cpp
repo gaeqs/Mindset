@@ -69,11 +69,13 @@ TEST_CASE("Brion load")
         if (!pre || !post) continue;
 
         std::cout << "Synapse UID " << synapse->getUID() << std::endl;
-        std::cout << "Synapse Pre " << synapse->getPreSynapticNeuron() << std::endl;
-        std::cout << "Synapse Pre section " << pre.value() << std::endl;
-        std::cout << "Synapse Post " << synapse->getPostSynapticNeuron() << std::endl;
-        std::cout << "Synapse Post section " << post.value() << std::endl;
+        std::cout << "Synapse pre " << synapse->getPreSynapticNeuron() << std::endl;
+        std::cout << "Synapse pre section " << pre.value() << std::endl;
+        std::cout << "Synapse post " << synapse->getPostSynapticNeuron() << std::endl;
+        std::cout << "Synapse post section " << post.value() << std::endl;
         std::cout << "Synapse position " << synapse.getPosition().value_or(rush::Vec3f(0.0f)) << std::endl;
+        std::cout << "Synapse pre pos " << synapse.getProperty<rush::Vec3f>(mindset::PROPERTY_SYNAPSE_PRE_POSITION).value_or(rush::Vec3f(0.0f)) << std::endl;
+        std::cout << "Synapse post pos " << synapse.getProperty<rush::Vec3f>(mindset::PROPERTY_SYNAPSE_POST_POSITION).value_or(rush::Vec3f(0.0f)) << std::endl;
 
         if (synapseIndex++ > 100) break;
     }

@@ -144,7 +144,7 @@ namespace mindset
         for (UID id : ids) {
             auto neuron = Neuron(id);
             UID layer = std::stoi(layers[index]);
-            neuron.setProperty(properties.neuronTransform, NeuronTransform(transpose(transforms[index])));
+            neuron.setProperty(properties.neuronTransform, NeuronTransform(transforms[index]));
             neuron.setProperty(properties.neuronLayer, layer);
 
             if (auto morphology = morphologies.find(uris[index].getPath()); morphology != morphologies.end()) {
