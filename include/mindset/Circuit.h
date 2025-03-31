@@ -5,9 +5,10 @@
 #ifndef CIRCUIT_H
 #define CIRCUIT_H
 
-#include <span>
 #include <ranges>
 #include <unordered_map>
+
+#include <hey/Hey.h>
 
 #include <mindset/Synapse.h>
 #include <mindset/Versioned.h>
@@ -24,6 +25,10 @@ namespace mindset
         std::unordered_map<UID, Synapse> _synapses;
         std::unordered_multimap<UID, UID> _preSynapses;
         std::unordered_multimap<UID, UID> _postSynapses;
+
+        hey::Observable<Synapse*> _synapseAddedEvent;
+        hey::Observable<UID> _synapseRemovedEvent;
+        hey::Observable<void*> _clearEvent;
 
       public:
         /**
@@ -45,10 +50,17 @@ namespace mindset
         void addSynapses(std::vector<Synapse> synapses);
 
         /**
+         * Removes a synapse identified by its UID.
+         * @param uid The unique identifier of the synapse.
+         * @return True if the synapse was successfully removed; false otherwise.
+         */
+        bool removeSynapse(UID uid);
+
+        /**
          * Clears all synapses from the circuit.
          */
         void clear();
-        
+
         /**
          * Returns a mutable pointer to the synapse with the specified UID.
          */
@@ -58,7 +70,22 @@ namespace mindset
          * Returns a const pointer to the synapses with the specified UID.
          */
         [[nodiscard]] std::optional<const Synapse*> getSynapse(UID uid) const;
-        
+
+        /**
+         * The observable that manages the event triggered when a synapse is added.
+         */
+        hey::Observable<Synapse*>& getSynapseAddedEvent();
+
+        /**
+         * The observable that manages the event triggered when a synapse is removed.
+         */
+        hey::Observable<UID>& getSynapseRemovedEvent();
+
+        /**
+         * The observable that manages the event triggered when the dataset is cleared.
+         */
+        hey::Observable<void*>& getClearEvent();
+
         /**
          * Returns a view to iterate over all stored synapses in a mutable context.
          * @return A range view of mutable synapses references.

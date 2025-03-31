@@ -148,6 +148,11 @@ namespace mindset
         hey::Observable<void*>& getClearEvent();
 
         /**
+         * Returns the smallest UID available for a neuron.
+         */
+        [[nodiscard]] UID findSmallestAvailableNeuronUID() const;
+
+        /**
          * Returns a view to iterate over all stored neurons' UIDs.
          * @returns A range view of UIDs.
          */

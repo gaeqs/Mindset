@@ -2,7 +2,6 @@
 // Created by gaeqs on 11/03/2025.
 //
 
-#include <unistd.h>
 #include <mindset/Circuit.h>
 
 namespace mindset
@@ -19,6 +18,7 @@ namespace mindset
             _preSynapses.insert({pre, uid});
             _postSynapses.insert({post, uid});
             incrementVersion();
+            _synapseAddedEvent.invoke(&it->second);
         }
         return {&it->second, result};
     }
@@ -31,12 +31,47 @@ namespace mindset
         incrementVersion();
     }
 
+    bool Circuit::removeSynapse(UID uid)
+    {
+        auto it = _synapses.find(uid);
+        if (it == _synapses.end()) {
+            return false;
+        }
+
+        UID pre = it->second.getPreSynapticNeuron();
+        UID post = it->second.getPostSynapticNeuron();
+
+        _synapses.erase(it);
+
+        auto [preBegin, preEnd] = _preSynapses.equal_range(pre);
+        for (auto iter = preBegin; iter != preEnd; ++iter) {
+            if (iter->second == uid) {
+                _preSynapses.erase(iter);
+                break;
+            }
+        }
+
+        auto [postBegin, postEnd] = _postSynapses.equal_range(post);
+        for (auto iter = postBegin; iter != postEnd; ++iter) {
+            if (iter->second == uid) {
+                _postSynapses.erase(iter);
+                break;
+            }
+        }
+
+        _synapseRemovedEvent.invoke(uid);
+
+        incrementVersion();
+        return true;
+    }
+
     void Circuit::clear()
     {
         _synapses.clear();
         _preSynapses.clear();
         _postSynapses.clear();
         incrementVersion();
+        _clearEvent.invoke(nullptr);
     }
 
     std::optional<Synapse*> Circuit::getSynapse(UID uid)
@@ -55,6 +90,21 @@ namespace mindset
             return &it->second;
         }
         return {};
+    }
+
+    hey::Observable<Synapse*>& Circuit::getSynapseAddedEvent()
+    {
+        return _synapseAddedEvent;
+    }
+
+    hey::Observable<UID>& Circuit::getSynapseRemovedEvent()
+    {
+        return _synapseRemovedEvent;
+    }
+
+    hey::Observable<void*>& Circuit::getClearEvent()
+    {
+        return _clearEvent;
     }
 
 } // namespace mindset

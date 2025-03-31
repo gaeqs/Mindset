@@ -125,4 +125,13 @@ namespace mindset
     {
         return _clearEvent;
     }
+
+    UID Dataset::findSmallestAvailableNeuronUID() const
+    {
+        UID smallest = 0;
+        while (_neurons.contains(smallest)) {
+            ++smallest;
+        }
+        return smallest;
+    }
 } // namespace mindset
