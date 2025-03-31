@@ -107,4 +107,9 @@ namespace mindset
 
         return &_tree.value();
     }
+
+    void Morphology::setMorphologyTree(MorphologyTree tree)
+    {
+        _tree = std::move(tree);
+    }
 } // namespace mindset

@@ -66,6 +66,93 @@ namespace mindset
         return {result.has_value(), result.value_or(0), resultDistance, resultT};
     }
 
+    std::optional<Morphology*> getMorphology(Dataset& dataset, UID neuronId)
+    {
+        auto neuronOptional = dataset.getNeuron(neuronId);
+        if (!neuronOptional) {
+            return {};
+        }
+        return neuronOptional.value()->getMorphology();
+    }
+
+    std::optional<const Morphology*> getMorphology(const Dataset& dataset, UID neuronId)
+    {
+        auto neuronOptional = dataset.getNeuron(neuronId);
+        if (!neuronOptional) {
+            return {};
+        }
+        return neuronOptional.value()->getMorphology();
+    }
+
+    std::optional<MorphologyTree*> getMorphologyTree(Dataset& dataset, UID neuronId)
+    {
+        auto neuronOptional = dataset.getNeuron(neuronId);
+        if (!neuronOptional) {
+            return {};
+        }
+        auto morphologyOptional = neuronOptional.value()->getMorphology();
+        if (!morphologyOptional) {
+            return {};
+        }
+
+        return morphologyOptional.value()->getMorphologyTree();
+    }
+
+    std::optional<const MorphologyTree*> getMorphologyTree(const Dataset& dataset, UID neuronId)
+    {
+        auto neuronOptional = dataset.getNeuron(neuronId);
+        if (!neuronOptional) {
+            return {};
+        }
+        auto morphologyOptional = neuronOptional.value()->getMorphology();
+        if (!morphologyOptional) {
+            return {};
+        }
+
+        return morphologyOptional.value()->getMorphologyTree();
+    }
+
+    std::optional<MorphologyTreeSection*> getMorphologyTreeSection(Dataset& dataset, UID neuronId, UID sectionId)
+    {
+        auto tree = getMorphologyTree(dataset, neuronId);
+        if (!tree) {
+            return {};
+        }
+
+        return tree.value()->getSection(sectionId);
+    }
+
+    std::optional<const MorphologyTreeSection*> getMorphologyTreeSection(const Dataset& dataset, UID neuronId,
+                                                                         UID sectionId)
+    {
+        auto tree = getMorphologyTree(dataset, neuronId);
+        if (!tree) {
+            return {};
+        }
+
+        return tree.value()->getSection(sectionId);
+    }
+
+    std::optional<MorphologyTreeSection*> getMorphologyTreeSection(Morphology* morphology, UID sectionId)
+    {
+        auto tree = morphology->getMorphologyTree();
+        if (!tree) {
+            return {};
+        }
+
+        return tree.value()->getSection(sectionId);
+    }
+
+    std::optional<const MorphologyTreeSection*> getMorphologyTreeSection(const Morphology* morphology, UID sectionId)
+    {
+        auto tree = morphology->getMorphologyTree();
+        if (!tree) {
+            return {};
+        }
+
+        return tree.value()->getSection(sectionId);
+    }
+
     std::vector<ClosestNeuriteResult> closestNeuriteToPosition(const Dataset& dataset, const Morphology& morphology,
                                                                const std::vector<rush::Vec3f>& points,
                                                                const NeuronTransform* transform)
@@ -80,7 +167,6 @@ namespace mindset
                 point = transform->positionToLocalCoordinates(point);
             }
         }
-
 
         std::vector<ClosestNeuriteResult> results(localPoints.size(), {.valid = false});
 

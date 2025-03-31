@@ -24,19 +24,29 @@ namespace mindset
         std::unordered_set<UID> _childSections;
 
       public:
-        /** Constructs a MorphologyTreeSection identified by a unique UID. */
+        /**
+         * Constructs a MorphologyTreeSection identified by a unique UID.
+         */
         explicit MorphologyTreeSection(UID uid);
 
-        /** Constructs a MorphologyTreeSection with initial neurite identifiers. */
+        /**
+         * Constructs a MorphologyTreeSection with initial neurite identifiers.
+         */
         explicit MorphologyTreeSection(UID uid, std::initializer_list<UID> neurites);
 
-        /** Constructs a MorphologyTreeSection from a span of neurite identifiers. */
+        /**
+         * Constructs a MorphologyTreeSection from a span of neurite identifiers.
+         */
         explicit MorphologyTreeSection(UID uid, std::span<const UID> neurites);
 
-        /** Retrieves a const span containing all neurite identifiers in this section. */
+        /**
+         * Retrieves a const span containing all neurite identifiers in this section.
+         */
         [[nodiscard]] std::span<const UID> getNeurites() const;
 
-        /** Checks whether a neurite identified by neuriteId exists within this section. */
+        /**
+         * Checks whether a neurite identified by neuriteId exists within this section.
+         */
         [[nodiscard]] bool containsNeurite(UID neuriteId) const;
 
         /**
@@ -45,19 +55,35 @@ namespace mindset
          */
         void redefineNeurites(std::span<const UID> uids);
 
-        /** Returns the count of neurites within this section. */
+        /**
+         * Adds a neurite at the end of this section.
+         * @param uid The neurite.
+         */
+        void addNeurite(UID uid);
+
+        /**
+         * Returns the count of neurites within this section.
+         */
         [[nodiscard]] size_t getNeuritesCount() const;
 
-        /** Retrieves the UID of the first neurite. Returns std::nullopt if the section has no neurites. */
+        /**
+         * Retrieves the UID of the first neurite. Returns std::nullopt if the section has no neurites.
+         */
         [[nodiscard]] std::optional<UID> getFistNeurite();
 
-        /** Retrieves the UID of the last neurite. Returns std::nullopt if the section has no neurites. */
+        /**
+         * Retrieves the UID of the last neurite. Returns std::nullopt if the section has no neurites.
+         */
         [[nodiscard]] std::optional<UID> getLastNeurite();
 
-        /** Retrieves the UID of the parent section. Returns std::nullopt if no parent is set. */
+        /**
+         * Retrieves the UID of the parent section. Returns std::nullopt if no parent is set.
+         */
         [[nodiscard]] std::optional<UID> getParentSection() const;
 
-        /** Retrieves a const reference to the set of child section identifiers. */
+        /**
+         * Retrieves a const reference to the set of child section identifiers.
+         */
         [[nodiscard]] const std::unordered_set<UID>& getChildSections() const;
 
         /**
@@ -72,6 +98,11 @@ namespace mindset
          * @return True if the child was successfully added; false if it already existed.
          */
         bool addChildSection(UID child);
+
+        /**
+         * Removes the parent section for this section.
+         */
+        void removeParentSection();
 
         /**
          * Removes a child section identifier.

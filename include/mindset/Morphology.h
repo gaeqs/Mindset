@@ -93,6 +93,8 @@ namespace mindset
 
         MorphologyTree* getOrCreateMorphologyTree(const Dataset& dataset);
 
+        void setMorphologyTree(MorphologyTree tree);
+
         /**
          * Returns a view to iterate over all stored neurites' UIDs.
          * @returns A range view of UIDs.

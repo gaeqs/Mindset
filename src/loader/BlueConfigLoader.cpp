@@ -4,12 +4,90 @@
 
 #ifdef MINDSET_BRION
 
+    #include <mindset/util/MorphologyUtils.h>
     #include <mindset/util/NeuronTransform.h>
     #include <mindset/loader/BlueConfigLoader.h>
     #include <mindset/DefaultProperties.h>
 
     #include <brain/brain.h>
     #include <rush/rush.h>
+
+namespace
+{
+
+    struct RequiredSynapsePositionData
+    {
+        std::optional<mindset::NeuronTransform> transform;
+        const mindset::Neurite* neurite;
+        const mindset::Neurite* child;
+    };
+
+    bool hasPositions(const brain::Synapses& synapses)
+    {
+        try {
+            return synapses.preSurfaceXPositions() != nullptr;
+        } catch (const std::exception& e) {
+            return false;
+        }
+    }
+
+    std::optional<RequiredSynapsePositionData> getNeuriteAndChild(const mindset::Dataset& dataset,
+                                                                  const mindset::BlueConfigLoaderProperties& properties,
+                                                                  mindset::UID neuronId, mindset::UID sectionId,
+                                                                  size_t index)
+    {
+        auto neuron = dataset.getNeuron(neuronId);
+        if (!neuron) {
+            return {};
+        }
+
+        auto morphology = getMorphology(dataset, neuronId);
+
+        if (!morphology) {
+            return {};
+        }
+
+        auto section = getMorphologyTreeSection(morphology.value(), sectionId);
+        if (!section) {
+            return {};
+        }
+
+        auto neurites = section.value()->getNeurites();
+        if (neurites.size() < index - 1) {
+            return {};
+        }
+
+        mindset::UID neuriteId = neurites[index];
+        mindset::UID childId = neurites[index + 1];
+
+        auto neurite = morphology.value()->getNeurite(neuriteId);
+        auto child = morphology.value()->getNeurite(childId);
+
+        if (!neurite || !child) {
+            return {};
+        }
+
+        auto transform = neuron.value()->getProperty<mindset::NeuronTransform>(properties.neuronTransform);
+        return {
+            {transform, *neurite, *child}
+        };
+    }
+
+    std::optional<rush::Vec3f> calculatePosition(const mindset::BlueConfigLoaderProperties& properties,
+                                                 const mindset::Neurite* neurite, const mindset::Neurite* child,
+                                                 float distance)
+    {
+        auto start = neurite->getProperty<rush::Vec3f>(properties.position);
+        auto end = child->getProperty<rush::Vec3f>(properties.position);
+
+        if (!start || !end) {
+            return {};
+        }
+
+        auto direction = (*end - *start).normalized();
+        return *start + direction * distance;
+    }
+} // namespace
 
 namespace mindset
 {
@@ -66,7 +144,7 @@ namespace mindset
         for (UID id : ids) {
             auto neuron = Neuron(id);
             UID layer = std::stoi(layers[index]);
-            neuron.setProperty(properties.neuronTransform, NeuronTransform(transforms[index]));
+            neuron.setProperty(properties.neuronTransform, NeuronTransform(transpose(transforms[index])));
             neuron.setProperty(properties.neuronLayer, layer);
 
             if (auto morphology = morphologies.find(uris[index].getPath()); morphology != morphologies.end()) {
@@ -109,14 +187,63 @@ namespace mindset
         auto& outCircuit = dataset.getCircuit();
 
         UID uidGenerator = 0;
+
+        bool usePositions = hasPositions(synapses);
+
         for (auto synapse : synapses) {
             Synapse result(uidGenerator++, synapse.getPresynapticGID(), synapse.getPostsynapticGID());
 
-            result.setProperty(properties.position, synapse.getPresynapticCenterPosition());
-            result.setProperty(properties.synapsePreSection, synapse.getPresynapticSectionID());
-            result.setProperty(properties.synapsePostSection, synapse.getPostsynapticSectionID());
-            result.setProperty(properties.synapsePrePosition, synapse.getPresynapticSurfacePosition());
-            result.setProperty(properties.synapsePrePosition, synapse.getPostsynapticSurfacePosition());
+            auto preNeurites = getNeuriteAndChild(dataset, properties, synapse.getPresynapticGID(),
+                                                  synapse.getPresynapticSectionID(), synapse.getPresynapticSegmentID());
+
+            auto postNeurites =
+                getNeuriteAndChild(dataset, properties, synapse.getPostsynapticGID(),
+                                   synapse.getPostsynapticSectionID(), synapse.getPostsynapticSegmentID());
+
+            if (preNeurites) {
+                // Brion uses neurite to children. Mindset uses neuron to parent.
+                // Because of that, we have to set that the neurite that has the synapse is the child.
+                result.setProperty(properties.synapsePreSection, preNeurites->child->getUID());
+            }
+
+            if (postNeurites) {
+                // Brion uses neurite to children. Mindset uses neuron to parent.
+                // Because of that, we have to set that the neurite that has the synapse is the child.
+                result.setProperty(properties.synapsePostSection, postNeurites->child->getUID());
+            }
+
+            if (usePositions) {
+                result.setProperty(properties.position, synapse.getPresynapticCenterPosition());
+                result.setProperty(properties.synapsePrePosition, synapse.getPresynapticSurfacePosition());
+                result.setProperty(properties.synapsePrePosition, synapse.getPostsynapticSurfacePosition());
+            } else {
+                // Calculate positions!
+                if (preNeurites) {
+                    auto& [transform, neurite, child] = preNeurites.value();
+
+                    auto position = calculatePosition(properties, neurite, child, synapse.getPresynapticDistance());
+                    if (position) {
+                        if (transform) {
+                            *position = transform->positionToGlobalCoordinates(*position);
+                        }
+                        result.setProperty(properties.position, *position);
+                        result.setProperty(properties.synapsePrePosition, *position);
+                    }
+                }
+
+                if (postNeurites) {
+                    auto& [transform, neurite, child] = postNeurites.value();
+
+                    auto position = calculatePosition(properties, neurite, child, synapse.getPostsynapticDistance());
+                    if (position) {
+                        if (transform) {
+                            *position = transform->positionToGlobalCoordinates(*position);
+                        }
+                        result.setProperty(properties.position, *position);
+                        result.setProperty(properties.synapsePostPosition, *position);
+                    }
+                }
+            }
 
             result.setProperty(properties.synapseDelay, synapse.getDelay());
             result.setProperty(properties.synapseConductance, synapse.getConductance());
@@ -167,6 +294,7 @@ namespace mindset
                                                                  const brion::Morphology& morphology)
     {
         auto result = std::make_shared<Morphology>();
+        MorphologyTree tree;
 
         auto& points = morphology.getPoints();
         auto& sections = morphology.getSections();
@@ -177,8 +305,16 @@ namespace mindset
 
         size_t idGenerator = 0;
         for (size_t i = 0; i < sections.size(); ++i) {
+            MorphologyTreeSection section(i);
             int fatherSectionId = sections[i].y;
             auto sectionType = static_cast<NeuriteType>(types[i]);
+
+            if (fatherSectionId >= 0) {
+                if (auto parent = tree.getSection(fatherSectionId); parent.has_value()) {
+                    section.setParentSection(fatherSectionId);
+                    parent.value()->addChildSection(i);
+                }
+            }
 
             size_t startNode = sections[i].x;
             size_t endNode = i + 1 >= sections.size() ? points.size() : sections[i + 1].x;
@@ -192,6 +328,8 @@ namespace mindset
                     soma.addNode({rush::Vec3f(point.x, point.y, point.z), point.w / 2.0f});
                 }
                 result->setSoma(std::move(soma));
+
+                section.addNeurite(soma.getUID());
             } else {
                 auto previous = fatherSectionId >= 0 ? lastNeurites[fatherSectionId] : std::optional<UID>();
                 for (size_t p = startNode; p < endNode; ++p) {
@@ -203,6 +341,8 @@ namespace mindset
                         neurite.setProperty(properties.neuriteParent, previous.value());
                     }
                     neurite.setProperty(properties.neuriteType, sectionType);
+
+                    section.addNeurite(neurite.getUID());
                     previous = neurite.getUID();
                     result->addNeurite(std::move(neurite));
                     if (p == startNode) {
@@ -210,7 +350,11 @@ namespace mindset
                     }
                 }
             }
+
+            tree.addSection(std::move(section));
         }
+
+        result->setMorphologyTree(tree);
 
         return result;
     }
@@ -303,11 +447,11 @@ namespace mindset
                 morphologies = loadMorphologies(properties, ids, circuit);
             }
 
+            loadNeurons(dataset, properties, ids, circuit, morphologies);
+
             if (_loadSynapses) {
                 loadSynapses(dataset, properties, ids, circuit);
             }
-
-            loadNeurons(dataset, properties, ids, circuit, morphologies);
         }
 
         if (_loadHierarchy) {

@@ -11,6 +11,7 @@ namespace mindset
         Identifiable(uid)
     {
     }
+
     MorphologyTreeSection::MorphologyTreeSection(UID uid, std::initializer_list<UID> neurites) :
         Identifiable(uid),
         _neurites(neurites)
@@ -42,6 +43,12 @@ namespace mindset
         }
         incrementVersion();
     }
+
+    void MorphologyTreeSection::addNeurite(UID uid)
+    {
+        _neurites.push_back(uid);
+    }
+
     size_t MorphologyTreeSection::getNeuritesCount() const
     {
         return _neurites.size();
@@ -62,6 +69,7 @@ namespace mindset
         }
         return _neurites.back();
     }
+
     std::optional<UID> MorphologyTreeSection::getParentSection() const
     {
         return _parentSection;
@@ -84,6 +92,11 @@ namespace mindset
             incrementVersion();
         }
         return result;
+    }
+
+    void MorphologyTreeSection::removeParentSection()
+    {
+        _parentSection = {};
     }
 
     bool MorphologyTreeSection::removeChildSection(UID child)
