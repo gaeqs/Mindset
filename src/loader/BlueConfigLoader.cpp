@@ -61,7 +61,7 @@ namespace
                 mindset::UID neuriteId = neurites[index];
                 auto neurite = morphology.value()->getNeurite(neuriteId);
                 return {
-                {transform, *neurite, *neurite}
+                    {transform, *neurite, *neurite}
                 };
             }
 
@@ -126,8 +126,8 @@ namespace mindset
         }
 
         if (_loadSynapses) {
-            result.synapsePreSection = properties.defineProperty(PROPERTY_SYNAPSE_PRE_SECTION);
-            result.synapsePostSection = properties.defineProperty(PROPERTY_SYNAPSE_POST_SECTION);
+            result.synapsePreNeurite = properties.defineProperty(PROPERTY_SYNAPSE_PRE_NEURITE);
+            result.synapsePostNeurite = properties.defineProperty(PROPERTY_SYNAPSE_POST_NEURITE);
             result.synapsePrePosition = properties.defineProperty(PROPERTY_SYNAPSE_PRE_POSITION);
             result.synapsePostPosition = properties.defineProperty(PROPERTY_SYNAPSE_POST_POSITION);
             result.synapseDelay = properties.defineProperty(PROPERTY_SYNAPSE_DELAY);
@@ -213,13 +213,13 @@ namespace mindset
             if (preNeurites) {
                 // Brion uses neurite to children. Mindset uses neuron to parent.
                 // Because of that, we have to set that the neurite that has the synapse is the child.
-                result.setProperty(properties.synapsePreSection, preNeurites->child->getUID());
+                result.setProperty(properties.synapsePostNeurite, preNeurites->child->getUID());
             }
 
             if (postNeurites) {
                 // Brion uses neurite to children. Mindset uses neuron to parent.
                 // Because of that, we have to set that the neurite that has the synapse is the child.
-                result.setProperty(properties.synapsePostSection, postNeurites->child->getUID());
+                result.setProperty(properties.synapsePostNeurite, postNeurites->child->getUID());
             }
 
             if (usePositions) {

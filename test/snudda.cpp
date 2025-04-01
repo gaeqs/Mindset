@@ -21,8 +21,8 @@ TEST_CASE("Snudda load")
     auto& props = dataset.getProperties();
 
     auto posProp = props.getPropertyUID(mindset::PROPERTY_POSITION);
-    auto preSectionProp = props.getPropertyUID(mindset::PROPERTY_SYNAPSE_PRE_SECTION);
-    auto postSectionProp = props.getPropertyUID(mindset::PROPERTY_SYNAPSE_POST_SECTION);
+    auto preSectionProp = props.getPropertyUID(mindset::PROPERTY_SYNAPSE_PRE_NEURITE);
+    auto postSectionProp = props.getPropertyUID(mindset::PROPERTY_SYNAPSE_POST_NEURITE);
 
     REQUIRE(posProp.has_value());
     REQUIRE(preSectionProp.has_value());

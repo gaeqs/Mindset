@@ -17,15 +17,18 @@ namespace mindset
 
     struct SnuddaLoaderProperties
     {
-        UID neuritePosition;
+        UID position;
+
         UID neuriteRadius;
         UID neuriteParent;
         UID neuriteType;
 
         UID neuronTransform;
 
-        UID synapsePreSection;
-        UID synapsePostSection;
+        UID synapsePreNeurite;
+        UID synapsePostNeurite;
+        UID synapsePrePosition;
+        UID synapsePostPosition;
     };
 
     /**

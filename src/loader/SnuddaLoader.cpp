@@ -21,16 +21,22 @@ namespace mindset
     SnuddaLoaderProperties SnuddaLoader::initProperties(Properties& properties) const
     {
         SnuddaLoaderProperties result{};
+
+        if (_loadSynapses || _loadMorphology) {
+            result.position = properties.defineProperty(PROPERTY_POSITION);
+        }
+
         if (_loadMorphology) {
-            result.neuritePosition = properties.defineProperty(PROPERTY_POSITION);
             result.neuriteRadius = properties.defineProperty(PROPERTY_RADIUS);
             result.neuriteParent = properties.defineProperty(PROPERTY_PARENT);
             result.neuriteType = properties.defineProperty(PROPERTY_NEURITE_TYPE);
         }
 
         if (_loadSynapses) {
-            result.synapsePreSection = properties.defineProperty(PROPERTY_SYNAPSE_PRE_SECTION);
-            result.synapsePostSection = properties.defineProperty(PROPERTY_SYNAPSE_POST_SECTION);
+            result.synapsePreNeurite = properties.defineProperty(PROPERTY_SYNAPSE_PRE_NEURITE);
+            result.synapsePostNeurite = properties.defineProperty(PROPERTY_SYNAPSE_POST_NEURITE);
+            result.synapsePrePosition = properties.defineProperty(PROPERTY_SYNAPSE_PRE_POSITION);
+            result.synapsePostPosition = properties.defineProperty(PROPERTY_SYNAPSE_POST_POSITION);
         }
 
         result.neuronTransform = properties.defineProperty(PROPERTY_TRANSFORM);
@@ -126,10 +132,11 @@ namespace mindset
                 (rush::Vec3f(synapse[2], synapse[3], synapse[4]) * voxelSize + origin) * METER_MICROMETER_RATIO;
 
             Synapse syn(uidGenerator++, sourceId, destId);
-            syn.setProperty(properties.neuritePosition, position);
+            syn.setProperty(properties.position, position);
+            syn.setProperty(properties.synapsePostPosition, position);
 
             if (destSegId >= 0) {
-                syn.setProperty(properties.synapsePostSection, static_cast<UID>(destSegId) + 1);
+                syn.setProperty(properties.synapsePostNeurite, static_cast<UID>(destSegId) + 1);
             }
 
             synapsesMap.insert({
@@ -166,7 +173,8 @@ namespace mindset
                         continue;
                     }
 
-                    synapseOpt.value()->setProperty(properties.synapsePreSection, results[idx].uid);
+                    synapseOpt.value()->setProperty(properties.synapsePreNeurite, results[idx].uid);
+                    synapseOpt.value()->setProperty(properties.synapsePrePosition, results[idx].position);
                 }
             }
 

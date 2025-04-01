@@ -42,6 +42,7 @@ namespace mindset
 
         std::optional<UID> result;
         float resultT = 0;
+        rush::Vec3f resultPosition;
         float resultDistance = std::numeric_limits<float>::max();
 
         for (UID uid : morphology.getNeuritesUIDs()) {
@@ -55,15 +56,18 @@ namespace mindset
                 continue;
             }
 
-            auto [distance, t] = squaredDistanceToLine(parentPosition->second, position->second, localPoint);
+            auto from = parentPosition->second;
+            auto to = position->second;
+            auto [distance, t] = squaredDistanceToLine(from, to, localPoint);
             if (distance < resultDistance) {
                 resultDistance = distance;
                 resultT = t;
                 result = uid;
+                resultPosition = from + (to - from) * t;
             }
         }
 
-        return {result.has_value(), result.value_or(0), resultDistance, resultT};
+        return {result.has_value(), result.value_or(0), resultDistance, resultT, resultPosition};
     }
 
     std::optional<Morphology*> getMorphology(Dataset& dataset, UID neuronId)
@@ -183,12 +187,15 @@ namespace mindset
 
             for (size_t i = 0; i < localPoints.size(); i++) {
                 auto& result = results[i];
+                auto from = parentPosition->second;
+                auto to = position->second;
                 auto [distance, t] = squaredDistanceToLine(parentPosition->second, position->second, localPoints[i]);
                 if (!result.valid || distance < result.distanceSquared) {
                     result.distanceSquared = distance;
                     result.t = t;
                     result.uid = uid;
                     result.valid = true;
+                    result.position = from + (to - from) * t;
                 }
             }
         }

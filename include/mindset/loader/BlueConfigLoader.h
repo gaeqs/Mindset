@@ -29,8 +29,8 @@ namespace mindset
         UID neuronLayer;      // "mindset:layer"
         UID neuronName;       // "mindset:name"
 
-        UID synapsePreSection;   // "mindset:synapse_pre_section"
-        UID synapsePostSection;  // "mindset:synapse_post_section"
+        UID synapsePreNeurite;   // "mindset:synapse_pre_neurite"
+        UID synapsePostNeurite;  // "mindset:synapse_post_neurite"
         UID synapsePrePosition;  // "mindset:synapse_pre_position"
         UID synapsePostPosition; // "mindset:synapse_post_position"
         UID synapseDelay;        // "mindset:synapse_delay"

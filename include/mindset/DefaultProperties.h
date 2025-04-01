@@ -21,8 +21,8 @@ namespace mindset
     const std::string PROPERTY_LAYER = "mindset:layer";
     const std::string PROPERTY_NAME = "mindset:name";
 
-    const std::string PROPERTY_SYNAPSE_PRE_SECTION = "mindset:synapse_pre_section";
-    const std::string PROPERTY_SYNAPSE_POST_SECTION = "mindset:synapse_post_section";
+    const std::string PROPERTY_SYNAPSE_PRE_NEURITE = "mindset:synapse_pre_neurite";
+    const std::string PROPERTY_SYNAPSE_POST_NEURITE = "mindset:synapse_post_neurite";
 
     const std::string PROPERTY_SYNAPSE_PRE_POSITION = "mindset:synapse_pre_position";
     const std::string PROPERTY_SYNAPSE_POST_POSITION = "mindset:synapse_post_position";

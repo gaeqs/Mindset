@@ -18,6 +18,7 @@ namespace mindset
         UID uid;
         float distanceSquared;
         float t; // Position = parentPosition + (position - parentPosition) * t
+        rush::Vec3f position;
     };
 
     std::vector<ClosestNeuriteResult> closestNeuriteToPosition(const Dataset& dataset, const Morphology& morphology,

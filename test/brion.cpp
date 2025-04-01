@@ -63,8 +63,8 @@ TEST_CASE("Brion load")
     size_t synapseIndex = 0;
     for (auto synapse : dataset.getCircuit().getSynapses() | dataset) {
 
-        auto pre = synapse.getProperty<mindset::UID>(mindset::PROPERTY_SYNAPSE_PRE_SECTION);
-        auto post = synapse.getProperty<mindset::UID>(mindset::PROPERTY_SYNAPSE_POST_SECTION);
+        auto pre = synapse.getProperty<mindset::UID>(mindset::PROPERTY_SYNAPSE_PRE_NEURITE);
+        auto post = synapse.getProperty<mindset::UID>(mindset::PROPERTY_SYNAPSE_POST_NEURITE);
 
         if (!pre || !post) continue;
 
