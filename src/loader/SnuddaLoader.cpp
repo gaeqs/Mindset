@@ -117,7 +117,7 @@ namespace mindset
         auto synapses = _file.getDataSet("network/synapses").read<std::vector<Syn>>();
         auto origo = _file.getDataSet("meta/simulation_origo").read<std::array<double, 3>>();
 
-        auto origin = rush::Vec3f(origo[0], origo[1], origo[2]) * METER_MICROMETER_RATIO;
+        auto origin = rush::Vec3f(origo[0], origo[1], origo[2]);
 
         std::unordered_multimap<UID, std::pair<UID, rush::Vec3f>> synapsesMap;
 
