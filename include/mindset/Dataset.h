@@ -128,7 +128,8 @@ namespace mindset
         Node* createHierarchy(UID uid, std::string type);
 
         /**
-         * Clears this dataset. This includes all properties, neurons, synapses and hierarchy.
+         * Clears this dataset. This includes all neurons, synapses and hierarchy.
+         * This method does not clear properties.
          */
         void clear();
 
