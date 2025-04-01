@@ -15,7 +15,7 @@ namespace mindset
     }
 
     std::vector<std::pair<std::optional<std::string>, std::any>> PropertyHolder::getNamedProperties(
-        const Properties& properties)
+        const Properties& properties) const
     {
         std::vector<std::pair<std::optional<std::string>, std::any>> result;
         result.reserve(_properties.size());

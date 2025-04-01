@@ -39,7 +39,8 @@ namespace mindset
         /**
          * Returns a new vector holding all the properties of this holder with their respective names.
          */
-        std::vector<std::pair<std::optional<std::string>, std::any>> getNamedProperties(const Properties& properties);
+        std::vector<std::pair<std::optional<std::string>, std::any>> getNamedProperties(
+            const Properties& properties) const;
 
         /**
          * Sets a property value by UID.
