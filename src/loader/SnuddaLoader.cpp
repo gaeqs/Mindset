@@ -12,7 +12,7 @@
 
 namespace
 {
-    constexpr float METER_MICROMETER_RATIO = 1000000.0f;
+    constexpr float METER_MICROMETER_RATIO = 1'000'000.0f;
 }
 
 namespace mindset
@@ -53,14 +53,12 @@ namespace mindset
         auto origo = _file.getDataSet("meta/simulation_origo").read<std::array<double, 3>>();
         auto morphologiesNames = _file.getDataSet("network/neurons/morphology").read<std::vector<std::string>>();
 
-        auto origin = rush::Vec3f(origo[0], origo[1], origo[2]) * METER_MICROMETER_RATIO;
-
         for (size_t i = 0; i < ids.size(); ++i) {
             rush::Vec3f pos(position[i][0], position[i][1], position[i][2]); // Position in meters
             rush::Mat3f rot([array = rotation[i]](size_t c, size_t r) { return static_cast<float>(array[c + r * 3]); });
 
             rush::Mat4f model(rot, 1.0f);
-            model[3] = rush::Vec4f(pos * METER_MICROMETER_RATIO + origin, 1.0f);
+            model[3] = rush::Vec4f(pos * METER_MICROMETER_RATIO, 1.0f);
 
             auto morphologyName = morphologiesNames[i];
             auto morphology = morphologies.find(morphologyName);
@@ -119,6 +117,7 @@ namespace mindset
 
         auto origin = rush::Vec3f(origo[0], origo[1], origo[2]);
 
+        std::unordered_map<UID, Synapse> _synapses;
         std::unordered_multimap<UID, std::pair<UID, rush::Vec3f>> synapsesMap;
 
         UID uidGenerator = 0;
@@ -142,7 +141,7 @@ namespace mindset
             synapsesMap.insert({
                 sourceId, {syn.getUID(), position}
             });
-            dataset.getCircuit().addSynapse(std::move(syn));
+            _synapses.insert({syn.getUID(), std::move(syn)});
         }
 
         for (auto it = synapsesMap.begin(); it != synapsesMap.end();) {
@@ -168,17 +167,22 @@ namespace mindset
                         continue;
                     }
 
-                    auto synapseOpt = dataset.getCircuit().getSynapse(gIt->second.first);
-                    if (!synapseOpt) {
+                    auto synapseOpt = _synapses.find(gIt->second.first);
+                    if (synapseOpt == _synapses.end()) {
                         continue;
                     }
 
-                    synapseOpt.value()->setProperty(properties.synapsePreNeurite, results[idx].uid);
-                    synapseOpt.value()->setProperty(properties.synapsePrePosition, results[idx].position);
+                    synapseOpt->second.setProperty(properties.synapsePreNeurite, results[idx].uid);
+                    synapseOpt->second.setProperty(properties.synapsePrePosition, results[idx].position);
                 }
             }
 
             it = range.second;
+        }
+
+        auto& circuit = dataset.getCircuit();
+        for (auto& synapse : _synapses | std::views::values) {
+            circuit.addSynapse(std::move(synapse));
         }
 
         return {};

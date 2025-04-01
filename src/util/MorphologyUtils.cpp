@@ -67,6 +67,10 @@ namespace mindset
             }
         }
 
+        if (transform != nullptr) {
+            resultPosition = transform->positionToGlobalCoordinates(resultPosition);
+        }
+
         return {result.has_value(), result.value_or(0), resultDistance, resultT, resultPosition};
     }
 
@@ -197,6 +201,12 @@ namespace mindset
                     result.valid = true;
                     result.position = from + (to - from) * t;
                 }
+            }
+        }
+
+        if (transform != nullptr) {
+            for (auto& result : results) {
+                result.position = transform->positionToGlobalCoordinates(result.position);
             }
         }
 
