@@ -104,7 +104,6 @@ namespace mindset
     void Dataset::clear()
     {
         _neurons.clear();
-        _properties.clear();
         _circuit.clear();
         _hierarchy = {};
         _clearEvent.invoke(nullptr);
