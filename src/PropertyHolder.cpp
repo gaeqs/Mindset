@@ -3,10 +3,30 @@
 //
 
 #include <mindset/PropertyHolder.h>
+#include <mindset/Properties.h>
 
 namespace mindset
 {
     PropertyHolder::PropertyHolder() = default;
+
+    const std::unordered_map<UID, std::any>& PropertyHolder::getProperties() const
+    {
+        return _properties;
+    }
+
+    std::vector<std::pair<std::optional<std::string>, std::any>> PropertyHolder::getNamedProperties(
+        const Properties& properties)
+    {
+        std::vector<std::pair<std::optional<std::string>, std::any>> result;
+        result.reserve(_properties.size());
+
+        for (const auto& [uid, any] : _properties) {
+            auto name = properties.getPropertyName(uid);
+            result.emplace_back(name, any);
+        }
+
+        return result;
+    }
 
     void PropertyHolder::setProperty(UID uid, std::any value)
     {

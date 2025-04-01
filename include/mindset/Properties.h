@@ -60,6 +60,12 @@ namespace mindset
         [[nodiscard]] std::optional<UID> getPropertyUID(const std::string& name) const;
 
         /**
+         * Retrieves the name of a property by UID, if defined.
+         * @param uid UID of the property.
+         */
+        [[nodiscard]] std::optional<std::string> getPropertyName(UID uid) const;
+
+        /**
          * Returns a map of property names to their UIDs.
          */
         [[nodiscard]] const std::map<std::string, UID>& getPropertiesUIDs() const;

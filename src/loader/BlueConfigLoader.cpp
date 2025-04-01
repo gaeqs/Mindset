@@ -52,8 +52,19 @@ namespace
             return {};
         }
 
+        auto transform = neuron.value()->getProperty<mindset::NeuronTransform>(properties.neuronTransform);
+
         auto neurites = section.value()->getNeurites();
-        if (neurites.size() < index - 1) {
+        if (neurites.size() - 1 < index) {
+            if (neurites.size() - 1 == index) {
+                // If last
+                mindset::UID neuriteId = neurites[index];
+                auto neurite = morphology.value()->getNeurite(neuriteId);
+                return {
+                {transform, *neurite, *neurite}
+                };
+            }
+
             return {};
         }
 
@@ -67,7 +78,6 @@ namespace
             return {};
         }
 
-        auto transform = neuron.value()->getProperty<mindset::NeuronTransform>(properties.neuronTransform);
         return {
             {transform, *neurite, *child}
         };

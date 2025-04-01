@@ -58,6 +58,15 @@ namespace mindset
         return it->second;
     }
 
+    std::optional<std::string> Properties::getPropertyName(UID uid) const
+    {        auto it = _propertiesNames.find(uid);
+        if (it == _propertiesNames.end()) {
+            return {};
+        }
+        return it->second;
+
+    }
+
     const std::map<std::string, UID>& Properties::getPropertiesUIDs() const
     {
         return _properties;

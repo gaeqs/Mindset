@@ -7,25 +7,39 @@
 
 #include <any>
 #include <optional>
-#include <map>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 #include <mindset/Versioned.h>
 #include <mindset/UID.h>
 
 namespace mindset
 {
+    class Properties;
+
     /**
      * Holds a set of properties, each associated with a UID and stored as any type.
      */
     class PropertyHolder : public Versioned
     {
-        std::map<UID, std::any> _properties;
+        std::unordered_map<UID, std::any> _properties;
 
       public:
         /**
          * Creates a new property holder.
          */
         PropertyHolder();
+
+        /**
+         * Returns a reference to the properties map.
+         */
+        const std::unordered_map<UID, std::any>& getProperties() const;
+
+        /**
+         * Returns a new vector holding all the properties of this holder with their respective names.
+         */
+        std::vector<std::pair<std::optional<std::string>, std::any>> getNamedProperties(const Properties& properties);
 
         /**
          * Sets a property value by UID.
