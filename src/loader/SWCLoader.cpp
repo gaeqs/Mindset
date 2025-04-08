@@ -88,7 +88,7 @@ namespace mindset
             auto result = toSegment(i);
             if (!result.isOk()) {
                 std::string error = "Error while converting segment " + std::to_string(i) + ". " + result.getError();
-                invoke({LoaderStatusType::ERROR, error, STAGES, 1});
+                invoke({LoaderStatusType::LOADING_ERROR, error, STAGES, 1});
                 return error;
             }
             prototypes.emplace(result.getResult().id, result.getResult());

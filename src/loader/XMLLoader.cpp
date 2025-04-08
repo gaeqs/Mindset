@@ -98,18 +98,18 @@ namespace mindset
 
         if (!_valid) {
             std::cerr << "Parser is not valid" << std::endl;
-            invoke({LoaderStatusType::ERROR, "Parser is not valid", STAGES, 0});
+            invoke({LoaderStatusType::LOADING_ERROR, "Parser is not valid", STAGES, 0});
             return;
         }
         if (!_fileProvider) {
             std::cerr << "Filesystem is not set" << std::endl;
-            invoke({LoaderStatusType::ERROR, "Filesystem is not set", STAGES, 0});
+            invoke({LoaderStatusType::LOADING_ERROR, "Filesystem is not set", STAGES, 0});
             return;
         }
         auto scene = _doc.child("scene").child("morphology");
         if (!scene) {
             std::cerr << "Scene not found" << std::endl;
-            invoke({LoaderStatusType::ERROR, "Scene not found", STAGES, 0});
+            invoke({LoaderStatusType::LOADING_ERROR, "Scene not found", STAGES, 0});
             return;
         };
 
@@ -148,7 +148,7 @@ namespace mindset
                     auto gid = asUID(neuron.attribute("gid"));
                     if (!gid.has_value()) {
                         std::cerr << "Neuron GID not found!" << std::endl;
-                        invoke({LoaderStatusType::ERROR, "Neuron GID not found", STAGES, 1});
+                        invoke({LoaderStatusType::LOADING_ERROR, "Neuron GID not found", STAGES, 1});
                         return;
                     };
 
@@ -165,13 +165,13 @@ namespace mindset
                         auto result = split(string, ',');
                         if (!result.isOk()) {
                             std::cerr << result.getError() << std::endl;
-                            invoke({LoaderStatusType::ERROR, result.getError(), STAGES, 1});
+                            invoke({LoaderStatusType::LOADING_ERROR, result.getError(), STAGES, 1});
                             return;
                         };
                         auto floats = std::move(result.getResult());
                         if (floats.size() != 16) {
                             std::cerr << "Invalid matrix size." << std::endl;
-                            invoke({LoaderStatusType::ERROR, "Invalid matrix size", STAGES, 1});
+                            invoke({LoaderStatusType::LOADING_ERROR, "Invalid matrix size", STAGES, 1});
                             return;
                         };
 
@@ -219,7 +219,7 @@ namespace mindset
             if (!swcResult.isOk()) {
                 auto error = "Error loading SWC file '" + fileName + "': " + swcResult.getError();
                 std::cerr << error << std::endl;
-                invoke({LoaderStatusType::ERROR, error, STAGES, 2});
+                invoke({LoaderStatusType::LOADING_ERROR, error, STAGES, 2});
                 return;
             };
 

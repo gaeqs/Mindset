@@ -20,7 +20,7 @@ namespace mindset
         /// Loading has completed successfully.
         DONE,
         /// Loading encountered an error.
-        ERROR
+        LOADING_ERROR
     };
 
     /**
