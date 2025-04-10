@@ -99,7 +99,7 @@ namespace mindset
          * Returns a view to iterate over all stored neurites' UIDs.
          * @returns A range view of UIDs.
          */
-        [[nodiscard]] auto getNeuritesUIDs() const
+        [[nodiscard]] decltype(auto) getNeuritesUIDs() const
         {
             return _neurites | std::views::keys;
         }
@@ -108,7 +108,7 @@ namespace mindset
          * Returns a view to iterate over all stored neurites in a mutable context.
          * @return A range view of mutable neurites references.
          */
-        [[nodiscard]] auto getNeurites()
+        [[nodiscard]] decltype(auto) getNeurites()
         {
             return _neurites | std::views::transform([](auto& pair) -> Neurite* { return &pair.second; });
         }
@@ -117,7 +117,7 @@ namespace mindset
          * Returns a view to iterate over all stored neurites in a const context.
          * @return A range view of const neurites references.
          */
-        [[nodiscard]] auto getNeurites() const
+        [[nodiscard]] decltype(auto) getNeurites() const
         {
             return _neurites | std::views::transform([](const auto& pair) -> const Neurite* { return &pair.second; });
         }
