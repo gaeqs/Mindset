@@ -87,6 +87,15 @@ namespace mindset
         hey::Observable<void*>& getClearEvent();
 
         /**
+         * Returns a view to iterate over all stored synapses' UIDs.
+         * @returns A range view of UIDs.
+         */
+        [[nodiscard]] auto getSynapsesUIDs() const
+        {
+            return _synapses | std::views::keys;
+        }
+
+        /**
          * Returns a view to iterate over all stored synapses in a mutable context.
          * @return A range view of mutable synapses references.
          */
