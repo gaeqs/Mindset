@@ -90,7 +90,7 @@ namespace mindset
          * Returns a view to iterate over all stored synapses' UIDs.
          * @returns A range view of UIDs.
          */
-        [[nodiscard]] auto getSynapsesUIDs() const
+        [[nodiscard]] decltype(auto) getSynapsesUIDs() const
         {
             return _synapses | std::views::keys;
         }
@@ -99,7 +99,7 @@ namespace mindset
          * Returns a view to iterate over all stored synapses in a mutable context.
          * @return A range view of mutable synapses references.
          */
-        [[nodiscard]] auto getSynapses()
+        [[nodiscard]] decltype(auto) getSynapses()
         {
             return _synapses | std::views::transform([](auto& pair) -> Synapse* { return &pair.second; });
         }
@@ -108,7 +108,7 @@ namespace mindset
          * Returns a view to iterate over all stored synapses in a const context.
          * @return A range view of const synapses references.
          */
-        [[nodiscard]] auto getSynapses() const
+        [[nodiscard]] decltype(auto) getSynapses() const
         {
             return _synapses | std::views::transform([](const auto& pair) -> const Synapse* { return &pair.second; });
         }
@@ -118,7 +118,7 @@ namespace mindset
          * @param uid Neuron UID.
          * @return Range view of mutable pre-synaptic synapses.
          */
-        [[nodiscard]] auto getPreSynapses(UID uid)
+        [[nodiscard]] decltype(auto) getPreSynapses(UID uid)
         {
             auto [begin, end] = _preSynapses.equal_range(uid);
             auto range = std::ranges::subrange(begin, end);
@@ -130,7 +130,7 @@ namespace mindset
          * @param uid Neuron UID.
          * @return Range view of const pre-synaptic synapses.
          */
-        [[nodiscard]] auto getPreSynapses(UID uid) const
+        [[nodiscard]] decltype(auto) getPreSynapses(UID uid) const
         {
             auto [begin, end] = _preSynapses.equal_range(uid);
             auto range = std::ranges::subrange(begin, end);
@@ -143,7 +143,7 @@ namespace mindset
          * @param uid Neuron UID.
          * @return Range view of mutable post-synaptic synapses.
          */
-        [[nodiscard]] auto getPostSynapses(UID uid)
+        [[nodiscard]] decltype(auto) getPostSynapses(UID uid)
         {
             auto [begin, end] = _postSynapses.equal_range(uid);
             auto range = std::ranges::subrange(begin, end);
@@ -155,7 +155,7 @@ namespace mindset
          * @param uid Neuron UID.
          * @return Range view of const post-synaptic synapses.
          */
-        [[nodiscard]] auto getPostSynapses(UID uid) const
+        [[nodiscard]] decltype(auto) getPostSynapses(UID uid) const
         {
             auto [begin, end] = _postSynapses.equal_range(uid);
             auto range = std::ranges::subrange(begin, end);

@@ -157,7 +157,7 @@ namespace mindset
          * Returns a view to iterate over all stored neurons' UIDs.
          * @returns A range view of UIDs.
          */
-        [[nodiscard]] auto getNeuronsUIDs() const
+        [[nodiscard]] decltype(auto) getNeuronsUIDs() const
         {
             return _neurons | std::views::keys;
         }
@@ -166,7 +166,7 @@ namespace mindset
          * Returns a view to iterate over all stored neurons in a mutable context.
          * @return A range view of mutable neuron references.
          */
-        [[nodiscard]] auto getNeurons()
+        [[nodiscard]] decltype(auto) getNeurons()
         {
             return _neurons | std::views::transform([this](auto& pair) { return Contextualized(&pair.second, this); });
         }
@@ -175,9 +175,27 @@ namespace mindset
          * Returns a view to iterate over all stored neurons in a read-only context.
          * @return A range view of const neuron references.
          */
-        [[nodiscard]] auto getNeurons() const
+        [[nodiscard]] decltype(auto) getNeurons() const
         {
             return _neurons | std::views::transform([this](auto& pair) { return Contextualized(&pair.second, this); });
+        }
+
+        /**
+         * Returns a view to iterate over all stored neurons in a mutable context.
+         * @return A range view of mutable neuron references.
+         */
+        [[nodiscard]] decltype(auto) getNonContextualizedNeurons()
+        {
+            return _neurons | std::views::transform([](auto& pair) { return &pair.second; });
+        }
+
+        /**
+         * Returns a view to iterate over all stored neurons in a read-only context.
+         * @return A range view of const neuron references.
+         */
+        [[nodiscard]] decltype(auto) getNonContextualizedNeurons() const
+        {
+            return _neurons | std::views::transform([](auto& pair) { return &pair.second; });
         }
     };
 } // namespace mindset
