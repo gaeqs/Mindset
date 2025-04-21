@@ -164,7 +164,13 @@ namespace mindset
             std::cerr << result.getError() << std::endl;
             return;
         }
-        dataset.addNeuron(Neuron(_provider == nullptr ? 0 : _provider(), result.getResult()));
+
+        UID uid = _provider == nullptr ? 0 : _provider();
+        if (auto neuron = dataset.getNeuron(uid)) {
+            neuron.value()->setMorphology(result.getResult());
+        } else {
+            dataset.addNeuron(Neuron(uid, result.getResult()));
+        }
     }
 
     LoaderFactory SWCLoader::createFactory()

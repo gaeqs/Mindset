@@ -85,7 +85,13 @@ namespace mindset
         }
 
         invoke({LoaderStatusType::LOADING, "Creating neuron", STAGES, 4});
-        dataset.addNeuron(Neuron(_provider == nullptr ? 0 : _provider(), std::move(result)));
+
+        UID uid = _provider == nullptr ? 0 : _provider();
+        if (auto neuron = dataset.getNeuron(uid)) {
+            neuron.value()->setMorphology(std::move(result));
+        } else {
+            dataset.addNeuron(Neuron(uid, std::move(result)));
+        }
         invoke({LoaderStatusType::DONE, "Done", STAGES, 5});
     }
 

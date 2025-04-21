@@ -152,16 +152,24 @@ namespace mindset
 
         size_t index = 0;
         for (UID id : ids) {
-            auto neuron = Neuron(id);
             UID layer = std::stoi(layers[index]);
-            neuron.setProperty(properties.neuronTransform, NeuronTransform(transforms[index]));
-            neuron.setProperty(properties.neuronLayer, layer);
+            if (auto presentNeuron = dataset.getNeuron(id)) {
+                presentNeuron.value()->setProperty(properties.neuronTransform, NeuronTransform(transforms[index]));
+                presentNeuron.value()->setProperty(properties.neuronLayer, layer);
 
-            if (auto morphology = morphologies.find(uris[index].getPath()); morphology != morphologies.end()) {
-                neuron.setMorphology(morphology->second);
+                if (auto morphology = morphologies.find(uris[index].getPath()); morphology != morphologies.end()) {
+                    presentNeuron.value()->setMorphology(morphology->second);
+                }
+            } else {
+                auto neuron = Neuron(id);
+                neuron.setProperty(properties.neuronTransform, NeuronTransform(transforms[index]));
+                neuron.setProperty(properties.neuronLayer, layer);
+
+                if (auto morphology = morphologies.find(uris[index].getPath()); morphology != morphologies.end()) {
+                    neuron.setMorphology(morphology->second);
+                }
+                dataset.addNeuron(std::move(neuron));
             }
-
-            dataset.addNeuron(std::move(neuron));
             ++index;
         }
     }
@@ -426,7 +434,7 @@ namespace mindset
     {
         constexpr size_t STAGES = 5;
         if (_targets.empty()) {
-            invoke({LoaderStatusType::ERROR, "No targets found", STAGES, 0});
+            invoke({LoaderStatusType::LOADING_ERROR, "No targets found", STAGES, 0});
         }
 
         invoke({LoaderStatusType::LOADING, "Loading targets", STAGES, 0});
@@ -437,7 +445,7 @@ namespace mindset
             ids.insert(targetSet.begin(), targetSet.end());
         }
         if (ids.empty()) {
-            invoke({LoaderStatusType::ERROR, "No neurons found", STAGES, 0});
+            invoke({LoaderStatusType::LOADING_ERROR, "No neurons found", STAGES, 0});
             return;
         }
 

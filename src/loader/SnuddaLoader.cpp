@@ -63,14 +63,22 @@ namespace mindset
             auto morphologyName = morphologiesNames[i];
             auto morphology = morphologies.find(morphologyName);
 
-            Neuron neuron(ids[i]);
+            auto presentNeuron = dataset.getNeuron(ids[i]);
+            if (presentNeuron.has_value()) {
+                if (morphology != morphologies.end()) {
+                    presentNeuron.value()->setMorphology(morphology->second);
+                }
+                presentNeuron.value()->setProperty(properties.neuronTransform, NeuronTransform(model));
+            } else {
+                Neuron neuron(ids[i]);
 
-            if (morphology != morphologies.end()) {
-                neuron.setMorphology(morphology->second);
+                if (morphology != morphologies.end()) {
+                    neuron.setMorphology(morphology->second);
+                }
+
+                neuron.setProperty(properties.neuronTransform, NeuronTransform(model));
+                dataset.addNeuron(std::move(neuron));
             }
-
-            neuron.setProperty(properties.neuronTransform, NeuronTransform(model));
-            dataset.addNeuron(std::move(neuron));
         }
     }
 

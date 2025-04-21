@@ -232,14 +232,24 @@ namespace mindset
                 }
                 auto& xml = it->second;
 
-                Neuron neuron(xml.id, swc);
-                if (xml.transform.has_value()) {
-                    neuron.setProperty(transformProp, xml.transform.value());
-                }
+                if (auto presentNeuron = dataset.getNeuron(xml.id)) {
+                    presentNeuron.value()->setMorphology(swc);
+                    if (xml.transform.has_value()) {
+                        presentNeuron.value()->setProperty(transformProp, xml.transform.value());
+                    }
+                    if (xml.node != nullptr) {
+                        xml.node->addNeuron(xml.id);
+                    }
+                } else {
+                    Neuron neuron(xml.id, swc);
+                    if (xml.transform.has_value()) {
+                        neuron.setProperty(transformProp, xml.transform.value());
+                    }
 
-                auto [neuronInDataset, result] = dataset.addNeuron(std::move(neuron));
-                if (result && xml.node != nullptr) {
-                    xml.node->addNeuron(neuronInDataset->getUID());
+                    auto [neuronInDataset, result] = dataset.addNeuron(std::move(neuron));
+                    if (result && xml.node != nullptr) {
+                        xml.node->addNeuron(neuronInDataset->getUID());
+                    }
                 }
             }
         }
