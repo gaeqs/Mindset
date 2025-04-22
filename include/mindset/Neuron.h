@@ -15,6 +15,8 @@ namespace mindset
 {
     /**
      * Represents a neuron, holding a unique identifier, properties, and optional morphology.
+     *
+     * This representation usually stores atemporal data.
      */
     class Neuron : public Identifiable, public PropertyHolder
     {
