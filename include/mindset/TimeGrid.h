@@ -76,9 +76,23 @@ namespace mindset
          *
          * @return The number of timesteps.
          */
-        size_t getTimesteps() const
+        size_t getTimestepsAmount() const
         {
             return _data.size();
+        }
+
+        /**
+         * Retrieves the dimensions of the grid.
+         *
+         * The method returns a pair of size_t values, representing the dimensions of
+         * the grid. The first element corresponds to the number of UIDs,
+         * and the second element corresponds to the number of timesteps.
+         *
+         * @return A pair consisting of the size of `_uids` and `_data`, in that order.
+         */
+        std::pair<size_t, size_t> getDimensions() const
+        {
+            return {_uids.size(), _data.size()};
         }
 
         /**
@@ -298,6 +312,7 @@ namespace mindset
 
             for (size_t i = 0; i < oldRows; ++i) {
                 auto& row = _data[i];
+                row.resize(_uids.size());
                 if (i < timeline.size()) {
                     row[index] = timeline[i];
                 } else {

@@ -192,7 +192,7 @@ namespace mindset
         template<typename Rep, typename Period>
         void addEvent(UID uid, std::chrono::duration<Rep, Period> duration, Value value)
         {
-            _events.insert({uid, duration, std::move(value)});
+            _events.insert({uid, duration_cast<std::chrono::nanoseconds>(duration), std::move(value)});
             incrementVersion();
         }
     };

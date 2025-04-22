@@ -35,8 +35,8 @@ namespace mindset
     const std::string PROPERTY_SYNAPSE_DECAY = "mindset:synapse_decay";
     const std::string PROPERTY_SYNAPSE_EFFICACY = "mindset:synapse_efficacy";
 
-    const std::string PROPERTY_SIMULATION_VOLTAGE = "mindset:simulation_voltage";
-    const std::string PROPERTY_SIMULATION_SPIKES = "mindset:simulation_spikes";
+    const std::string PROPERTY_ACTIVITY_VOLTAGE = "mindset:activity_voltage";
+    const std::string PROPERTY_ACTIVITY_SPIKES = "mindset:activity_spikes";
 
     enum class NeuriteType : uint8_t
     {

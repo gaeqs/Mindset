@@ -101,44 +101,44 @@ namespace mindset
         return &_hierarchy.value();
     }
 
-    size_t Dataset::getSimulationsAmount() const
+    size_t Dataset::getActivitiesAmount() const
     {
-        return _simulations.size();
+        return _activities.size();
     }
 
-    std::pair<Simulation*, bool> Dataset::addSimulation(Simulation simulation)
+    std::pair<Activity*, bool> Dataset::addActivity(Activity activity)
     {
-        auto [it, result] = _simulations.insert({simulation.getUID(), std::move(simulation)});
+        auto [it, result] = _activities.insert({activity.getUID(), std::move(activity)});
         if (result) {
-            _simulationAddedEvent.invoke(&it->second);
+            _activityAddedEvent.invoke(&it->second);
             incrementVersion();
         }
         return {&it->second, result};
     }
 
-    bool Dataset::removeSimulation(UID uid)
+    bool Dataset::removeActivity(UID uid)
     {
-        bool result = _simulations.erase(uid) > 0;
+        bool result = _activities.erase(uid) > 0;
         if (result) {
-            _simulationRemovedEvent.invoke(uid);
+            _activityRemovedEvent.invoke(uid);
             incrementVersion();
         }
         return result;
     }
 
-    std::optional<Simulation*> Dataset::getSimulation(UID uid)
+    std::optional<Activity*> Dataset::getActivity(UID uid)
     {
-        auto it = _simulations.find(uid);
-        if (it != _simulations.end()) {
+        auto it = _activities.find(uid);
+        if (it != _activities.end()) {
             return &it->second;
         }
         return {};
     }
 
-    std::optional<const Simulation*> Dataset::getSimulation(UID uid) const
+    std::optional<const Activity*> Dataset::getActivity(UID uid) const
     {
-        auto it = _simulations.find(uid);
-        if (it != _simulations.end()) {
+        auto it = _activities.find(uid);
+        if (it != _activities.end()) {
             return &it->second;
         }
         return {};
@@ -149,7 +149,7 @@ namespace mindset
         _neurons.clear();
         _circuit.clear();
         _hierarchy = {};
-        _simulations.clear();
+        _activities.clear();
         _clearEvent.invoke(nullptr);
         incrementVersion();
     }

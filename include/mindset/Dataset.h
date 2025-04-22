@@ -17,7 +17,7 @@
 #include <mindset/Properties.h>
 #include <mindset/Circuit.h>
 #include <mindset/Context.h>
-#include <mindset/Simulation.h>
+#include <mindset/Activity.h>
 
 namespace mindset
 {
@@ -25,7 +25,7 @@ namespace mindset
      * The Dataset class serves as the primary container for scene data within the Mindset library.
      *
      * This class encapsulates all essential elements of a neural scene representation, including neurons,
-     * their associated properties, circuit definitions, simulations and an optional hierarchical structure.
+     * their associated properties, circuit definitions, activitys and an optional hierarchical structure.
      */
     class Dataset final : public Versioned, public Context
     {
@@ -34,12 +34,12 @@ namespace mindset
         Circuit _circuit;
         std::optional<Node> _hierarchy;
 
-        std::unordered_map<UID, Simulation> _simulations;
+        std::unordered_map<UID, Activity> _activities;
 
         hey::Observable<Neuron*> _neuronAddedEvent;
         hey::Observable<UID> _neuronRemovedEvent;
-        hey::Observable<Simulation*> _simulationAddedEvent;
-        hey::Observable<UID> _simulationRemovedEvent;
+        hey::Observable<Activity*> _activityAddedEvent;
+        hey::Observable<UID> _activityRemovedEvent;
         hey::Observable<void*> _clearEvent;
 
       public:
@@ -133,37 +133,37 @@ namespace mindset
         Node* createHierarchy(UID uid, std::string type);
 
         /**
-         * Returns the amount of simulations inside this dataset.
+         * Returns the amount of activities inside this dataset.
          */
-        [[nodiscard]] size_t getSimulationsAmount() const;
+        [[nodiscard]] size_t getActivitiesAmount() const;
 
         /**
          * Adds a new neuron to the dataset.
-         * @param simulation The simulation object to insert.
-         * @return A pair containing a pointer to the inserted simulation and a boolean indicating success.
+         * @param activity The activity object to insert.
+         * @return A pair containing a pointer to the inserted activity and a boolean indicating success.
          */
-        std::pair<Simulation*, bool> addSimulation(Simulation simulation);
+        std::pair<Activity*, bool> addActivity(Activity activity);
 
         /**
-         * Removes a simulation identified by its UID from the dataset.
-         * @param uid The unique identifier of the simulation.
-         * @return True if the simulation was successfully removed; false otherwise.
+         * Removes an activity identified by its UID from the dataset.
+         * @param uid The unique identifier of the activity.
+         * @return True if the activity was successfully removed; false otherwise.
          */
-        bool removeSimulation(UID uid);
+        bool removeActivity(UID uid);
 
         /**
-         * Retrieves a mutable pointer to a simulation by its UID, if it exists.
-         * @param uid The unique identifier of the simulation.
-         * @return Optional pointer to the simulation, or std::nullopt if not found.
+         * Retrieves a mutable pointer to an activity by its UID, if it exists.
+         * @param uid The unique identifier of the activity.
+         * @return Optional pointer to the activity, or std::nullopt if not found.
          */
-        [[nodiscard]] std::optional<Simulation*> getSimulation(UID uid);
+        [[nodiscard]] std::optional<Activity*> getActivity(UID uid);
 
         /**
-         * Retrieves a const pointer to a simulation by its UID, if it exists.
-         * @param uid The unique identifier of the simulation.
-         * @return Optional const pointer to the simulation, or std::nullopt if not found.
+         * Retrieves a const pointer to an activity by its UID, if it exists.
+         * @param uid The unique identifier of the activity.
+         * @return Optional const pointer to the activity, or std::nullopt if not found.
          */
-        [[nodiscard]] std::optional<const Simulation*> getSimulation(UID uid) const;
+        [[nodiscard]] std::optional<const Activity*> getActivity(UID uid) const;
 
         /**
          * Clears this dataset. This includes all neurons, synapses and hierarchy.
@@ -217,6 +217,26 @@ namespace mindset
         {
             return _neurons | std::views::transform([this](auto& pair) { return Contextualized(&pair.second, this); });
         }
+
+        /**
+         * Returns a view to iterate over all stored activities in a mutable context.
+         * @return A range view of mutable activities references.
+         */
+        [[nodiscard]] decltype(auto) getActivities()
+        {
+            return _activities | std::views::transform([this](auto& pair) { return &pair.second; });
+        }
+
+        /**
+         * Returns a view to iterate over all stored activities in a read-only context.
+         * @return A range view of const activities references.
+         */
+        [[nodiscard]] decltype(auto) getActivities() const
+        {
+            return _activities | std::views::transform([this](const auto& pair) { return &pair.second; });
+        }
+
+        /**
 
         /**
          * Returns a view to iterate over all stored neurons in a mutable context.

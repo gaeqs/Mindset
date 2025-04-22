@@ -2,10 +2,13 @@
 // Created by gaeqs on 14/03/25.
 //
 
+#include "mindset/loader/SnuddaActivityLoader.h"
+
 #include <mindset/loader/BlueConfigLoader.h>
 #include <mindset/loader/LoaderRegistry.h>
 #include <mindset/loader/MorphoIOLoader.h>
 #include <mindset/loader/SnuddaLoader.h>
+#include <mindset/loader/SnuddaActivityLoader.h>
 #include <mindset/loader/SWCLoader.h>
 #include <mindset/loader/XMLLoader.h>
 
@@ -21,6 +24,7 @@ namespace mindset
             add(SWCLoader::createFactory());
             add(XMLLoader::createFactory());
             add(SnuddaLoader::createFactory());
+            add(SnuddaActivityLoader::createFactory());
         }
     }
 

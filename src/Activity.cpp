@@ -2,12 +2,12 @@
 // Created by gaeqs on 22/04/25.
 //
 
-#include <mindset/Simulation.h>
+#include <mindset/Activity.h>
 
 namespace mindset
 {
 
-    Simulation::Simulation(UID uid) :
+    Activity::Activity(UID uid) :
         Identifiable(uid)
     {
     }

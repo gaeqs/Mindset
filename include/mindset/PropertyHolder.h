@@ -55,9 +55,9 @@ namespace mindset
          */
         [[nodiscard]] std::optional<std::any> getPropertyAsAny(UID uid) const;
 
-        [[nodiscard]] std::optional<std::any&> getPropertyAsAnyRef(UID uid);
+        [[nodiscard]] std::optional<std::any*> getPropertyAsAnyPtr(UID uid);
 
-        [[nodiscard]] std::optional<const std::any&> getPropertyAsAnyRef(UID uid) const;
+        [[nodiscard]] std::optional<const std::any*> getPropertyAsAnyPtr(UID uid) const;
 
         /**
          * Checks if the property exists.
@@ -92,22 +92,41 @@ namespace mindset
         }
 
         /**
-         * Retrieves the property as a specific type's reference, if present.
+         * Retrieves the property as a specific type's pointer, if present.
          * @tparam T Expected type of the property.
          * @param uid UID of the property.
          */
         template<typename T>
-        [[nodiscard]] std::optional<T&> getPropertyRef(UID uid) const
+        [[nodiscard]] std::optional<T*> getPropertyPtr(UID uid)
         {
-            auto optional = getPropertyAsAnyRef(uid);
+            auto optional = getPropertyAsAnyPtr(uid);
             if (!optional.has_value()) {
                 return {};
             }
-            T* v = std::any_cast<T>(&optional.value());
+            T* v = std::any_cast<T>(optional.value());
             if (v == nullptr) {
                 return {};
             }
-            return std::optional<T&>(*v);
+            return std::optional<T*>(v);
+        }
+
+        /**
+         * Retrieves the property as a specific type's pointer, if present.
+         * @tparam T Expected type of the property.
+         * @param uid UID of the property.
+         */
+        template<typename T>
+        [[nodiscard]] std::optional<const T*> getPropertyPtr(UID uid) const
+        {
+            auto optional = getPropertyAsAnyPtr(uid);
+            if (!optional.has_value()) {
+                return {};
+            }
+            const T* v = std::any_cast<T>(optional.value());
+            if (v == nullptr) {
+                return {};
+            }
+            return std::optional<const T*>(v);
         }
     };
 } // namespace mindset

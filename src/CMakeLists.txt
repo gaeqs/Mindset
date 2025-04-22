@@ -32,6 +32,7 @@ target_sources(mindset PRIVATE
         Versioned.cpp
         MorphologyTree.cpp
         MorphologyTreeSection.cpp
+        Activity.cpp
 
         util/NeuronTransform.cpp
         util/MorphologyUtils.cpp
@@ -42,6 +43,7 @@ target_sources(mindset PRIVATE
         loader/SWCLoader.cpp
         loader/XMLLoader.cpp
         loader/SnuddaLoader.cpp
+        loader/SnuddaActivityLoader.cpp
         loader/LoaderRegistry.cpp
 )
 

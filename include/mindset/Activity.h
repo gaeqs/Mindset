@@ -12,11 +12,12 @@ namespace mindset
 {
 
     /**
-     * Collection of data related to a simulation.
+     * Collection of temporal data.
      */
-    class Simulation : public Identifiable, public PropertyHolder
+    class Activity : public Identifiable, public PropertyHolder
     {
-        explicit Simulation(UID uid);
+    public:
+        explicit Activity(UID uid);
     };
 
 } // namespace mindset

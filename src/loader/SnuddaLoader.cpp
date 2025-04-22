@@ -47,10 +47,9 @@ namespace mindset
                                    const std::unordered_map<std::string, std::shared_ptr<Morphology>>& morphologies,
                                    const SnuddaLoaderProperties& properties) const
     {
-        auto ids = _file.getDataSet("network/neurons/neuron_id").read<std::vector<uint32_t>>();
+        auto ids = _file.getDataSet("network/neurons/neuron_id").read<std::vector<uint64_t>>();
         auto position = _file.getDataSet("network/neurons/position").read<std::vector<std::array<double, 3>>>();
         auto rotation = _file.getDataSet("network/neurons/rotation").read<std::vector<std::array<double, 9>>>();
-        auto origo = _file.getDataSet("meta/simulation_origo").read<std::array<double, 3>>();
         auto morphologiesNames = _file.getDataSet("network/neurons/morphology").read<std::vector<std::string>>();
 
         for (size_t i = 0; i < ids.size(); ++i) {
@@ -87,13 +86,10 @@ namespace mindset
     {
         static const std::string SNUDDA_PREFIX = "$SNUDDA_DATA";
 
-        auto ids = _file.getDataSet("network/neurons/neuron_id").read<std::vector<uint32_t>>();
         auto morphologies = _file.getDataSet("network/neurons/morphology").read<std::vector<std::string>>();
-
         std::unordered_map<std::string, std::shared_ptr<Morphology>> loaded;
 
-        for (size_t i = 0; i < ids.size(); ++i) {
-            auto id = ids[i];
+        for (size_t i = 0; i < morphologies.size(); ++i) {
             auto& name = morphologies[i];
             if (loaded.contains(name)) {
                 continue;

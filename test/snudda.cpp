@@ -68,3 +68,38 @@ TEST_CASE("Snudda load")
         }
     }
 }
+
+TEST_CASE("Snudda activity load")
+{
+    auto cPath = getenv("SNUDDA_ACTIVITY_PATH");
+    if (cPath == nullptr) {
+        FAIL("SNUDDA_ACTIVITY_PATH environment variable not set.");
+        return;
+    }
+
+    mindset::Dataset dataset;
+    mindset::SnuddaActivityLoader loader(cPath);
+    loader.setLoadMorphology(false);
+    loader.load(dataset);
+
+    auto& props = dataset.getProperties();
+
+    auto spikesProp = props.getPropertyUID(mindset::PROPERTY_ACTIVITY_SPIKES);
+    auto voltageProp = props.getPropertyUID(mindset::PROPERTY_ACTIVITY_VOLTAGE);
+
+    REQUIRE(spikesProp.has_value());
+    REQUIRE(voltageProp.has_value());
+
+    mindset::Activity* activity = *dataset.getActivities().begin();
+    auto spikesOptional = activity->getPropertyPtr<mindset::EventSequence<std::monostate>>(*spikesProp);
+    REQUIRE(spikesOptional.has_value());
+
+    auto* spikes = spikesOptional.value();
+    std::cout << spikes->getEvents().size() << std::endl;
+
+    auto voltageOptional = activity->getPropertyPtr<mindset::TimeGrid<double>>(*voltageProp);
+    REQUIRE(voltageOptional.has_value());
+
+    auto* voltage = voltageOptional.value();
+    std::cout << voltage->getDimensions().first << " - " << voltage->getDimensions().second << std::endl;
+}
