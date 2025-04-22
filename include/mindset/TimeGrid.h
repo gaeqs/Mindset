@@ -13,16 +13,17 @@
 namespace mindset
 {
 
-    template<typename Value>
-
     /**
      * A data structure for managing time-stepped data associated with unique identifiers,
      * ideal for timelines where all the elements have a value each timestep.
+     *
+     * If you need a data structure that stores dispersed temporal events, use EventSequence.
      *
      * This structure defines two concepts: timestep and timeline.
      * - Timestep: collection of values for all elements at a given time.
      * - Timestep: collections of values for a element across the time.
      */
+    template<typename Value>
     class TimeGrid
     {
         std::chrono::nanoseconds _delta;
