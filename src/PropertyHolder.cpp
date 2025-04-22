@@ -43,6 +43,24 @@ namespace mindset
         return it->second;
     }
 
+    std::optional<std::any&> PropertyHolder::getPropertyAsAnyRef(UID uid)
+    {
+        auto it = _properties.find(uid);
+        if (it == _properties.end()) {
+            return {};
+        }
+        return it->second;
+    }
+
+    std::optional<const std::any&> PropertyHolder::getPropertyAsAnyRef(UID uid) const
+    {
+        auto it = _properties.find(uid);
+        if (it == _properties.end()) {
+            return {};
+        }
+        return it->second;
+    }
+
     bool PropertyHolder::hasProperty(UID uid) const
     {
         return _properties.contains(uid);

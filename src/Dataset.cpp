@@ -101,11 +101,55 @@ namespace mindset
         return &_hierarchy.value();
     }
 
+    size_t Dataset::getSimulationsAmount() const
+    {
+        return _simulations.size();
+    }
+
+    std::pair<Simulation*, bool> Dataset::addSimulation(Simulation simulation)
+    {
+        auto [it, result] = _simulations.insert({simulation.getUID(), std::move(simulation)});
+        if (result) {
+            _simulationAddedEvent.invoke(&it->second);
+            incrementVersion();
+        }
+        return {&it->second, result};
+    }
+
+    bool Dataset::removeSimulation(UID uid)
+    {
+        bool result = _simulations.erase(uid) > 0;
+        if (result) {
+            _simulationRemovedEvent.invoke(uid);
+            incrementVersion();
+        }
+        return result;
+    }
+
+    std::optional<Simulation*> Dataset::getSimulation(UID uid)
+    {
+        auto it = _simulations.find(uid);
+        if (it != _simulations.end()) {
+            return &it->second;
+        }
+        return {};
+    }
+
+    std::optional<const Simulation*> Dataset::getSimulation(UID uid) const
+    {
+        auto it = _simulations.find(uid);
+        if (it != _simulations.end()) {
+            return &it->second;
+        }
+        return {};
+    }
+
     void Dataset::clear()
     {
         _neurons.clear();
         _circuit.clear();
         _hierarchy = {};
+        _simulations.clear();
         _clearEvent.invoke(nullptr);
         incrementVersion();
     }

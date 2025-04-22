@@ -17,6 +17,7 @@
 #include <mindset/Properties.h>
 #include <mindset/Circuit.h>
 #include <mindset/Context.h>
+#include <mindset/Simulation.h>
 
 namespace mindset
 {
@@ -24,7 +25,7 @@ namespace mindset
      * The Dataset class serves as the primary container for scene data within the Mindset library.
      *
      * This class encapsulates all essential elements of a neural scene representation, including neurons,
-     * their associated properties, circuit definitions, and an optional hierarchical structure.
+     * their associated properties, circuit definitions, simulations and an optional hierarchical structure.
      */
     class Dataset final : public Versioned, public Context
     {
@@ -33,8 +34,12 @@ namespace mindset
         Circuit _circuit;
         std::optional<Node> _hierarchy;
 
+        std::unordered_map<UID, Simulation> _simulations;
+
         hey::Observable<Neuron*> _neuronAddedEvent;
         hey::Observable<UID> _neuronRemovedEvent;
+        hey::Observable<Simulation*> _simulationAddedEvent;
+        hey::Observable<UID> _simulationRemovedEvent;
         hey::Observable<void*> _clearEvent;
 
       public:
@@ -126,6 +131,39 @@ namespace mindset
          * @return Pointer to the newly created hierarchy node.
          */
         Node* createHierarchy(UID uid, std::string type);
+
+        /**
+         * Returns the amount of simulations inside this dataset.
+         */
+        [[nodiscard]] size_t getSimulationsAmount() const;
+
+        /**
+         * Adds a new neuron to the dataset.
+         * @param simulation The simulation object to insert.
+         * @return A pair containing a pointer to the inserted simulation and a boolean indicating success.
+         */
+        std::pair<Simulation*, bool> addSimulation(Simulation simulation);
+
+        /**
+         * Removes a simulation identified by its UID from the dataset.
+         * @param uid The unique identifier of the simulation.
+         * @return True if the simulation was successfully removed; false otherwise.
+         */
+        bool removeSimulation(UID uid);
+
+        /**
+         * Retrieves a mutable pointer to a simulation by its UID, if it exists.
+         * @param uid The unique identifier of the simulation.
+         * @return Optional pointer to the simulation, or std::nullopt if not found.
+         */
+        [[nodiscard]] std::optional<Simulation*> getSimulation(UID uid);
+
+        /**
+         * Retrieves a const pointer to a simulation by its UID, if it exists.
+         * @param uid The unique identifier of the simulation.
+         * @return Optional const pointer to the simulation, or std::nullopt if not found.
+         */
+        [[nodiscard]] std::optional<const Simulation*> getSimulation(UID uid) const;
 
         /**
          * Clears this dataset. This includes all neurons, synapses and hierarchy.

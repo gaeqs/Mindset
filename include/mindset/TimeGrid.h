@@ -9,6 +9,7 @@
 #include <ranges>
 
 #include <mindset/UID.h>
+#include <mindset/Versioned.h>
 
 namespace mindset
 {
@@ -24,7 +25,7 @@ namespace mindset
      * - Timestep: collections of values for a element across the time.
      */
     template<typename Value>
-    class TimeGrid
+    class TimeGrid : public Versioned
     {
         std::chrono::nanoseconds _delta;
         std::vector<UID> _uids;
@@ -251,6 +252,8 @@ namespace mindset
             for (auto& data : _data) {
                 data.resize(_uids.size(), Value());
             }
+
+            incrementVersion();
         }
 
         /**
@@ -266,6 +269,8 @@ namespace mindset
         {
             timestep.resize(_uids.size(), Value());
             _data.push_back(std::move(timestep));
+
+            incrementVersion();
         }
 
         /**
@@ -305,6 +310,8 @@ namespace mindset
                 row[index] = timeline[i];
                 _data.push_back(std::move(row));
             }
+
+            incrementVersion();
         }
     };
 

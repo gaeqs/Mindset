@@ -7,8 +7,10 @@
 
 #include <chrono>
 #include <set>
+#include <ranges>
 
 #include <mindset/UID.h>
+#include <mindset/Versioned.h>
 
 namespace mindset
 {
@@ -31,7 +33,7 @@ namespace mindset
      *   within specific time ranges.
      */
     template<typename Value>
-    class EventSequence
+    class EventSequence : public Versioned
     {
         /**
          * @brief Represents an event with associated data and behaviors.
@@ -191,6 +193,7 @@ namespace mindset
         void addEvent(UID uid, std::chrono::duration<Rep, Period> duration, Value value)
         {
             _events.insert({uid, duration, std::move(value)});
+            incrementVersion();
         }
     };
 

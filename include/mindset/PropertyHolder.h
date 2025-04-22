@@ -32,7 +32,7 @@ namespace mindset
         PropertyHolder();
 
         /**
-         * Returns a reference to the properties map.
+         * Returns a reference to the property map.
          */
         const std::unordered_map<UID, std::any>& getProperties() const;
 
@@ -54,6 +54,10 @@ namespace mindset
          * @param uid UID of the property.
          */
         [[nodiscard]] std::optional<std::any> getPropertyAsAny(UID uid) const;
+
+        [[nodiscard]] std::optional<std::any&> getPropertyAsAnyRef(UID uid);
+
+        [[nodiscard]] std::optional<const std::any&> getPropertyAsAnyRef(UID uid) const;
 
         /**
          * Checks if the property exists.
@@ -85,6 +89,25 @@ namespace mindset
                 return {};
             }
             return std::optional<T>(*v);
+        }
+
+        /**
+         * Retrieves the property as a specific type's reference, if present.
+         * @tparam T Expected type of the property.
+         * @param uid UID of the property.
+         */
+        template<typename T>
+        [[nodiscard]] std::optional<T&> getPropertyRef(UID uid) const
+        {
+            auto optional = getPropertyAsAnyRef(uid);
+            if (!optional.has_value()) {
+                return {};
+            }
+            T* v = std::any_cast<T>(&optional.value());
+            if (v == nullptr) {
+                return {};
+            }
+            return std::optional<T&>(*v);
         }
     };
 } // namespace mindset
