@@ -81,13 +81,12 @@ namespace mindset
         loadMorphologies(Dataset& dataset) const
     {
         static const std::string SNUDDA_PREFIX = "$SNUDDA_DATA";
-
-        auto morphologies = _file.getDataSet("meta_data/morphology").read<std::vector<std::string>>();
+        auto morphologies = _file.getDataSet("meta_data/morphology").read<HighFive::FixedLenStringArray<1024>>();
 
         std::unordered_map<std::string, std::shared_ptr<Morphology>> loaded;
 
         for (size_t i = 0; i < morphologies.size(); ++i) {
-            auto& name = morphologies[i];
+            auto name = std::string(morphologies[i]);
             if (loaded.contains(name)) {
                 continue;
             }
