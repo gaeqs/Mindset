@@ -88,6 +88,11 @@ TEST_CASE("Snudda activity load")
 
     auto loader = std::move(result.getResult());
 
+    hey::Listener<mindset::LoaderStatus> listener = [](const mindset::LoaderStatus& status) {
+        std::cout << status.currentTask << " (" << status.stagesCompleted << "/" << status.stages << ")" << std::endl;
+    };
+    loader->addListener(listener);
+
     mindset::Dataset dataset;
     loader->load(dataset);
     auto& props = dataset.getProperties();

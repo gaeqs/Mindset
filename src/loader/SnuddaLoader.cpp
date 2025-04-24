@@ -64,6 +64,22 @@ namespace
 
         return values;
     }
+
+    std::vector<std::string> readMorphologies(const HighFive::File& file, std::string group)
+    {
+        try {
+            return file.getDataSet(group).read<std::vector<std::string>>();
+        } catch (HighFive::DataSetException& e) {
+            // Read it using fixed strings.
+            auto raw = file.getDataSet(group).read<HighFive::FixedLenStringArray<1024>>();
+            std::vector<std::string> result;
+            result.reserve(raw.size());
+            for (auto& name : raw) {
+                result.push_back(std::string(name.begin(), name.end()));
+            }
+            return result;
+        }
+    }
 } // namespace
 
 namespace mindset
@@ -82,6 +98,10 @@ namespace mindset
         result.positionGroup = fetchValidGroup(_file, SNUDDA_LOADER_VALID_POSITION_GROUPS);
         result.rotationGroup = fetchValidGroup(_file, SNUDDA_LOADER_VALID_ROTATION_GROUPS);
         result.morphologyGroup = fetchValidGroup(_file, SNUDDA_LOADER_VALID_MORPHOLOGY_GROUPS);
+
+        result.voxelSizeGroup = fetchValidGroup(_file, SNUDDA_LOADER_VALID_VOXEL_SIZE_GROUPS);
+        result.synapsesGroup = fetchValidGroup(_file, SNUDDA_LOADER_VALID_SYNAPSES_GROUPS);
+        result.simulationOrigoGroup = fetchValidGroup(_file, SNUDDA_LOADER_VALID_SIMULATION_ORIGO_GROUPS);
 
         if (result.loadSynapses || result.loadMorphologies) {
             result.position = properties.defineProperty(PROPERTY_POSITION);
@@ -126,7 +146,7 @@ namespace mindset
             _file.getDataSet(properties.rotationGroup.value()).read(rotations);
         }
         if (properties.morphologyGroup.has_value()) {
-            _file.getDataSet(properties.morphologyGroup.value()).read(morphologiesNames);
+            morphologiesNames = readMorphologies(_file, properties.morphologyGroup.value());
         }
 
         for (size_t i = 0; i < ids.size(); ++i) {
@@ -152,7 +172,7 @@ namespace mindset
             }
 
             if (hasMorphology) {
-                if (auto it = morphologies.find(morphologiesNames[i]); it != morphologies.end()) {
+                if (auto it = morphologies.find(std::string(morphologiesNames[i])); it != morphologies.end()) {
                     morphology = it->second;
                 }
             }
@@ -186,10 +206,10 @@ namespace mindset
             return std::move(loaded);
         }
 
-        auto morphologies = _file.getDataSet(properties.morphologyGroup.value()).read<std::vector<std::string>>();
+        auto morphologies = readMorphologies(_file, properties.morphologyGroup.value());
 
         for (size_t i = 0; i < morphologies.size(); ++i) {
-            auto& name = morphologies[i];
+            auto name = morphologies[i];
             if (loaded.contains(name)) {
                 continue;
             }
@@ -212,10 +232,15 @@ namespace mindset
 
     void SnuddaLoader::loadSynapses(Dataset& dataset, const SnuddaLoaderProperties& properties) const
     {
+        if (!properties.voxelSizeGroup.has_value() || !properties.synapsesGroup.has_value() ||
+            !properties.simulationOrigoGroup.has_value()) {
+            return;
+        }
+
         using Syn = std::array<int32_t, 13>;
-        auto voxelSize = static_cast<float>(_file.getDataSet("meta/voxel_size").read<double>());
-        auto synapses = _file.getDataSet("network/synapses").read<std::vector<Syn>>();
-        auto origo = _file.getDataSet("meta/simulation_origo").read<std::array<double, 3>>();
+        auto voxelSize = static_cast<float>(_file.getDataSet(properties.voxelSizeGroup.value()).read<double>());
+        auto synapses = _file.getDataSet(properties.synapsesGroup.value()).read<std::vector<Syn>>();
+        auto origo = _file.getDataSet(properties.simulationOrigoGroup.value()).read<std::array<double, 3>>();
 
         auto origin = rush::Vec3f(origo[0], origo[1], origo[2]);
 
@@ -357,7 +382,7 @@ namespace mindset
             for (auto& set : tableSpikes) {
                 if (_file.exist(set)) {
                     auto ds = _file.getDataSet(set);
-                    rawSpikes.resize( ds.getElementCount());
+                    rawSpikes.resize(ds.getElementCount());
                     ds.read(rawSpikes);
                     for (double time : rawSpikes) {
                         if (time > 0) {
@@ -430,11 +455,15 @@ namespace mindset
     LoaderFactory SnuddaLoader::createFactory()
     {
         auto path = getenv("SNUDDA_DATA");
+        std::optional<std::any> pathOptional;
+        if (path != nullptr) {
+            pathOptional = std::string(path);
+        }
         std::vector<LoaderEnvironmentEntry> entries = {
             {.name = SNUDDA_LOADER_ENTRY_SNUDDA_DATA_PATH,
              .displayName = "Snudda data path",
              .type = typeid(std::string),
-             .defaultValue = path == nullptr ? std::optional<std::string>() : std::optional<std::string>(path),
+             .defaultValue = pathOptional,
              .hint = {}},
             { .name = SNUDDA_LOADER_ENTRY_LOAD_MORPHOLOGY,
              .displayName = "Load morphology",

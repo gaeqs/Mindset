@@ -38,6 +38,16 @@ namespace mindset
         "meta_data/morphology",
     };
 
+    static constexpr std::array SNUDDA_LOADER_VALID_VOXEL_SIZE_GROUPS = {
+        "meta/voxel_size"
+    };
+    static constexpr std::array SNUDDA_LOADER_VALID_SYNAPSES_GROUPS = {
+        "network/synapses"
+    };
+    static constexpr std::array SNUDDA_LOADER_VALID_SIMULATION_ORIGO_GROUPS = {
+        "meta/simulation_origo"
+    };
+
     struct SnuddaLoaderProperties
     {
         std::string snuddaPath;
@@ -66,6 +76,10 @@ namespace mindset
         std::optional<std::string> positionGroup;
         std::optional<std::string> rotationGroup;
         std::optional<std::string> morphologyGroup;
+
+        std::optional<std::string> voxelSizeGroup;
+        std::optional<std::string> synapsesGroup;
+        std::optional<std::string> simulationOrigoGroup;
     };
 
     /**
