@@ -26,7 +26,7 @@ namespace mindset
         std::function<UID()> _provider;
 
       public:
-        explicit MorphoIOLoader(std::filesystem::path path);
+        explicit MorphoIOLoader(const LoaderCreateInfo& info, std::filesystem::path path);
 
         void addUIDProvider(std::function<UID()> provider) override;
 

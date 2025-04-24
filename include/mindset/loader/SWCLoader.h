@@ -41,13 +41,13 @@ namespace mindset
         [[nodiscard]] Result<SWCSegment, std::string> toSegment(size_t lineIndex) const;
 
       public:
-        explicit SWCLoader(const std::vector<std::string>& lines);
+        explicit SWCLoader(const LoaderCreateInfo& info, const std::vector<std::string>& lines);
 
-        explicit SWCLoader(std::vector<std::string>&& lines);
+        explicit SWCLoader(const LoaderCreateInfo& info, std::vector<std::string>&& lines);
 
-        explicit SWCLoader(std::istream& stream);
+        explicit SWCLoader(const LoaderCreateInfo& info, std::istream& stream);
 
-        explicit SWCLoader(const std::filesystem::path& path);
+        explicit SWCLoader(const LoaderCreateInfo& info, const std::filesystem::path& path);
 
         void addUIDProvider(std::function<UID()> provider) override;
 

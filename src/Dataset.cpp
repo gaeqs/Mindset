@@ -177,4 +177,13 @@ namespace mindset
         }
         return smallest;
     }
+
+    UID Dataset::findSmallestAvailableActivityUID() const
+    {
+        UID smallest = 0;
+        while (_activities.contains(smallest)) {
+            ++smallest;
+        }
+        return smallest;
+    }
 } // namespace mindset

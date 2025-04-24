@@ -9,7 +9,7 @@
 TEST_CASE("Test")
 {
     mindset::Dataset dataset;
-    mindset::SWCLoader loader(std::filesystem::current_path() / "data/test.swc");
+    mindset::SWCLoader loader(mindset::LoaderCreateInfo(), std::filesystem::current_path() / "data/test.swc");
     loader.load(dataset);
 
     REQUIRE(dataset.getNeurons().size() == 1);

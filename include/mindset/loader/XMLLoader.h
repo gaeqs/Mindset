@@ -42,16 +42,15 @@ namespace mindset
         using FileProvider = std::function<std::optional<std::vector<std::string>>(std::filesystem::path)>;
 
       private:
-        FileProvider _fileProvider;
         pugi::xml_document _doc;
         bool _valid;
 
       public:
-        XMLLoader(FileProvider provider, const void* data, size_t size);
+        XMLLoader(const LoaderCreateInfo& info, const void* data, size_t size);
 
-        XMLLoader(FileProvider provider, std::istream& stream);
+        XMLLoader(const LoaderCreateInfo& info, std::istream& stream);
 
-        XMLLoader(FileProvider provider, std::filesystem::path path);
+        XMLLoader(const LoaderCreateInfo& info, std::filesystem::path path);
 
         void load(Dataset& dataset) const override;
 

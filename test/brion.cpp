@@ -14,20 +14,24 @@
 TEST_CASE("Brion load")
 {
     std::filesystem::path path = "/run/media/gaeqs/HDD/SynCoPaData/build/vizCa2p0_1x7/BlueConfig";
-    mindset::BlueConfigLoader loader(path);
-    loader.addTarget("felix");
-    loader.setLoadMorphology(true);
-    loader.setLoadHierarchy(true);
-    loader.setLoadSynapses(true);
+
+    auto factory = mindset::BlueConfigLoader::createFactory();
+
+    auto result = factory.create(nullptr, {}, path);
+    if (!result.isOk()) {
+        FAIL();
+    }
+
+    auto loader = std::move(result.getResult());
 
     size_t i = 0;
-    auto listener = loader.createListener([&](const mindset::LoaderStatus& result) {
+    auto listener = loader->createListener([&](const mindset::LoaderStatus& result) {
         ++i;
         std::cout << result.currentTask << " (" << result.stagesCompleted << "/" << result.stages << ")" << std::endl;
     });
 
     mindset::Dataset dataset;
-    loader.load(dataset);
+    loader->load(dataset);
 
     auto& properties = dataset.getProperties();
 

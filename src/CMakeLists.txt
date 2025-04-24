@@ -43,7 +43,6 @@ target_sources(mindset PRIVATE
         loader/SWCLoader.cpp
         loader/XMLLoader.cpp
         loader/SnuddaLoader.cpp
-        loader/SnuddaActivityLoader.cpp
         loader/LoaderRegistry.cpp
 )
 

@@ -101,17 +101,18 @@ namespace
 
 namespace mindset
 {
-    BlueConfigLoaderProperties BlueConfigLoader::initProperties(Properties& properties) const
+    BlueConfigLoaderProperties BlueConfigLoader::initProperties(Properties& properties, bool shouldLoadMorphologies,
+                                                                bool shouldLoadSynapses, bool shouldLoadHierarchy) const
     {
         BlueConfigLoaderProperties result{};
 
         // Used for neurites and synapses.
 
-        if (_loadMorphology || _loadSynapses) {
+        if (shouldLoadMorphologies || shouldLoadSynapses) {
             result.position = properties.defineProperty(PROPERTY_POSITION);
         }
 
-        if (_loadMorphology) {
+        if (shouldLoadMorphologies) {
             result.neuriteRadius = properties.defineProperty(PROPERTY_RADIUS);
             result.neuriteParent = properties.defineProperty(PROPERTY_PARENT);
             result.neuriteType = properties.defineProperty(PROPERTY_NEURITE_TYPE);
@@ -120,12 +121,12 @@ namespace mindset
         result.neuronTransform = properties.defineProperty(PROPERTY_TRANSFORM);
         result.neuronLayer = properties.defineProperty(PROPERTY_LAYER);
 
-        if (_loadHierarchy) {
+        if (shouldLoadHierarchy) {
             result.neuronColumn = properties.defineProperty(PROPERTY_COLUMN);
             result.neuronMiniColumn = properties.defineProperty(PROPERTY_MINI_COLUMN);
         }
 
-        if (_loadSynapses) {
+        if (shouldLoadSynapses) {
             result.synapsePreNeurite = properties.defineProperty(PROPERTY_SYNAPSE_PRE_NEURITE);
             result.synapsePostNeurite = properties.defineProperty(PROPERTY_SYNAPSE_POST_NEURITE);
             result.synapsePrePosition = properties.defineProperty(PROPERTY_SYNAPSE_PRE_POSITION);
@@ -377,70 +378,29 @@ namespace mindset
         return result;
     }
 
-    BlueConfigLoader::BlueConfigLoader(std::filesystem::path path) :
-        _blueConfig(std::move(path)),
-        _loadMorphology(true),
-        _loadHierarchy(true),
-        _loadSynapses(true)
+    BlueConfigLoader::BlueConfigLoader(const LoaderCreateInfo& info, std::filesystem::path path) :
+        Loader(info),
+        _blueConfig(std::move(path))
     {
-    }
-
-    bool BlueConfigLoader::addTarget(std::string target)
-    {
-        return _targets.insert(std::move(target)).second;
-    }
-
-    std::set<std::string>& BlueConfigLoader::getTargets()
-    {
-        return _targets;
-    }
-
-    const std::set<std::string>& BlueConfigLoader::getTargets() const
-    {
-        return _targets;
-    }
-
-    bool BlueConfigLoader::shouldLoadMorphology() const
-    {
-        return _loadMorphology;
-    }
-
-    void BlueConfigLoader::setLoadMorphology(bool loadMorphology)
-    {
-        _loadMorphology = loadMorphology;
-    }
-
-    bool BlueConfigLoader::shouldLoadHierarchy() const
-    {
-        return _loadHierarchy;
-    }
-
-    void BlueConfigLoader::setLoadHierarchy(bool loadHierarchy)
-    {
-        _loadHierarchy = loadHierarchy;
-    }
-
-    bool BlueConfigLoader::shouldLoadSynapses() const
-    {
-        return _loadSynapses;
-    }
-
-    void BlueConfigLoader::setLoadSynapses(bool loadSynapses)
-    {
-        _loadSynapses = loadSynapses;
     }
 
     void BlueConfigLoader::load(Dataset& dataset) const
     {
         constexpr size_t STAGES = 5;
-        if (_targets.empty()) {
+
+        bool shouldLoadMorphologies = getEnvironmentEntryOr(BLUE_CONFIG_LOADER_ENTRY_LOAD_MORPHOLOGY, false);
+        bool shouldLoadSynapses = getEnvironmentEntryOr(BLUE_CONFIG_LOADER_ENTRY_LOAD_SYNAPSES, false);
+        bool shouldLoadHierarchy = getEnvironmentEntryOr(BLUE_CONFIG_LOADER_ENTRY_LOAD_HIERARCHY, false);
+
+        auto targets = getEnvironmentEntry<std::vector<std::string>>(BLUE_CONFIG_LOADER_ENTRY_TARGETS);
+        if (!targets.has_value() || targets.value()->empty()) {
             invoke({LoaderStatusType::LOADING_ERROR, "No targets found", STAGES, 0});
         }
 
         invoke({LoaderStatusType::LOADING, "Loading targets", STAGES, 0});
 
         brion::GIDSet ids;
-        for (auto& target : _targets) {
+        for (auto& target : *targets.value()) {
             brion::GIDSet targetSet = _blueConfig.parseTarget(target);
             ids.insert(targetSet.begin(), targetSet.end());
         }
@@ -451,7 +411,8 @@ namespace mindset
 
         invoke({LoaderStatusType::LOADING, "Defining properties", STAGES, 1});
 
-        BlueConfigLoaderProperties properties = initProperties(dataset.getProperties());
+        auto properties =
+            initProperties(dataset.getProperties(), shouldLoadMorphologies, shouldLoadSynapses, shouldLoadHierarchy);
 
         invoke({LoaderStatusType::LOADING, "Loading global neuron data", STAGES, 2});
 
@@ -460,19 +421,19 @@ namespace mindset
 
             std::map<std::string, std::shared_ptr<Morphology>> morphologies;
 
-            if (_loadMorphology) {
+            if (shouldLoadMorphologies) {
                 invoke({LoaderStatusType::LOADING, "Loading morphologies", STAGES, 3});
                 morphologies = loadMorphologies(properties, ids, circuit);
             }
 
             loadNeurons(dataset, properties, ids, circuit, morphologies);
 
-            if (_loadSynapses) {
+            if (shouldLoadSynapses) {
                 loadSynapses(dataset, properties, ids, circuit);
             }
         }
 
-        if (_loadHierarchy) {
+        if (shouldLoadHierarchy) {
             invoke({LoaderStatusType::LOADING, "Loading hierarchy", STAGES, 4});
             auto circuit = brion::Circuit(_blueConfig.getCircuitSource());
             loadHierarchy(dataset, properties, ids, circuit);
@@ -483,11 +444,34 @@ namespace mindset
 
     LoaderFactory BlueConfigLoader::createFactory()
     {
+        std::vector<LoaderEnvironmentEntry> entries = {
+            {        .name = BLUE_CONFIG_LOADER_ENTRY_TARGETS,
+             .displayName = "Targets",
+             .type = typeid(std::vector<std::string>),
+             .defaultValue = std::vector<std::string>{},
+             .hint = {}},
+            {.name = BLUE_CONFIG_LOADER_ENTRY_LOAD_MORPHOLOGY,
+             .displayName = "Load morphology",
+             .type = typeid(bool),
+             .defaultValue = true,
+             .hint = {}},
+            { .name = BLUE_CONFIG_LOADER_ENTRY_LOAD_HIERARCHY,
+             .displayName = "Load hierarchy",
+             .type = typeid(bool),
+             .defaultValue = true,
+             .hint = {}},
+            {  .name = BLUE_CONFIG_LOADER_ENTRY_LOAD_SYNAPSES,
+             .displayName = "Load synapses",
+             .type = typeid(bool),
+             .defaultValue = true,
+             .hint = {}},
+        };
+
         return LoaderFactory(
-            BLUE_CONFIG_LOADER_ID, BLUE_CONFIG_LOADER_NAME, true,
+            BLUE_CONFIG_LOADER_ID, BLUE_CONFIG_LOADER_NAME, true, entries,
             [](const std::string& name) { return name == "BlueConfig"; },
-            [](LoaderFactory::FileProvider, const std::filesystem::path& path) {
-                return LoaderFactory::FactoryResult(std::make_unique<BlueConfigLoader>(path));
+            [](const LoaderCreateInfo& info, const std::filesystem::path& path) {
+                return FactoryResult(std::make_unique<BlueConfigLoader>(info, path));
             });
     }
 } // namespace mindset

@@ -45,18 +45,20 @@ namespace mindset
     static const std::string BLUE_CONFIG_LOADER_ID = "mindset:loader_blue_config";
     static const std::string BLUE_CONFIG_LOADER_NAME = "Blue Config";
 
+    static const std::string BLUE_CONFIG_LOADER_ENTRY_TARGETS = "mindset:targets";
+    static const std::string BLUE_CONFIG_LOADER_ENTRY_LOAD_MORPHOLOGY = "mindset:load_morphology";
+    static const std::string BLUE_CONFIG_LOADER_ENTRY_LOAD_HIERARCHY = "mindset:load_hierarchy";
+    static const std::string BLUE_CONFIG_LOADER_ENTRY_LOAD_SYNAPSES = "mindset:load_synapses";
+
     /**
      * This Loader loads BlueConfig files.
      */
     class BlueConfigLoader : public Loader
     {
         brion::BlueConfig _blueConfig;
-        std::set<std::string> _targets;
-        bool _loadMorphology;
-        bool _loadHierarchy;
-        bool _loadSynapses;
 
-        BlueConfigLoaderProperties initProperties(Properties& properties) const;
+        BlueConfigLoaderProperties initProperties(Properties& properties, bool shouldLoadMorphologies,
+                                                  bool shouldLoadSynapses, bool shouldLoadHierarchy) const;
 
         static void loadNeurons(Dataset& dataset, const BlueConfigLoaderProperties& properties,
                                 const brion::GIDSet& ids, const brain::Circuit& circuit,
@@ -75,25 +77,7 @@ namespace mindset
                                                           const brion::Morphology& morphology);
 
       public:
-        explicit BlueConfigLoader(std::filesystem::path path);
-
-        bool addTarget(std::string target);
-
-        [[nodiscard]] std::set<std::string>& getTargets();
-
-        [[nodiscard]] const std::set<std::string>& getTargets() const;
-
-        [[nodiscard]] bool shouldLoadMorphology() const;
-
-        void setLoadMorphology(bool loadMorphology);
-
-        [[nodiscard]] bool shouldLoadHierarchy() const;
-
-        void setLoadHierarchy(bool loadHierarchy);
-
-        [[nodiscard]] bool shouldLoadSynapses() const;
-
-        void setLoadSynapses(bool loadSynapses);
+        explicit BlueConfigLoader(const LoaderCreateInfo& info, std::filesystem::path path);
 
         void load(Dataset& dataset) const override;
 

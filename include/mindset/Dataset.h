@@ -192,6 +192,11 @@ namespace mindset
         [[nodiscard]] UID findSmallestAvailableNeuronUID() const;
 
         /**
+         * Returns the smallest UID available for an activity.
+         */
+        [[nodiscard]] UID findSmallestAvailableActivityUID() const;
+
+        /**
          * Returns a view to iterate over all stored neurons' UIDs.
          * @returns A range view of UIDs.
          */

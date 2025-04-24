@@ -30,17 +30,20 @@ namespace mindset
         return segment;
     }
 
-    SWCLoader::SWCLoader(const std::vector<std::string>& lines) :
+    SWCLoader::SWCLoader(const LoaderCreateInfo& info, const std::vector<std::string>& lines) :
+        Loader(info),
         _lines(lines)
     {
     }
 
-    SWCLoader::SWCLoader(std::vector<std::string>&& lines) :
+    SWCLoader::SWCLoader(const LoaderCreateInfo& info, std::vector<std::string>&& lines) :
+        Loader(info),
         _lines(std::move(lines))
     {
     }
 
-    SWCLoader::SWCLoader(std::istream& stream)
+    SWCLoader::SWCLoader(const LoaderCreateInfo& info, std::istream& stream) :
+        Loader(info)
     {
         std::string line;
         while (std::getline(stream, line)) {
@@ -48,7 +51,8 @@ namespace mindset
         }
     }
 
-    SWCLoader::SWCLoader(const std::filesystem::path& path)
+    SWCLoader::SWCLoader(const LoaderCreateInfo& info, const std::filesystem::path& path) :
+        Loader(info)
     {
         std::ifstream stream(path);
         std::string line;
@@ -176,19 +180,19 @@ namespace mindset
     LoaderFactory SWCLoader::createFactory()
     {
         return LoaderFactory(
-            SWC_LOADER_ID, SWC_LOADER_NAME, false,
+            SWC_LOADER_ID, SWC_LOADER_NAME, false, {},
             [](const std::string& name) {
                 std::string extension = std::filesystem::path(name).extension().string();
                 return extension == ".swc";
             },
-            [](LoaderFactory::FileProvider, const std::filesystem::path& path) {
-                return LoaderFactory::FactoryResult(std::make_unique<SWCLoader>(path));
+            [](const LoaderCreateInfo& info, const std::filesystem::path& path) {
+                return FactoryResult(std::make_unique<SWCLoader>(info, path));
             },
-            [](LoaderFactory::FileProvider, const std::vector<std::string>& lines) {
-                return LoaderFactory::FactoryResult(std::make_unique<SWCLoader>(lines));
+            [](const LoaderCreateInfo& info, const std::vector<std::string>& lines) {
+                return FactoryResult(std::make_unique<SWCLoader>(info, lines));
             },
-            [](LoaderFactory::FileProvider, std::istream& stream) {
-                return LoaderFactory::FactoryResult(std::make_unique<SWCLoader>(stream));
+            [](const LoaderCreateInfo& info, std::istream& stream) {
+                return FactoryResult(std::make_unique<SWCLoader>(info, stream));
             });
     }
 } // namespace mindset

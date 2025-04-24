@@ -2,6 +2,9 @@
 // Created by gaeqs on 14/03/25.
 //
 
+#include "mindset/EventSequence.h"
+#include "mindset/TimeGrid.h"
+
 #include <mindset/DefaultProperties.h>
 #include <mindset/loader/SnuddaLoader.h>
 #include <mindset/loader/SWCLoader.h>
@@ -13,33 +16,97 @@
 namespace
 {
     constexpr float METER_MICROMETER_RATIO = 1'000'000.0f;
-}
+
+    template<typename Collection>
+    std::optional<std::string> fetchValidGroup(const HighFive::File& file, const Collection& groups)
+    {
+        for (const auto& group : groups) {
+            if (file.exist(group)) {
+                return group;
+            }
+        }
+
+        return {};
+    }
+
+    std::optional<std::vector<uint64_t>> tryFetchUIDs(const HighFive::File& file, std::optional<std::string> idGroup)
+    {
+        std::vector<uint64_t> values;
+        if (idGroup.has_value()) {
+            // Fetch using the dataset group.
+            file.getDataSet(idGroup.value()).read(values);
+            return values;
+        }
+
+        // Check if it is an input or an output file
+        std::string groupName;
+        if (file.exist("neurons")) {
+            groupName = "neurons";
+        } else if (file.exist("input")) {
+            groupName = "input";
+        } else {
+            return {};
+        }
+
+        auto group = file.getGroup(groupName);
+        auto names = group.listObjectNames(HighFive::IndexType::NAME);
+        values.reserve(names.size());
+
+        for (auto& name : names) {
+            if (group.getObjectType(name) == HighFive::ObjectType::Group) {
+                uint64_t value;
+                auto result = std::from_chars(name.data(), name.data() + name.size(), value);
+                if (result.ec == std::errc()) {
+                    values.push_back(value);
+                }
+            }
+        }
+
+        return values;
+    }
+} // namespace
 
 namespace mindset
 {
 
-    SnuddaLoaderProperties SnuddaLoader::initProperties(Properties& properties) const
+    SnuddaLoaderProperties SnuddaLoader::initProperties(Properties& properties, const std::string& snuddaPath,
+                                                        std::vector<uint64_t> ids) const
     {
         SnuddaLoaderProperties result{};
+        result.snuddaPath = snuddaPath;
+        result.ids = std::move(ids);
+        result.loadMorphologies = getEnvironmentEntryOr(SNUDDA_LOADER_ENTRY_LOAD_MORPHOLOGY, false);
+        result.loadSynapses = getEnvironmentEntryOr(SNUDDA_LOADER_ENTRY_LOAD_SYNAPSES, false);
+        result.loadActivity = getEnvironmentEntryOr(SNUDDA_LOADER_ENTRY_LOAD_ACTIVITY, false);
 
-        if (_loadSynapses || _loadMorphology) {
+        result.positionGroup = fetchValidGroup(_file, SNUDDA_LOADER_VALID_POSITION_GROUPS);
+        result.rotationGroup = fetchValidGroup(_file, SNUDDA_LOADER_VALID_ROTATION_GROUPS);
+        result.morphologyGroup = fetchValidGroup(_file, SNUDDA_LOADER_VALID_MORPHOLOGY_GROUPS);
+
+        if (result.loadSynapses || result.loadMorphologies) {
             result.position = properties.defineProperty(PROPERTY_POSITION);
         }
 
-        if (_loadMorphology) {
+        if (result.loadMorphologies) {
             result.neuriteRadius = properties.defineProperty(PROPERTY_RADIUS);
             result.neuriteParent = properties.defineProperty(PROPERTY_PARENT);
             result.neuriteType = properties.defineProperty(PROPERTY_NEURITE_TYPE);
         }
 
-        if (_loadSynapses) {
+        if (result.loadSynapses) {
             result.synapsePreNeurite = properties.defineProperty(PROPERTY_SYNAPSE_PRE_NEURITE);
             result.synapsePostNeurite = properties.defineProperty(PROPERTY_SYNAPSE_POST_NEURITE);
             result.synapsePrePosition = properties.defineProperty(PROPERTY_SYNAPSE_PRE_POSITION);
             result.synapsePostPosition = properties.defineProperty(PROPERTY_SYNAPSE_POST_POSITION);
         }
 
+        if (result.loadActivity) {
+            result.activitySpikes = properties.defineProperty(PROPERTY_ACTIVITY_SPIKES);
+            result.activityVoltage = properties.defineProperty(PROPERTY_ACTIVITY_VOLTAGE);
+        }
+
         result.neuronTransform = properties.defineProperty(PROPERTY_TRANSFORM);
+
         return result;
     }
 
@@ -47,47 +114,79 @@ namespace mindset
                                    const std::unordered_map<std::string, std::shared_ptr<Morphology>>& morphologies,
                                    const SnuddaLoaderProperties& properties) const
     {
-        auto ids = _file.getDataSet("network/neurons/neuron_id").read<std::vector<uint64_t>>();
-        auto position = _file.getDataSet("network/neurons/position").read<std::vector<std::array<double, 3>>>();
-        auto rotation = _file.getDataSet("network/neurons/rotation").read<std::vector<std::array<double, 9>>>();
-        auto morphologiesNames = _file.getDataSet("network/neurons/morphology").read<std::vector<std::string>>();
+        auto& ids = properties.ids;
+        std::vector<std::array<double, 3>> positions;
+        std::vector<std::array<double, 9>> rotations;
+        std::vector<std::string> morphologiesNames;
+
+        if (properties.positionGroup.has_value()) {
+            _file.getDataSet(properties.positionGroup.value()).read(positions);
+        }
+        if (properties.rotationGroup.has_value()) {
+            _file.getDataSet(properties.rotationGroup.value()).read(rotations);
+        }
+        if (properties.morphologyGroup.has_value()) {
+            _file.getDataSet(properties.morphologyGroup.value()).read(morphologiesNames);
+        }
 
         for (size_t i = 0; i < ids.size(); ++i) {
-            rush::Vec3f pos(position[i][0], position[i][1], position[i][2]); // Position in meters
-            rush::Mat3f rot([array = rotation[i]](size_t c, size_t r) { return static_cast<float>(array[c + r * 3]); });
+            bool hasPosition = i < positions.size();
+            bool hasRotation = i < rotations.size();
+            bool hasMorphology = i < morphologiesNames.size();
 
-            rush::Mat4f model(rot, 1.0f);
-            model[3] = rush::Vec4f(pos * METER_MICROMETER_RATIO, 1.0f);
+            std::optional<NeuronTransform> transform = {};
+            std::shared_ptr<Morphology> morphology = nullptr;
+            if (hasPosition || hasRotation) {
+                rush::Mat4f model(1.0f);
+                if (hasRotation) {
+                    rush::Mat3f rot(
+                        [array = rotations[i]](size_t c, size_t r) { return static_cast<float>(array[c + r * 3]); });
+                    model = rush::Mat4f(rot, 1.0f);
+                }
 
-            auto morphologyName = morphologiesNames[i];
-            auto morphology = morphologies.find(morphologyName);
+                if (hasPosition) {
+                    rush::Vec3f pos(positions[i][0], positions[i][1], positions[i][2]); // Position in meters
+                    model[3] = rush::Vec4f(pos * METER_MICROMETER_RATIO, 1.0f);
+                }
+                transform = NeuronTransform(model);
+            }
+
+            if (hasMorphology) {
+                if (auto it = morphologies.find(morphologiesNames[i]); it != morphologies.end()) {
+                    morphology = it->second;
+                }
+            }
 
             auto presentNeuron = dataset.getNeuron(ids[i]);
             if (presentNeuron.has_value()) {
-                if (morphology != morphologies.end()) {
-                    presentNeuron.value()->setMorphology(morphology->second);
+                if (morphology != nullptr) {
+                    presentNeuron.value()->setMorphology(morphology);
                 }
-                presentNeuron.value()->setProperty(properties.neuronTransform, NeuronTransform(model));
+                if (transform.has_value()) {
+                    presentNeuron.value()->setProperty(properties.neuronTransform, transform.value());
+                }
             } else {
-                Neuron neuron(ids[i]);
-
-                if (morphology != morphologies.end()) {
-                    neuron.setMorphology(morphology->second);
+                Neuron neuron(ids[i], morphology);
+                if (transform.has_value()) {
+                    neuron.setProperty(properties.neuronTransform, transform.value());
                 }
-
-                neuron.setProperty(properties.neuronTransform, NeuronTransform(model));
                 dataset.addNeuron(std::move(neuron));
             }
         }
     }
 
     Result<std::unordered_map<std::string, std::shared_ptr<Morphology>>, std::string> SnuddaLoader::loadMorphologies(
-        Dataset& dataset) const
+        const SnuddaLoaderProperties& properties, Dataset& dataset) const
     {
-        static const std::string SNUDDA_PREFIX = "$SNUDDA_DATA";
+        static constexpr std::string SNUDDA_PREFIX = "$SNUDDA_DATA";
 
-        auto morphologies = _file.getDataSet("network/neurons/morphology").read<std::vector<std::string>>();
         std::unordered_map<std::string, std::shared_ptr<Morphology>> loaded;
+        if (!properties.morphologyGroup.has_value()) {
+            // This is not an error; it just happens that the dataset doesn't have morphologies!
+            return std::move(loaded);
+        }
+
+        auto morphologies = _file.getDataSet(properties.morphologyGroup.value()).read<std::vector<std::string>>();
 
         for (size_t i = 0; i < morphologies.size(); ++i) {
             auto& name = morphologies[i];
@@ -96,10 +195,10 @@ namespace mindset
             }
 
             std::string modified = name;
-            modified.replace(0, SNUDDA_PREFIX.length(), _dataPath.string());
+            modified.replace(0, SNUDDA_PREFIX.length(), properties.snuddaPath);
             std::filesystem::path path(modified);
 
-            SWCLoader loader(path);
+            SWCLoader loader(LoaderCreateInfo(), path);
 
             auto swc = loader.loadMorphology(dataset);
             if (!swc.isOk()) {
@@ -111,8 +210,7 @@ namespace mindset
         return std::move(loaded);
     }
 
-    std::optional<std::string> SnuddaLoader::loadSynapses(Dataset& dataset,
-                                                          const SnuddaLoaderProperties& properties) const
+    void SnuddaLoader::loadSynapses(Dataset& dataset, const SnuddaLoaderProperties& properties) const
     {
         using Syn = std::array<int32_t, 13>;
         auto voxelSize = static_cast<float>(_file.getDataSet("meta/voxel_size").read<double>());
@@ -188,46 +286,121 @@ namespace mindset
         for (auto& synapse : _synapses | std::views::values) {
             circuit.addSynapse(std::move(synapse));
         }
-
-        return {};
     }
 
-    SnuddaLoader::SnuddaLoader(const std::filesystem::path& path) :
-        _file(path.string(), HighFive::File::ReadOnly),
-        _dataPath(path.parent_path() / "data"),
-        _loadMorphology(true),
-        _loadSynapses(true)
+    void SnuddaLoader::loadOutputActivity(Dataset& dataset, const SnuddaLoaderProperties& properties) const
     {
+        if (!_file.exist("neurons")) {
+            return;
+        }
+        Activity activity(dataset.findSmallestAvailableActivityUID());
+        EventSequence<std::monostate> spikes;
+        TimeGrid<double> voltage(std::chrono::nanoseconds(25000));
+
+        std::vector<double> rawSpikes;
+        std::vector<double> rawVoltage;
+
+        rawSpikes.reserve(1000);
+        rawVoltage.reserve(400001);
+
+        for (UID id : properties.ids) {
+            std::string spikesDataset = std::format("neurons/{}/spikes", id);
+            std::string voltageDataset = std::format("neurons/{}/voltage", id);
+
+            if (_file.exist(spikesDataset)) {
+                _file.getDataSet(spikesDataset).read(rawSpikes);
+                for (double time : rawSpikes) {
+                    spikes.addEvent(id, std::chrono::duration<double>(time), std::monostate());
+                }
+            }
+
+            if (_file.exist(voltageDataset)) {
+                _file.getDataSet(voltageDataset).read(rawVoltage);
+                voltage.addTimeline(id, rawVoltage);
+            }
+        }
+
+        activity.setProperty(properties.activitySpikes, std::move(spikes));
+        activity.setProperty(properties.activityVoltage, std::move(voltage));
+        dataset.addActivity(std::move(activity));
     }
 
-    bool SnuddaLoader::shouldLoadMorphology() const
+    void SnuddaLoader::loadInputActivity(Dataset& dataset, const SnuddaLoaderProperties& properties) const
     {
-        return _loadMorphology;
+        if (!_file.exist("input")) {
+            return;
+        }
+        Activity activity(dataset.findSmallestAvailableActivityUID());
+        EventSequence<std::monostate> spikes;
+        TimeGrid<double> voltage(std::chrono::nanoseconds(25000));
+
+        std::vector<double> rawSpikes;
+        std::vector<double> rawVoltage;
+
+        rawSpikes.reserve(1000);
+        rawVoltage.reserve(400001);
+
+        for (UID id : properties.ids) {
+            std::string spikesDataset = std::format("input/{}/activity/spikes", id);
+
+            std::array tableSpikes = {std::format("input/{}/cortical/spikes", id),
+                                      std::format("input/{}/cortical_background/spikes", id),
+                                      std::format("input/{}/thalamic_background/spikes", id)};
+
+            if (_file.exist(spikesDataset)) {
+                _file.getDataSet(spikesDataset).read(rawSpikes);
+                for (double time : rawSpikes) {
+                    spikes.addEvent(id, std::chrono::duration<double>(time), std::monostate());
+                }
+            }
+
+            for (auto& set : tableSpikes) {
+                if (_file.exist(set)) {
+                    auto ds = _file.getDataSet(set);
+                    rawSpikes.resize( ds.getElementCount());
+                    ds.read(rawSpikes);
+                    for (double time : rawSpikes) {
+                        if (time > 0) {
+                            spikes.addEvent(id, std::chrono::duration<double>(time), std::monostate());
+                        }
+                    }
+                }
+            }
+        }
+
+        activity.setProperty(properties.activitySpikes, std::move(spikes));
+        dataset.addActivity(std::move(activity));
     }
 
-    void SnuddaLoader::setLoadMorphology(bool loadMorphology)
+    SnuddaLoader::SnuddaLoader(const LoaderCreateInfo& info, const std::filesystem::path& path) :
+        Loader(info),
+        _file(path.string(), HighFive::File::ReadOnly)
     {
-        _loadMorphology = loadMorphology;
-    }
-
-    bool SnuddaLoader::shouldLoadSynapses() const
-    {
-        return _loadSynapses;
-    }
-
-    void SnuddaLoader::setLoadSynapses(bool loadSynapses)
-    {
-        _loadSynapses = loadSynapses;
     }
 
     void SnuddaLoader::load(Dataset& dataset) const
     {
-        SnuddaLoaderProperties properties = initProperties(dataset.getProperties());
+        constexpr size_t STAGES = 6;
+        invoke({LoaderStatusType::LOADING, "Fetching properties", STAGES, 0});
+
+        auto path = getEnvironmentEntry<std::string>(SNUDDA_LOADER_ENTRY_SNUDDA_DATA_PATH);
+        if (!path.has_value()) {
+            invoke({LoaderStatusType::LOADING_ERROR, "Snudda path not set.", STAGES, 0});
+            return;
+        }
+
+        auto ids = tryFetchUIDs(_file, fetchValidGroup(_file, SNUDDA_LOADER_VALID_ID_GROUPS));
+        if (!ids.has_value()) {
+            invoke({LoaderStatusType::LOADING_ERROR, "Neuron ids not present.", STAGES, 0});
+            return;
+        }
+
+        auto properties = initProperties(dataset.getProperties(), *path.value(), std::move(ids.value()));
 
         std::unordered_map<std::string, std::shared_ptr<Morphology>> morphologies;
-
-        if (_loadMorphology) {
-            auto result = loadMorphologies(dataset);
+        if (properties.loadMorphologies) {
+            invoke({LoaderStatusType::LOADING, "Loading morphologies", STAGES, 1});
+            auto result = loadMorphologies(properties, dataset);
             if (!result.isOk()) {
                 std::cerr << result.getError() << std::endl;
                 return;
@@ -236,27 +409,58 @@ namespace mindset
             morphologies = std::move(result.getResult());
         }
 
+        invoke({LoaderStatusType::LOADING, "Loading neurons", STAGES, 2});
         loadNeurons(dataset, morphologies, properties);
 
-        if (_loadSynapses) {
-            auto error = loadSynapses(dataset, properties);
-            if (error.has_value()) {
-                std::cerr << error.value() << std::endl;
-                return;
-            }
+        if (properties.loadSynapses) {
+            invoke({LoaderStatusType::LOADING, "Loading synapses", STAGES, 3});
+            loadSynapses(dataset, properties);
         }
+
+        if (properties.loadActivity) {
+            invoke({LoaderStatusType::LOADING, "Loading input activity", STAGES, 4});
+            loadInputActivity(dataset, properties);
+            invoke({LoaderStatusType::LOADING, "Loading output activity", STAGES, 5});
+            loadOutputActivity(dataset, properties);
+        }
+
+        invoke({LoaderStatusType::DONE, "Done", STAGES, STAGES});
     }
 
     LoaderFactory SnuddaLoader::createFactory()
     {
+        auto path = getenv("SNUDDA_DATA");
+        std::vector<LoaderEnvironmentEntry> entries = {
+            {.name = SNUDDA_LOADER_ENTRY_SNUDDA_DATA_PATH,
+             .displayName = "Snudda data path",
+             .type = typeid(std::string),
+             .defaultValue = path == nullptr ? std::optional<std::string>() : std::optional<std::string>(path),
+             .hint = {}},
+            { .name = SNUDDA_LOADER_ENTRY_LOAD_MORPHOLOGY,
+             .displayName = "Load morphology",
+             .type = typeid(bool),
+             .defaultValue = true,
+             .hint = {}},
+            {   .name = SNUDDA_LOADER_ENTRY_LOAD_SYNAPSES,
+             .displayName = "Load synapses",
+             .type = typeid(bool),
+             .defaultValue = true,
+             .hint = {}},
+            {   .name = SNUDDA_LOADER_ENTRY_LOAD_ACTIVITY,
+             .displayName = "Load activity",
+             .type = typeid(bool),
+             .defaultValue = true,
+             .hint = {}},
+        };
+
         return LoaderFactory(
-            SNUDDA_LOADER_ID, SNUDDA_LOADER_NAME, false,
+            SNUDDA_LOADER_ID, SNUDDA_LOADER_NAME, false, entries,
             [](const std::string& name) {
                 std::string extension = std::filesystem::path(name).extension().string();
                 return extension == ".h5" || extension == ".hdf5";
             },
-            [](LoaderFactory::FileProvider, const std::filesystem::path& path) {
-                return LoaderFactory::FactoryResult(std::make_unique<SnuddaLoader>(path));
+            [](const LoaderCreateInfo& info, const std::filesystem::path& path) {
+                return FactoryResult(std::make_unique<SnuddaLoader>(info, path));
             });
     }
 } // namespace mindset

@@ -69,22 +69,22 @@ namespace
 
 namespace mindset
 {
-    XMLLoader::XMLLoader(FileProvider provider, const void* data, size_t size) :
-        _fileProvider(provider)
+    XMLLoader::XMLLoader(const LoaderCreateInfo& info, const void* data, size_t size) :
+        Loader(info)
     {
         auto result = _doc.load_buffer(data, size);
         _valid = result.status == pugi::status_ok;
     }
 
-    XMLLoader::XMLLoader(FileProvider provider, std::istream& stream) :
-        _fileProvider(provider)
+    XMLLoader::XMLLoader(const LoaderCreateInfo& info, std::istream& stream) :
+        Loader(info)
     {
         auto result = _doc.load(stream);
         _valid = result.status == pugi::status_ok;
     }
 
-    XMLLoader::XMLLoader(FileProvider provider, std::filesystem::path path) :
-        _fileProvider(provider)
+    XMLLoader::XMLLoader(const LoaderCreateInfo& info, std::filesystem::path path) :
+        Loader(info)
     {
         std::ifstream stream(path);
         auto result = _doc.load(stream);
@@ -101,7 +101,7 @@ namespace mindset
             invoke({LoaderStatusType::LOADING_ERROR, "Parser is not valid", STAGES, 0});
             return;
         }
-        if (!_fileProvider) {
+        if (!getFileProvider()) {
             std::cerr << "Filesystem is not set" << std::endl;
             invoke({LoaderStatusType::LOADING_ERROR, "Filesystem is not set", STAGES, 0});
             return;
@@ -208,13 +208,13 @@ namespace mindset
             }
 
             auto fileName = std::string(fileAtt.as_string(""));
-            auto lines = _fileProvider(fileName);
+            auto lines = getFileProvider()(fileName);
 
             if (!lines.has_value()) {
                 std::cerr << "File not found: " << fileName << std::endl;
             };
 
-            auto loader = SWCLoader(lines.value());
+            auto loader = SWCLoader(LoaderCreateInfo(), lines.value());
             auto swcResult = loader.loadMorphology(dataset);
             if (!swcResult.isOk()) {
                 auto error = "Error loading SWC file '" + fileName + "': " + swcResult.getError();
@@ -260,17 +260,17 @@ namespace mindset
     LoaderFactory XMLLoader::createFactory()
     {
         return LoaderFactory(
-            SWC_LOADER_ID, SWC_LOADER_NAME, true,
+            SWC_LOADER_ID, SWC_LOADER_NAME, true, {},
             [](const std::string& name) {
                 std::string extension = std::filesystem::path(name).extension().string();
                 return extension == ".xml";
             },
-            [](LoaderFactory::FileProvider provider, const std::filesystem::path& path) {
-                return LoaderFactory::FactoryResult(std::make_unique<XMLLoader>(provider, path));
+            [](const LoaderCreateInfo& info, const std::filesystem::path& path) {
+                return FactoryResult(std::make_unique<XMLLoader>(info, path));
             },
             nullptr,
-            [](LoaderFactory::FileProvider provider, std::istream& stream) {
-                return LoaderFactory::FactoryResult(std::make_unique<XMLLoader>(provider, stream));
+            [](const LoaderCreateInfo& info, std::istream& stream) {
+                return FactoryResult(std::make_unique<XMLLoader>(info, stream));
             });
     }
 } // namespace mindset

@@ -13,7 +13,8 @@
 
 namespace mindset
 {
-    MorphoIOLoader::MorphoIOLoader(std::filesystem::path path) :
+    MorphoIOLoader::MorphoIOLoader(const LoaderCreateInfo& info, std::filesystem::path path) :
+        Loader(info),
         _path(std::move(path))
     {
     }
@@ -98,13 +99,13 @@ namespace mindset
     LoaderFactory MorphoIOLoader::createFactory()
     {
         return LoaderFactory(
-            MORPHO_IO_LOADER_ID, MORPHO_IO_LOADER_NAME, false,
+            MORPHO_IO_LOADER_ID, MORPHO_IO_LOADER_NAME, false, {},
             [](const std::string& name) {
                 std::string extension = std::filesystem::path(name).extension().string();
                 return extension == ".h5" || extension == ".swc" || extension == ".arc" || extension == ".hdf5";
             },
-            [](LoaderFactory::FileProvider, const std::filesystem::path& path) {
-                return LoaderFactory::FactoryResult(std::make_unique<MorphoIOLoader>(path));
+            [](const LoaderCreateInfo& info, const std::filesystem::path& path) {
+                return FactoryResult(std::make_unique<MorphoIOLoader>(info, path));
             });
     }
 } // namespace mindset

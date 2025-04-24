@@ -14,9 +14,14 @@ TEST_CASE("Snudda load")
         return;
     }
 
+    auto factory = mindset::SnuddaLoader::createFactory();
+    auto result = factory.create(nullptr, {}, cPath);
+    REQUIRE(result.isOk());
+
+    auto loader = std::move(result.getResult());
+
     mindset::Dataset dataset;
-    mindset::SnuddaLoader loader(cPath);
-    loader.load(dataset);
+    loader->load(dataset);
 
     auto& props = dataset.getProperties();
 
@@ -77,11 +82,14 @@ TEST_CASE("Snudda activity load")
         return;
     }
 
-    mindset::Dataset dataset;
-    mindset::SnuddaActivityLoader loader(cPath);
-    loader.setLoadMorphology(false);
-    loader.load(dataset);
+    auto factory = mindset::SnuddaLoader::createFactory();
+    auto result = factory.create(nullptr, {}, cPath);
+    REQUIRE(result.isOk());
 
+    auto loader = std::move(result.getResult());
+
+    mindset::Dataset dataset;
+    loader->load(dataset);
     auto& props = dataset.getProperties();
 
     auto spikesProp = props.getPropertyUID(mindset::PROPERTY_ACTIVITY_SPIKES);
