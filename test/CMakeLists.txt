@@ -20,3 +20,10 @@ add_custom_command(
         ${CMAKE_CURRENT_SOURCE_DIR}/data
         ${CMAKE_CURRENT_BINARY_DIR}/data
 )
+
+
+project(mindset-test)
+set(CMAKE_CXX_STANDARD 20)
+add_executable(mindset-test test.cpp)
+add_dependencies(mindset-test mindset)
+target_link_libraries(mindset-test PRIVATE mindset Catch2::Catch2WithMain)

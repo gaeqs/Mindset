@@ -8,16 +8,29 @@
     #include <mindset/DefaultProperties.h>
 
     #include <mindset/loader/BlueConfigLoader.h>
-    #include <mindset/util/NeuronTransform.h>
     #include <rush/vector/vec.h>
 
 TEST_CASE("Brion load")
 {
-    std::filesystem::path path = "/run/media/gaeqs/HDD/SynCoPaData/build/vizCa2p0_1x7/BlueConfig";
+    auto cPath = getenv("BLUE_CONFIG_DATA");
+    if (cPath == nullptr) {
+        FAIL("BLUE_CONFIG_DATA environment variable not set.");
+        return;
+    }
+    auto target = getenv("BLUE_CONFIG_TARGET");
+    if (target == nullptr) {
+        FAIL("BLUE_CONFIG_TARGET environment variable not set.");
+        return;
+    }
+
+    std::filesystem::path path = cPath;
 
     auto factory = mindset::BlueConfigLoader::createFactory();
 
-    auto result = factory.create(nullptr, {}, path);
+    mindset::Environment env;
+    env.insert({mindset::BLUE_CONFIG_LOADER_ENTRY_TARGETS, std::vector<std::string>{target}});
+
+    auto result = factory.create(nullptr, env, path);
     if (!result.isOk()) {
         FAIL();
     }
@@ -63,14 +76,14 @@ TEST_CASE("Brion load")
 
     std::cout << "Loaded synapses: " << dataset.getCircuit().getSynapses().size() << std::endl;
 
-
     size_t synapseIndex = 0;
     for (auto synapse : dataset.getCircuit().getSynapses() | dataset) {
-
         auto pre = synapse.getProperty<mindset::UID>(mindset::PROPERTY_SYNAPSE_PRE_NEURITE);
         auto post = synapse.getProperty<mindset::UID>(mindset::PROPERTY_SYNAPSE_POST_NEURITE);
 
-        if (!pre || !post) continue;
+        if (!pre || !post) {
+            continue;
+        }
 
         std::cout << "Synapse UID " << synapse->getUID() << std::endl;
         std::cout << "Synapse pre " << synapse->getPreSynapticNeuron() << std::endl;
@@ -78,10 +91,18 @@ TEST_CASE("Brion load")
         std::cout << "Synapse post " << synapse->getPostSynapticNeuron() << std::endl;
         std::cout << "Synapse post section " << post.value() << std::endl;
         std::cout << "Synapse position " << synapse.getPosition().value_or(rush::Vec3f(0.0f)) << std::endl;
-        std::cout << "Synapse pre pos " << synapse.getProperty<rush::Vec3f>(mindset::PROPERTY_SYNAPSE_PRE_POSITION).value_or(rush::Vec3f(0.0f)) << std::endl;
-        std::cout << "Synapse post pos " << synapse.getProperty<rush::Vec3f>(mindset::PROPERTY_SYNAPSE_POST_POSITION).value_or(rush::Vec3f(0.0f)) << std::endl;
+        std::cout
+            << "Synapse pre pos "
+            << synapse.getProperty<rush::Vec3f>(mindset::PROPERTY_SYNAPSE_PRE_POSITION).value_or(rush::Vec3f(0.0f))
+            << std::endl;
+        std::cout
+            << "Synapse post pos "
+            << synapse.getProperty<rush::Vec3f>(mindset::PROPERTY_SYNAPSE_POST_POSITION).value_or(rush::Vec3f(0.0f))
+            << std::endl;
 
-        if (synapseIndex++ > 100) break;
+        if (synapseIndex++ > 100) {
+            break;
+        }
     }
 }
 
