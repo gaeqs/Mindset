@@ -46,6 +46,10 @@ if (MINDSET_USE_BRION)
         )
         FetchContent_MakeAvailable(brion)
     endif ()
+    if (TARGET morphio_obj)
+        target_precompile_headers(morphio_obj PUBLIC <cstdint>)
+    endif ()
+
     list(APPEND LIBRARIES Brion Brain)
 else ()
     # Import HighFive. Do not import if Brion is used.
@@ -65,7 +69,7 @@ list(APPEND LIBRARIES pugixml)
 
 # Create version.h
 
-if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
+if (EXISTS "${CMAKE_SOURCE_DIR}/.git")
     execute_process(
             COMMAND git rev-parse --short HEAD
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -73,9 +77,9 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
             OUTPUT_STRIP_TRAILING_WHITESPACE
             ERROR_QUIET
     )
-else()
+else ()
     set(GIT_COMMIT "unknown")
-endif()
+endif ()
 
 configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.h.in
