@@ -5,6 +5,7 @@
 #ifndef VERSIONED_H
 #define VERSIONED_H
 
+#include <atomic>
 #include <cstdint>
 
 namespace mindset
@@ -18,7 +19,7 @@ namespace mindset
      */
     class Versioned
     {
-        uint64_t _version;
+        std::atomic_uint64_t _version;
 
       public:
         /**
