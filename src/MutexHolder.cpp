@@ -12,6 +12,17 @@ namespace mindset
     {
     }
 
+    MutexHolder::MutexHolder(const MutexHolder&) :
+        _mutex(std::make_unique<std::shared_mutex>())
+    {
+    }
+
+    MutexHolder& MutexHolder::operator=(const MutexHolder&)
+    {
+        // Use the same mutex.
+        return *this;
+    }
+
     std::shared_lock<std::shared_mutex> MutexHolder::readLock() const
     {
         return std::shared_lock(*_mutex);

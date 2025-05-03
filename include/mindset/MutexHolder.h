@@ -34,8 +34,8 @@ namespace mindset
         MutexHolder(MutexHolder&& other) = default;
         MutexHolder& operator=(MutexHolder&& other) = default;
 
-        MutexHolder(const MutexHolder&) = delete;
-        MutexHolder& operator=(const MutexHolder&) = delete;
+        MutexHolder(const MutexHolder&);
+        MutexHolder& operator=(const MutexHolder&);
 
         /**
          * Acquires a read lock on the `shared_mutex` managed by the `MutexHolder`.
