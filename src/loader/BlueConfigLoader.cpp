@@ -101,9 +101,11 @@ namespace
 
 namespace mindset
 {
-    BlueConfigLoaderProperties BlueConfigLoader::initProperties(Properties& properties, bool shouldLoadMorphologies,
+    BlueConfigLoaderProperties BlueConfigLoader::initProperties(Dataset& dataset, bool shouldLoadMorphologies,
                                                                 bool shouldLoadSynapses, bool shouldLoadHierarchy) const
     {
+        auto lock = dataset.writeLock();
+        auto& properties = dataset.getProperties();
         BlueConfigLoaderProperties result{};
 
         // Used for neurites and synapses.
@@ -152,9 +154,11 @@ namespace mindset
         auto uris = circuit.getMorphologyURIs(ids);
 
         size_t index = 0;
+        auto lock = dataset.writeLock();
         for (UID id : ids) {
             UID layer = std::stoi(layers[index]);
             if (auto presentNeuron = dataset.getNeuron(id)) {
+                auto neuronLock = presentNeuron.value()->writeLock();
                 presentNeuron.value()->setProperty(properties.neuronTransform, NeuronTransform(transforms[index]));
                 presentNeuron.value()->setProperty(properties.neuronLayer, layer);
 
@@ -272,6 +276,7 @@ namespace mindset
             result.setProperty(properties.synapseDecay, synapse.getDecay());
             result.setProperty(properties.synapseEfficacy, synapse.getEfficacy());
 
+            auto lock = outCircuit.writeLock();
             outCircuit.addSynapse(std::move(result));
         }
     }
@@ -302,6 +307,7 @@ namespace mindset
                     }
                 }
 
+                auto lock = neuron.value()->writeLock();
                 neuron.value()->setProperty(properties.neuronColumn, column);
                 neuron.value()->setProperty(properties.neuronMiniColumn, miniColumn);
             }
@@ -411,8 +417,7 @@ namespace mindset
 
         invoke({LoaderStatusType::LOADING, "Defining properties", STAGES, 1});
 
-        auto properties =
-            initProperties(dataset.getProperties(), shouldLoadMorphologies, shouldLoadSynapses, shouldLoadHierarchy);
+        auto properties = initProperties(dataset, shouldLoadMorphologies, shouldLoadSynapses, shouldLoadHierarchy);
 
         invoke({LoaderStatusType::LOADING, "Loading global neuron data", STAGES, 2});
 

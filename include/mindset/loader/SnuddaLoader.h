@@ -89,7 +89,7 @@ namespace mindset
     {
         HighFive::File _file;
 
-        SnuddaLoaderProperties initProperties(Properties& properties, const std::string& snuddaPath,
+        SnuddaLoaderProperties initProperties(Dataset& dataset, const std::string& snuddaPath,
                                               std::vector<uint64_t> ids) const;
 
         void loadNeurons(Dataset& dataset,

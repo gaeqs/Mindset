@@ -232,7 +232,9 @@ namespace mindset
                 }
                 auto& xml = it->second;
 
+                auto lock = dataset.writeLock();
                 if (auto presentNeuron = dataset.getNeuron(xml.id)) {
+                    auto neuronLock = presentNeuron.value()->writeLock();
                     presentNeuron.value()->setMorphology(swc);
                     if (xml.transform.has_value()) {
                         presentNeuron.value()->setProperty(transformProp, xml.transform.value());

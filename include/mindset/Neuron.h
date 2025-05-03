@@ -7,6 +7,7 @@
 
 #include <memory>
 
+#include <mindset/MutexHolder.h>
 #include <mindset/Identifiable.h>
 #include <mindset/PropertyHolder.h>
 #include <mindset/Morphology.h>
@@ -18,7 +19,7 @@ namespace mindset
      *
      * This representation usually stores atemporal data.
      */
-    class Neuron : public Identifiable, public PropertyHolder
+    class Neuron : public Identifiable, public PropertyHolder, public MutexHolder
     {
         std::shared_ptr<Morphology> _morphology;
 
@@ -48,4 +49,4 @@ namespace mindset
     };
 } // namespace mindset
 
-#endif //NEURON_H
+#endif // NEURON_H

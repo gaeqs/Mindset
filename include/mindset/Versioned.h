@@ -19,7 +19,7 @@ namespace mindset
      */
     class Versioned
     {
-        std::atomic_uint64_t _version;
+        std::uint64_t _version;
 
       public:
         /**

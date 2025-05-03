@@ -65,11 +65,11 @@ namespace
         return values;
     }
 
-    std::vector<std::string> readMorphologies(const HighFive::File& file, std::string group)
+    std::vector<std::string> readMorphologies(const HighFive::File& file, const std::string& group)
     {
         try {
             return file.getDataSet(group).read<std::vector<std::string>>();
-        } catch (HighFive::DataSetException& e) {
+        } catch (HighFive::DataSetException&) {
             // Read it using fixed strings.
             auto raw = file.getDataSet(group).read<HighFive::FixedLenStringArray<1024>>();
             std::vector<std::string> result;
@@ -85,7 +85,7 @@ namespace
 namespace mindset
 {
 
-    SnuddaLoaderProperties SnuddaLoader::initProperties(Properties& properties, const std::string& snuddaPath,
+    SnuddaLoaderProperties SnuddaLoader::initProperties(Dataset& dataset, const std::string& snuddaPath,
                                                         std::vector<uint64_t> ids) const
     {
         SnuddaLoaderProperties result{};
@@ -102,6 +102,9 @@ namespace mindset
         result.voxelSizeGroup = fetchValidGroup(_file, SNUDDA_LOADER_VALID_VOXEL_SIZE_GROUPS);
         result.synapsesGroup = fetchValidGroup(_file, SNUDDA_LOADER_VALID_SYNAPSES_GROUPS);
         result.simulationOrigoGroup = fetchValidGroup(_file, SNUDDA_LOADER_VALID_SIMULATION_ORIGO_GROUPS);
+
+        auto lock = dataset.writeLock();
+        auto& properties = dataset.getProperties();
 
         if (result.loadSynapses || result.loadMorphologies) {
             result.position = properties.defineProperty(PROPERTY_POSITION);
@@ -177,8 +180,10 @@ namespace mindset
                 }
             }
 
+            auto lock = dataset.writeLock();
             auto presentNeuron = dataset.getNeuron(ids[i]);
             if (presentNeuron.has_value()) {
+                auto neuronLock = presentNeuron.value()->writeLock();
                 if (morphology != nullptr) {
                     presentNeuron.value()->setMorphology(morphology);
                 }
@@ -308,6 +313,7 @@ namespace mindset
         }
 
         auto& circuit = dataset.getCircuit();
+        auto lock = circuit.writeLock();
         for (auto& synapse : _synapses | std::views::values) {
             circuit.addSynapse(std::move(synapse));
         }
@@ -318,7 +324,6 @@ namespace mindset
         if (!_file.exist("neurons")) {
             return;
         }
-        Activity activity(dataset.findSmallestAvailableActivityUID());
         EventSequence<std::monostate> spikes;
         TimeGrid<double> voltage(std::chrono::nanoseconds(25000));
 
@@ -345,6 +350,8 @@ namespace mindset
             }
         }
 
+        auto lock = dataset.writeLock();
+        Activity activity(dataset.findSmallestAvailableActivityUID());
         activity.setProperty(properties.activitySpikes, std::move(spikes));
         activity.setProperty(properties.activityVoltage, std::move(voltage));
         dataset.addActivity(std::move(activity));
@@ -355,15 +362,12 @@ namespace mindset
         if (!_file.exist("input")) {
             return;
         }
-        Activity activity(dataset.findSmallestAvailableActivityUID());
         EventSequence<std::monostate> spikes;
         TimeGrid<double> voltage(std::chrono::nanoseconds(25000));
 
         std::vector<double> rawSpikes;
-        std::vector<double> rawVoltage;
 
         rawSpikes.reserve(1000);
-        rawVoltage.reserve(400001);
 
         for (UID id : properties.ids) {
             std::string spikesDataset = std::format("input/{}/activity/spikes", id);
@@ -393,6 +397,8 @@ namespace mindset
             }
         }
 
+        auto lock = dataset.writeLock();
+        Activity activity(dataset.findSmallestAvailableActivityUID());
         activity.setProperty(properties.activitySpikes, std::move(spikes));
         dataset.addActivity(std::move(activity));
     }
@@ -420,7 +426,7 @@ namespace mindset
             return;
         }
 
-        auto properties = initProperties(dataset.getProperties(), *path.value(), std::move(ids.value()));
+        auto properties = initProperties(dataset, *path.value(), std::move(ids.value()));
 
         std::unordered_map<std::string, std::shared_ptr<Morphology>> morphologies;
         if (properties.loadMorphologies) {

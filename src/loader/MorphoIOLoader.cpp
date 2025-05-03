@@ -36,10 +36,12 @@ namespace mindset
         invoke({LoaderStatusType::LOADING, "Defining properties", STAGES, 1});
 
         auto& properties = dataset.getProperties();
+        auto propLock = dataset.writeLock();
         auto propPosition = properties.defineProperty(PROPERTY_POSITION);
         auto propRadius = properties.defineProperty(PROPERTY_RADIUS);
         auto propParent = properties.defineProperty(PROPERTY_PARENT);
         auto propType = properties.defineProperty(PROPERTY_NEURITE_TYPE);
+        propLock.unlock();
 
         invoke({LoaderStatusType::LOADING, "Parsing neurites", STAGES, 2});
 
@@ -87,11 +89,15 @@ namespace mindset
 
         invoke({LoaderStatusType::LOADING, "Creating neuron", STAGES, 4});
 
-        UID uid = _provider == nullptr ? 0 : _provider();
-        if (auto neuron = dataset.getNeuron(uid)) {
-            neuron.value()->setMorphology(std::move(result));
-        } else {
-            dataset.addNeuron(Neuron(uid, std::move(result)));
+        {
+            UID uid = _provider == nullptr ? 0 : _provider();
+            auto lock = dataset.writeLock();
+            if (auto neuron = dataset.getNeuron(uid)) {
+                auto neuronLock = neuron.value()->writeLock();
+                neuron.value()->setMorphology(std::move(result));
+            } else {
+                dataset.addNeuron(Neuron(uid, std::move(result)));
+            }
         }
         invoke({LoaderStatusType::DONE, "Done", STAGES, 5});
     }

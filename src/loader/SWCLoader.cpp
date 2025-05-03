@@ -75,11 +75,13 @@ namespace mindset
         invoke({LoaderStatusType::LOADING, "Defining properties", STAGES, 0});
 
         // Define properties
+        auto lock = dataset.writeLock();
         auto& properties = dataset.getProperties();
         auto propPosition = properties.defineProperty(PROPERTY_POSITION);
         auto propRadius = properties.defineProperty(PROPERTY_RADIUS);
         auto propParent = properties.defineProperty(PROPERTY_PARENT);
         auto propType = properties.defineProperty(PROPERTY_NEURITE_TYPE);
+        lock.unlock();
 
         invoke({LoaderStatusType::LOADING, "Parsing SWC file", STAGES, 1});
 
@@ -170,7 +172,9 @@ namespace mindset
         }
 
         UID uid = _provider == nullptr ? 0 : _provider();
+        auto lock = dataset.writeLock();
         if (auto neuron = dataset.getNeuron(uid)) {
+            auto neuronLock = neuron.value()->writeLock();
             neuron.value()->setMorphology(result.getResult());
         } else {
             dataset.addNeuron(Neuron(uid, result.getResult()));

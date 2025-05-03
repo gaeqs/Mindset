@@ -11,6 +11,7 @@
 #include <mindset/Soma.h>
 #include <mindset/Versioned.h>
 #include <mindset/MorphologyTree.h>
+#include <mindset/MutexHolder.h>
 
 namespace mindset
 {
@@ -18,7 +19,7 @@ namespace mindset
      * The Morphology class represents the structural morphology of a neuron,
      * including its soma and neurites.
      */
-    class Morphology : public Versioned
+    class Morphology : public Versioned, public MutexHolder
     {
         std::optional<Soma> _soma;
         std::unordered_map<UID, Neurite> _neurites;

@@ -57,7 +57,7 @@ namespace mindset
     {
         brion::BlueConfig _blueConfig;
 
-        BlueConfigLoaderProperties initProperties(Properties& properties, bool shouldLoadMorphologies,
+        BlueConfigLoaderProperties initProperties(Dataset& dataset, bool shouldLoadMorphologies,
                                                   bool shouldLoadSynapses, bool shouldLoadHierarchy) const;
 
         static void loadNeurons(Dataset& dataset, const BlueConfigLoaderProperties& properties,

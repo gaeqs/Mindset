@@ -18,6 +18,7 @@
 #include <mindset/Circuit.h>
 #include <mindset/Context.h>
 #include <mindset/Activity.h>
+#include <mindset/MutexHolder.h>
 
 namespace mindset
 {
@@ -27,7 +28,7 @@ namespace mindset
      * This class encapsulates all essential elements of a neural scene representation, including neurons,
      * their associated properties, circuit definitions, activitys and an optional hierarchical structure.
      */
-    class Dataset final : public Versioned, public Context
+    class Dataset final : public Versioned, public Context, public MutexHolder
     {
         std::unordered_map<UID, Neuron> _neurons;
         Properties _properties;
@@ -55,7 +56,7 @@ namespace mindset
         void reserveSpaceForNeurons(size_t amount);
 
         /**
-         * Returns the amount of neurons inside this dataset.
+         * Returns the number of neurons inside this dataset.
          */
         [[nodiscard]] size_t getNeuronsAmount() const;
 

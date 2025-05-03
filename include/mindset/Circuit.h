@@ -12,6 +12,7 @@
 
 #include <mindset/Synapse.h>
 #include <mindset/Versioned.h>
+#include <mindset/MutexHolder.h>
 
 namespace mindset
 {
@@ -20,7 +21,7 @@ namespace mindset
      *
      * It manages synaptic connections, providing efficient access to pre- and post-synaptic relations.
      */
-    class Circuit : public Versioned
+    class Circuit : public Versioned, public MutexHolder
     {
         std::unordered_map<UID, Synapse> _synapses;
         std::unordered_multimap<UID, UID> _preSynapses;

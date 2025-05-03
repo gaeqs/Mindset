@@ -33,6 +33,7 @@ target_sources(mindset PRIVATE
         MorphologyTree.cpp
         MorphologyTreeSection.cpp
         Activity.cpp
+        MutexHolder.cpp
 
         util/NeuronTransform.cpp
         util/MorphologyUtils.cpp

@@ -5,6 +5,7 @@
 #ifndef SIMULATION_H
 #define SIMULATION_H
 
+#include <mindset/MutexHolder.h>
 #include <mindset/Identifiable.h>
 #include <mindset/PropertyHolder.h>
 
@@ -14,9 +15,9 @@ namespace mindset
     /**
      * Collection of temporal data.
      */
-    class Activity : public Identifiable, public PropertyHolder
+    class Activity : public Identifiable, public PropertyHolder, public MutexHolder
     {
-    public:
+      public:
         explicit Activity(UID uid);
     };
 
