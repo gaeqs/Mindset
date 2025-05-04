@@ -146,6 +146,6 @@ install(
 )
 
 install(
-        DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/mindset
+        DIRECTORY ${CMAKE_BINARY_DIR}/generated/mindset
         DESTINATION include
 )
