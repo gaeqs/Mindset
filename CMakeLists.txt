@@ -53,14 +53,6 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(hey)
 
-FetchContent_Declare(
-        HighFive
-        GIT_REPOSITORY https://github.com/BlueBrain/HighFive.git
-        GIT_TAG v2.7.1
-)
-
-FetchContent_MakeAvailable(HighFive)
-
 # Import Brion
 if (MINDSET_USE_BRION)
     if (NOT MINDSET_EXTERNAL_BRION)
@@ -78,6 +70,17 @@ if (MINDSET_USE_BRION)
     list(APPEND LIBRARIES Brion Brain)
 endif ()
 
+if (NOT TARGET HighFive)
+    FetchContent_Declare(
+            HighFive
+            GIT_REPOSITORY https://github.com/BlueBrain/HighFive.git
+            GIT_TAG v2.7.1
+    )
+
+    FetchContent_MakeAvailable(HighFive)
+else ()
+    set(EMBEDDED_SONATA TRUE)
+endif ()
 
 find_package(pugixml REQUIRED)
 
@@ -111,33 +114,35 @@ if (MINDSET_TESTS)
     add_subdirectory(test)
 endif ()
 
-# Installation and export
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-        "${CMAKE_CURRENT_BINARY_DIR}/MindsetConfigVersion.cmake"
-        VERSION ${PROJECT_VERSION}
-        COMPATIBILITY AnyNewerVersion
-)
+if (NOT EMBEDDED_SONATA)
+    # Installation and export
+    include(CMakePackageConfigHelpers)
+    write_basic_package_version_file(
+            "${CMAKE_CURRENT_BINARY_DIR}/MindsetConfigVersion.cmake"
+            VERSION ${PROJECT_VERSION}
+            COMPATIBILITY AnyNewerVersion
+    )
 
-install(
-        EXPORT MindsetTargets
-        FILE MindsetTargets.cmake
-        NAMESPACE Mindset::
-        DESTINATION lib/cmake/Mindset
-)
+    install(
+            EXPORT MindsetTargets
+            FILE MindsetTargets.cmake
+            NAMESPACE Mindset::
+            DESTINATION lib/cmake/Mindset
+    )
 
-configure_package_config_file(
-        "cmake/MindsetConfig.cmake.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/MindsetConfig.cmake"
-        INSTALL_DESTINATION lib/cmake/Mindset
-)
+    configure_package_config_file(
+            "cmake/MindsetConfig.cmake.in"
+            "${CMAKE_CURRENT_BINARY_DIR}/MindsetConfig.cmake"
+            INSTALL_DESTINATION lib/cmake/Mindset
+    )
 
-install(
-        FILES
-        "${CMAKE_CURRENT_BINARY_DIR}/MindsetConfig.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/MindsetConfigVersion.cmake"
-        DESTINATION lib/cmake/Mindset
-)
+    install(
+            FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/MindsetConfig.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/MindsetConfigVersion.cmake"
+            DESTINATION lib/cmake/Mindset
+    )
+endif ()
 
 # Install public headers
 install(
