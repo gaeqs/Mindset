@@ -31,7 +31,6 @@ option(MINDSET_TESTS "Include Mindset tests" ON)
 # Global parameters
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/appdir")
 set(MINDSET_GENERATED_DIR ${CMAKE_BINARY_DIR}/generated)
 set(MINDSET_SINGLE_HEADER_PATH ${CMAKE_BINARY_DIR}/generated/mindset/mindset.h)
 
