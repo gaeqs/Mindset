@@ -18,7 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 cmake_minimum_required(VERSION 3.16)
-project(Mindset LANGUAGES CXX VERSION 1.0.0)
+project(Mindset LANGUAGES CXX VERSION 1.0.1)
 
 include(FetchContent)
 
@@ -31,7 +31,7 @@ option(MINDSET_TESTS "Include Mindset tests" ON)
 # Global parameters
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
+set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/appdir")
 set(MINDSET_GENERATED_DIR ${CMAKE_BINARY_DIR}/generated)
 set(MINDSET_SINGLE_HEADER_PATH ${CMAKE_BINARY_DIR}/generated/mindset/mindset.h)
 
@@ -120,35 +120,33 @@ write_basic_package_version_file(
         COMPATIBILITY AnyNewerVersion
 )
 
-if (NOT MINDSET_USE_BRION)
-    install(
-            EXPORT MindsetTargets
-            FILE MindsetTargets.cmake
-            NAMESPACE Mindset::
-            DESTINATION lib/cmake/Mindset
-    )
+install(
+        EXPORT MindsetTargets
+        FILE MindsetTargets.cmake
+        NAMESPACE Mindset::
+        DESTINATION lib/cmake/Mindset
+)
 
-    configure_package_config_file(
-            "cmake/MindsetConfig.cmake.in"
-            "${CMAKE_CURRENT_BINARY_DIR}/MindsetConfig.cmake"
-            INSTALL_DESTINATION lib/cmake/Mindset
-    )
+configure_package_config_file(
+        "cmake/MindsetConfig.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/MindsetConfig.cmake"
+        INSTALL_DESTINATION lib/cmake/Mindset
+)
 
-    install(
-            FILES
-            "${CMAKE_CURRENT_BINARY_DIR}/MindsetConfig.cmake"
-            "${CMAKE_CURRENT_BINARY_DIR}/MindsetConfigVersion.cmake"
-            DESTINATION lib/cmake/Mindset
-    )
+install(
+        FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/MindsetConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/MindsetConfigVersion.cmake"
+        DESTINATION lib/cmake/Mindset
+)
 
-    # Install public headers
-    install(
-            DIRECTORY include/mindset
-            DESTINATION include
-    )
+# Install public headers
+install(
+        DIRECTORY include/mindset
+        DESTINATION include
+)
 
-    install(
-            DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/mindset
-            DESTINATION include
-    )
-endif ()
+install(
+        DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/mindset
+        DESTINATION include
+)
