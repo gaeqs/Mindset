@@ -1,0 +1,6 @@
+<component name="CopyrightManager">
+  <copyright>
+    <option name="notice" value="Copyright (c) &amp;#36;originalComment.match(&quot;Copyright \(c\) (\d+)&quot;, 1, &quot;-&quot;, &quot;&amp;#36;today.year&quot;)&amp;#36;today.year. VG-Lab/URJC.&#10;&#10;Authors: Gael Rial Costas &lt;gael.rial.costas@urjc.es&gt;&#10;&#10;This file is part of Mindset &lt;https://gitlab.gmrv.es/g.rial/mindset&gt;&#10;&#10;This library is free software; you can redistribute it and/or modify it under&#10;the terms of the GNU Lesser General Public License version 3.0 as published&#10;by the Free Software Foundation.&#10;&#10;This library is distributed in the hope that it will be useful, but WITHOUT&#10;ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS&#10;FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more&#10;details.&#10;&#10;You should have received a copy of the GNU Lesser General Public License&#10;along with this library; if not, write to the Free Software Foundation, Inc.,&#10;51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA." />
+    <option name="myName" value="Gael" />
+  </copyright>
+</component>
