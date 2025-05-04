@@ -20,7 +20,6 @@
 find_package(Catch2 REQUIRED)
 
 include(CTest)
-include(Catch)
 
 project(mindset-tests)
 set(CMAKE_CXX_STANDARD 20)

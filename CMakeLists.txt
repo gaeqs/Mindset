@@ -52,7 +52,14 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(hey)
-list(APPEND LIBRARIES hey)
+
+FetchContent_Declare(
+        HighFive
+        GIT_REPOSITORY https://github.com/BlueBrain/HighFive.git
+        GIT_TAG v2.7.1
+)
+
+FetchContent_MakeAvailable(HighFive)
 
 # Import Brion
 if (MINDSET_USE_BRION)
@@ -69,20 +76,13 @@ if (MINDSET_USE_BRION)
     endif ()
 
     list(APPEND LIBRARIES Brion Brain)
-else ()
-    # Import HighFive. Do not import if Brion is used.
-    FetchContent_Declare(
-            highfive
-            GIT_REPOSITORY https://github.com/BlueBrain/HighFive.git
-            GIT_TAG master
-    )
-
-    FetchContent_MakeAvailable(highfive)
 endif ()
-list(APPEND LIBRARIES HighFive)
 
-# Import pugiXML
+
 find_package(pugixml REQUIRED)
+
+list(APPEND LIBRARIES HighFive)
+list(APPEND LIBRARIES hey)
 list(APPEND LIBRARIES pugixml)
 
 # Create version.h
