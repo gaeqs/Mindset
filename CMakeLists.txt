@@ -33,6 +33,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(MINDSET_GENERATED_DIR ${CMAKE_BINARY_DIR}/generated)
 set(MINDSET_SINGLE_HEADER_PATH ${CMAKE_BINARY_DIR}/generated/mindset/mindset.h)
+set(EXTLIB_FROM_SUBMODULES ON) # For sonata
 
 # Import Rush
 FetchContent_Declare(
