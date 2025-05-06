@@ -18,7 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 cmake_minimum_required(VERSION 3.16)
-project(Mindset LANGUAGES CXX VERSION 1.0.1)
+project(Mindset LANGUAGES CXX VERSION 1.0.2)
 
 include(FetchContent)
 
@@ -91,10 +91,10 @@ list(APPEND LIBRARIES pugixml)
 
 # Create version.h
 
-if (EXISTS "${CMAKE_SOURCE_DIR}/.git")
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
     execute_process(
             COMMAND git rev-parse --short HEAD
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
             OUTPUT_VARIABLE GIT_COMMIT
             OUTPUT_STRIP_TRAILING_WHITESPACE
             ERROR_QUIET
