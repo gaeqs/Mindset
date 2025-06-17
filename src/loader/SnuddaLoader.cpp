@@ -126,6 +126,7 @@ namespace mindset
         }
 
         if (result.loadMorphologies) {
+            result.morphologyPath = properties.defineProperty(PROPERTY_PATH);
             result.neuriteRadius = properties.defineProperty(PROPERTY_RADIUS);
             result.neuriteParent = properties.defineProperty(PROPERTY_PARENT);
             result.neuriteType = properties.defineProperty(PROPERTY_NEURITE_TYPE);
@@ -244,6 +245,7 @@ namespace mindset
             if (!swc.isOk()) {
                 return swc.getError();
             }
+            swc.getResult()->setProperty(properties.morphologyPath, name);
             loaded[name] = swc.getResult();
         }
 

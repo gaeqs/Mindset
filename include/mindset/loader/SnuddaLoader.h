@@ -74,6 +74,7 @@ namespace mindset
 
         UID position;
 
+        UID morphologyPath;
         UID neuriteRadius;
         UID neuriteParent;
         UID neuriteType;

@@ -35,6 +35,8 @@ namespace mindset
     const std::string PROPERTY_MINI_COLUMN = "mindset:mini_column";
     const std::string PROPERTY_LAYER = "mindset:layer";
     const std::string PROPERTY_NAME = "mindset:name";
+    const std::string PROPERTY_PATH = "mindset:path";
+
 
     const std::string PROPERTY_SYNAPSE_PRE_NEURITE = "mindset:synapse_pre_neurite";
     const std::string PROPERTY_SYNAPSE_POST_NEURITE = "mindset:synapse_post_neurite";
