@@ -52,6 +52,7 @@ namespace mindset
 
         std::function<UID()> _provider;
         std::vector<std::string> _lines;
+        std::optional<std::filesystem::path> _path;
 
         [[nodiscard]] Result<SWCSegment, std::string> toSegment(size_t lineIndex) const;
 

@@ -67,7 +67,8 @@ namespace mindset
     }
 
     SWCLoader::SWCLoader(const LoaderCreateInfo& info, const std::filesystem::path& path) :
-        Loader(info)
+        Loader(info),
+        _path(path)
     {
         std::ifstream stream(path);
         std::string line;
@@ -96,6 +97,7 @@ namespace mindset
         auto propRadius = properties.defineProperty(PROPERTY_RADIUS);
         auto propParent = properties.defineProperty(PROPERTY_PARENT);
         auto propType = properties.defineProperty(PROPERTY_NEURITE_TYPE);
+        auto propPath = properties.defineProperty(PROPERTY_PATH);
         lock.unlock();
 
         invoke({LoaderStatusType::LOADING, "Parsing SWC file", STAGES, 1});
@@ -116,6 +118,9 @@ namespace mindset
         }
 
         auto morphology = std::make_shared<Morphology>();
+        if (_path) {
+            morphology->setProperty(propPath, _path->string());
+        }
         morphology->reserveSpaceForNeurites(_lines.size());
 
         invoke({LoaderStatusType::LOADING, "Parsing neurites", STAGES, 2});
