@@ -254,12 +254,21 @@ namespace mindset
         }
 
         /**
+         * Returns a view to iterate over all stored activities' UIDs.
+         * @returns A range view of UIDs.
+         */
+        [[nodiscard]] decltype(auto) getActivitiesUIDs() const
+        {
+            return _activities | std::views::keys;
+        }
+
+        /**
          * Returns a view to iterate over all stored activities in a mutable context.
          * @return A range view of mutable activities references.
          */
         [[nodiscard]] decltype(auto) getActivities()
         {
-            return _activities | std::views::transform([this](auto& pair) {
+            return _activities | std::views::transform([](auto& pair) {
                 return &pair.second;
             });
         }
@@ -270,7 +279,7 @@ namespace mindset
          */
         [[nodiscard]] decltype(auto) getActivities() const
         {
-            return _activities | std::views::transform([this](const auto& pair) {
+            return _activities | std::views::transform([](const auto& pair) {
                 return &pair.second;
             });
         }
