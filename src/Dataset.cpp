@@ -179,6 +179,16 @@ namespace mindset
         return _neuronRemovedEvent;
     }
 
+    hey::Observable<Activity*>& Dataset::getActivityAddedEvent()
+    {
+        return _activityAddedEvent;
+    }
+
+    hey::Observable<UID>& Dataset::getActivityRemovedEvent()
+    {
+        return _activityRemovedEvent;
+    }
+
     hey::Observable<void*>& Dataset::getClearEvent()
     {
         return _clearEvent;

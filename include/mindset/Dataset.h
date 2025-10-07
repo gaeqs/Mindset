@@ -58,7 +58,7 @@ namespace mindset
         hey::Observable<UID> _activityRemovedEvent;
         hey::Observable<void*> _clearEvent;
 
-      public:
+    public:
         /**
          * Constructs an empty Dataset object.
          */
@@ -188,6 +188,16 @@ namespace mindset
         void clear();
 
         /**
+         * The observable that manages the event triggered when an activity is added.
+         */
+        hey::Observable<Activity*>& getActivityAddedEvent();
+
+        /**
+         * The observable that manages the event triggered when an activity is removed.
+         */
+        hey::Observable<UID>& getActivityRemovedEvent();
+
+        /**
          * The observable that manages the event triggered when a neuron is added.
          */
         hey::Observable<Neuron*>& getNeuronAddedEvent();
@@ -227,7 +237,9 @@ namespace mindset
          */
         [[nodiscard]] decltype(auto) getNeurons()
         {
-            return _neurons | std::views::transform([this](auto& pair) { return Contextualized(&pair.second, this); });
+            return _neurons | std::views::transform([this](auto& pair) {
+                return Contextualized(&pair.second, this);
+            });
         }
 
         /**
@@ -236,7 +248,9 @@ namespace mindset
          */
         [[nodiscard]] decltype(auto) getNeurons() const
         {
-            return _neurons | std::views::transform([this](auto& pair) { return Contextualized(&pair.second, this); });
+            return _neurons | std::views::transform([this](auto& pair) {
+                return Contextualized(&pair.second, this);
+            });
         }
 
         /**
@@ -245,7 +259,9 @@ namespace mindset
          */
         [[nodiscard]] decltype(auto) getActivities()
         {
-            return _activities | std::views::transform([this](auto& pair) { return &pair.second; });
+            return _activities | std::views::transform([this](auto& pair) {
+                return &pair.second;
+            });
         }
 
         /**
@@ -254,7 +270,9 @@ namespace mindset
          */
         [[nodiscard]] decltype(auto) getActivities() const
         {
-            return _activities | std::views::transform([this](const auto& pair) { return &pair.second; });
+            return _activities | std::views::transform([this](const auto& pair) {
+                return &pair.second;
+            });
         }
 
         /**
@@ -265,7 +283,9 @@ namespace mindset
          */
         [[nodiscard]] decltype(auto) getNonContextualizedNeurons()
         {
-            return _neurons | std::views::transform([](auto& pair) { return &pair.second; });
+            return _neurons | std::views::transform([](auto& pair) {
+                return &pair.second;
+            });
         }
 
         /**
@@ -274,7 +294,9 @@ namespace mindset
          */
         [[nodiscard]] decltype(auto) getNonContextualizedNeurons() const
         {
-            return _neurons | std::views::transform([](auto& pair) { return &pair.second; });
+            return _neurons | std::views::transform([](auto& pair) {
+                return &pair.second;
+            });
         }
     };
 } // namespace mindset
