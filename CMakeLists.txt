@@ -24,7 +24,7 @@ include(FetchContent)
 
 # Configuration options
 option(MINDSET_BUILD_SHARED "Build Mindset as a shared library" OFF)
-option(MINDSET_USE_BRION "Import Brion" ON)
+option(MINDSET_USE_BRION "Import Brion" OFF)
 option(MINDSET_EXTERNAL_BRION "Use an external version of Brion" OFF)
 option(MINDSET_TESTS "Include Mindset tests" ON)
 
@@ -72,10 +72,12 @@ if (MINDSET_USE_BRION)
 endif ()
 
 if (NOT TARGET HighFive)
+    # This line is very important if we don't want HighFive to search for Boost's system component (removed in Boost 1.89.0).
+    find_package(Boost REQUIRED COMPONENTS serialization)
     FetchContent_Declare(
             HighFive
-            GIT_REPOSITORY https://github.com/BlueBrain/HighFive.git
-            GIT_TAG v2.7.1
+            GIT_REPOSITORY https://github.com/highfive-devs/highfive.git
+            GIT_TAG v3.2.0
     )
 
     FetchContent_MakeAvailable(HighFive)
