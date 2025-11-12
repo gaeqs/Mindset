@@ -76,8 +76,8 @@ if (NOT TARGET HighFive)
     find_package(Boost REQUIRED COMPONENTS serialization)
     FetchContent_Declare(
             HighFive
-            GIT_REPOSITORY https://github.com/highfive-devs/highfive.git
-            GIT_TAG v3.2.0
+            GIT_REPOSITORY https://github.com/BlueBrain/HighFive.git
+            GIT_TAG v2.7.1
     )
 
     FetchContent_MakeAvailable(HighFive)
